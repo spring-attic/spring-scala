@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.springframework.scala</groupId>
+    <artifactId>spring-scala</artifactId>
+    <packaging>jar</packaging>
+    <version>0.1.RELEASE-SNAPSHOT</version>
+    <name>Spring Scala</name>
+    <inceptionYear>2011</inceptionYear>
+    <developers>
+        <developer>
+            <id>apoutsma</id>
+            <name>Arjen Poutsma</name>
+            <email>apoutsma@vmware.com</email>
+            <organization>SpringSource - a division of VMware</organization>
+            <organizationUrl>http://www.springsource.com</organizationUrl>
+            <roles>
+                <role>Project Admin</role>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <distributionManagement>
+        <repository>
+            <id>spring-release</id>
+            <name>Spring Release Repository</name>
+            <url>s3://maven.springframework.org/release</url>
+        </repository>
+        <snapshotRepository>
+            <id>spring-s3</id>
+            <name>Spring Snapshot Repository</name>
+            <url>s3://maven.springframework.org/snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
+    <scm>
+        <connection>scm:svn:https://src.springframework.org/svn/spring-ws/trunk</connection>
+        <developerConnection>scm:svn:https://src.springframework.org/svn/spring-ws/trunk/</developerConnection>
+        <url>https://fisheye.springframework.org/browse/spring-ws/trunk</url>
+    </scm>
+    <properties>
+        <spring.framework.version>3.0.6.RELEASE</spring.framework.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</pluginRepository>
+	</pluginRepositories>
+    <build>
+        <pluginManagement>
+		            <plugins>
+		                <plugin>
+		                    <artifactId>maven-compiler-plugin</artifactId>
+		                    <version>2.1</version>
+		                    <configuration>
+		                        <source>1.5</source>
+		                        <target>1.5</target>
+		                    </configuration>
+		                </plugin>
+		                <plugin>
+		                    <artifactId>maven-surefire-plugin</artifactId>
+		                    <version>2.3</version>
+		                    <configuration>
+		                        <forkMode>once</forkMode>
+		                        <childDelegation>false</childDelegation>
+		                    </configuration>
+		                </plugin>
+		                <plugin>
+		                    <artifactId>maven-jar-plugin</artifactId>
+		                    <version>2.3</version>
+		                </plugin>
+		                <plugin>
+		                  <artifactId>maven-resources-plugin</artifactId>
+		                  <version>2.5</version>
+		                  <configuration>
+		                    <escapeString>\</escapeString>
+		                  </configuration>
+		                </plugin>                
+						<plugin>
+							<groupId>org.scala-tools</groupId>
+							<artifactId>maven-scala-plugin</artifactId>
+							<version>2.9.1</version>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-compiler-plugin</artifactId>
+							<version>2.0.2</version>
+						</plugin>
+					</plugins>
+		        </pluginManagement>
+		        <plugins>
+		            <!-- Building -->
+                    <plugin>
+		                <artifactId>maven-compiler-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>compile</phase>
+								<goals>
+									<goal>compile</goal>
+								</goals>
+							</execution>
+						</executions>
+		            </plugin>
+		            <plugin>
+		                <artifactId>maven-surefire-plugin</artifactId>
+		            </plugin>
+		            <plugin>
+		                <artifactId>maven-jar-plugin</artifactId>
+		            </plugin>
+					<plugin>
+						<groupId>org.scala-tools</groupId>
+						<artifactId>maven-scala-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>scala-compile-first</id>
+								<phase>process-resources</phase>
+								<goals>
+								    <goal>add-source</goal>
+									<goal>compile</goal>
+								</goals>
+							</execution>									
+							<execution>
+								<id>scala-test-compile</id>
+								<phase>process-test-resources</phase>
+								<goals>
+									<goal>testCompile</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+		        </plugins>
+		    </build>
+			<dependencies>
+				<dependency>
+					<groupId>org.scala-lang</groupId>
+					<artifactId>scala-library</artifactId>
+					<version>2.9.0</version>
+				</dependency>
+                <!-- Spring dependencies -->
+                <dependency>
+	                <groupId>org.springframework</groupId>
+	                <artifactId>spring-web</artifactId>
+	                <version>${spring.framework.version}</version>
+	            </dependency>
+	            
+			</dependencies>
+		
+</project>
