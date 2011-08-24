@@ -1,7 +1,5 @@
 package org.springframework.scala.web.client
 
-;
-
 import org.scalatest.mock.EasyMockSugar
 import org.springframework.web.client.RestOperations
 import java.util.HashMap
