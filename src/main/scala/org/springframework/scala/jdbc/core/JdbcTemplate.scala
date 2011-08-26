@@ -18,9 +18,9 @@ package org.springframework.scala.jdbc.core
 
 import scalaj.collection.Imports._
 import java.sql.{Statement, Connection, ResultSet}
-import org.springframework.jdbc.core._
+import org.springframework.jdbc.core.{RowMapper, RowCallbackHandler, ResultSetExtractor, StatementCallback, JdbcOperations, ConnectionCallback}
 
-class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcOperations) {
+class JdbcTemplate(val javaTemplate: JdbcOperations) {
 
   def this() {
     this (new org.springframework.jdbc.core.JdbcTemplate())
