@@ -12,7 +12,8 @@ object ScalaDriver {
     val template = new RestTemplate()
 //    template.delete("http://localhost")
 
-    val result = template.execute(new URI("http://localhost"), HttpMethod.GET) {
+    val result = template.execute(new URI("http://localhost"), HttpMethod.GET, null)
+    {
       response: ClientHttpResponse => FileCopyUtils.copyToString(new InputStreamReader(response.getBody))
     }
     println(result.getClass)
