@@ -1,3 +1,5 @@
+package org.springframework.scala
+
 /*
  * Copyright 2011 the original author or authors.
  *
@@ -14,22 +16,30 @@
  * limitations under the License.
  */
 
-package org.springframework.scala.web.client
-
 import java.net.URI
+import jdbc.core.JdbcTemplate
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.util.FileCopyUtils
 import java.io.InputStreamReader
+import web.client.RestTemplate
 
 object ScalaDriver {
 
+  def jdbcTemplate() {
+    val template = new JdbcTemplate();
+val result: Seq[String] = template.query("SELECT NAME FROM USERS") {
+  (resultSet, i) => {
+    resultSet.getNString("NAME")
+  }
+}
+    println(result)
+  }
+
   def main(args: Array[String]) {
     val template = new RestTemplate()
-//    template.delete("http://localhost")
-
-    val result = template.execute(new URI("http://localhost"), HttpMethod.GET, null)
-    {
+    //    template.delete("http://localhost")
+    val result = template.execute(new URI("http://localhost"), HttpMethod.GET, null) {
       response: ClientHttpResponse => FileCopyUtils.copyToString(new InputStreamReader(response.getBody))
     }
     println(result.getClass)

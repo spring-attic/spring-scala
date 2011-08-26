@@ -20,9 +20,8 @@ import org.easymock.EasyMock._
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.mock.EasyMockSugar
 import org.springframework.jdbc.core.{RowMapper, JdbcOperations}
-import org.easymock.EasyMock
 import scalaj.collection.Imports._
-
+import org.easymock.EasyMock
 
 class JdbcTemplateTest extends FunSuite with EasyMockSugar with BeforeAndAfter {
 
