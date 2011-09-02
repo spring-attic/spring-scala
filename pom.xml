@@ -48,7 +48,7 @@
     </scm>
     <properties>
         <spring.framework.version>3.0.6.RELEASE</spring.framework.version>
-        <scala.version>2.9.0</scala.version>
+        <scala.version>2.9.1</scala.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <repositories>
@@ -102,7 +102,7 @@
                 <dependency>
                   <groupId>org.scalaj</groupId>
                   <artifactId>scalaj-collection_${scala.version}</artifactId>
-                  <version>1.1</version>
+                  <version>1.2</version>
                 </dependency>
                 <!-- Spring dependencies -->
                 <dependency>
