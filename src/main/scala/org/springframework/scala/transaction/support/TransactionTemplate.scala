@@ -17,15 +17,25 @@
 package org.springframework.scala.transaction.support
 
 import org.springframework.transaction.support.{TransactionCallback, TransactionOperations}
-import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.{TransactionDefinition, PlatformTransactionManager, TransactionStatus}
 
 /**
  * @author Arjen Poutsma
  */
 class TransactionTemplate(val javaTemplate: TransactionOperations) {
 
-  def this() {
-    this (new org.springframework.transaction.support.TransactionTemplate())
+  def this(transactionManager: PlatformTransactionManager) {
+    this (new org.springframework.transaction.support.TransactionTemplate(transactionManager))
+  }
+
+  /**
+   * Construct a new TransactionTemplate using the given transaction manager,
+   * taking its default settings from the given transaction definition.
+   * @param transactionManager the transaction management strategy to be used
+   * @param transactionDefinition the transaction definition to copy the default settings from. Local properties can still be set to change values.
+   */
+  def this(transactionManager: PlatformTransactionManager, transactionDefinition: TransactionDefinition) {
+    this (new org.springframework.transaction.support.TransactionTemplate(transactionManager, transactionDefinition))
   }
 
   /**

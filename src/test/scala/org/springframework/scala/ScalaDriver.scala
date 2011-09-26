@@ -1,5 +1,3 @@
-package org.springframework.scala
-
 /*
  * Copyright 2011 the original author or authors.
  *
@@ -16,25 +14,17 @@ package org.springframework.scala
  * limitations under the License.
  */
 
+package org.springframework.scala
+
 import java.net.URI
-import jdbc.core.JdbcTemplate
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.util.FileCopyUtils
 import java.io.InputStreamReader
 import web.client.RestTemplate
 
-object ScalaDriver {
 
-  def jdbcTemplate() {
-    val template = new JdbcTemplate();
-val result: Seq[String] = template.query("SELECT NAME FROM USERS") {
-  (resultSet, i) => {
-    resultSet.getNString("NAME")
-  }
-}
-    println(result)
-  }
+object ScalaDriver {
 
   def main(args: Array[String]) {
     val template = new RestTemplate()
