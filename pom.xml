@@ -49,6 +49,7 @@
     <properties>
         <spring.framework.version>3.0.6.RELEASE</spring.framework.version>
         <scala.version>2.9.1</scala.version>
+        <scala.plugin.version>2.15.2</scala.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <repositories>
@@ -73,7 +74,7 @@
                 <plugin>
                     <groupId>org.scala-tools</groupId>
                     <artifactId>maven-scala-plugin</artifactId>
-                    <version>2.9.1</version>
+                    <version>${scala.plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -91,43 +92,75 @@
                 </executions>
             </plugin>
         </plugins>
-		    </build>
-			<dependencies>
-                <!-- Scala dependencies -->
-                <dependency>
-					<groupId>org.scala-lang</groupId>
-					<artifactId>scala-library</artifactId>
-					<version>${scala.version}</version>
-				</dependency>
-                <dependency>
-                  <groupId>org.scalaj</groupId>
-                  <artifactId>scalaj-collection_${scala.version}</artifactId>
-                  <version>1.2</version>
-                </dependency>
-                <!-- Spring dependencies -->
-                <dependency>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-web</artifactId>
-	                <version>${spring.framework.version}</version>
-	            </dependency>
-                <dependency>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-jdbc</artifactId>
-	                <version>${spring.framework.version}</version>
-	            </dependency>
-                <!-- Testing dependencies -->
-                <dependency>
-                    <groupId>org.scalatest</groupId>
-                    <artifactId>scalatest_${scala.version}</artifactId>
-                    <version>1.6.1</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.easymock</groupId>
-                    <artifactId>easymock</artifactId>
-                    <version>3.0</version>
-                    <scope>test</scope>
-                </dependency>
-			</dependencies>
+    </build>
+    <reporting>
+      <plugins>
+        <plugin>
+          <groupId>org.scala-tools</groupId>
+          <artifactId>maven-scala-plugin</artifactId>
+            <version>${scala.plugin.version}</version>
+        </plugin>
+      </plugins>
+    </reporting>
+    <dependencies>
+        <!-- Scala dependencies -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.scalaj</groupId>
+          <artifactId>scalaj-collection_${scala.version}</artifactId>
+          <version>1.2</version>
+        </dependency>
+        <!-- Spring dependencies -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+            <version>${spring.framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.framework.version}</version>
+        </dependency>
+        <!-- Testing dependencies -->
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.version}</artifactId>
+            <version>1.6.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.framework.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.hsqldb</groupId>
+          <artifactId>hsqldb-j5</artifactId>
+          <version>2.2.4</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 		
 </project>
