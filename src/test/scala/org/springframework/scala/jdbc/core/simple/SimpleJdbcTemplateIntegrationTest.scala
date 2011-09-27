@@ -26,7 +26,6 @@ class SimpleJdbcTemplateIntegrationTest extends FunSuite with BeforeAndAfter {
 	private val template = new SimpleJdbcTemplate(db)
 
 	test("queryForObject with Map") {
-		template.javaTemplate.
 		expect("John") {
 			template.queryForObject("SELECT * FROM USERS WHERE ID = :id", Map("id" -> 1)) {
 				(set, i) => {
