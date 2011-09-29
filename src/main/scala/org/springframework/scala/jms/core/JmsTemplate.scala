@@ -18,11 +18,23 @@ package org.springframework.scala.jms.core
 
 import org.springframework.jms.core.{BrowserCallback, MessagePostProcessor, MessageCreator, JmsOperations}
 import javax.jms.{Queue, QueueBrowser, Destination, Message, Session, ConnectionFactory}
+
 /**
+ * Scala-based convenience wrapper for the Spring [[org.springframework.jms.core.JmsTemplate]], taking
+ * advantage of functions and Scala types.
+
  * @author Arjen Poutsma
+ * @since 1.0
+ * @constructor Creates a `JmsTemplate` that wraps the given Java template
+ * @param javaTemplate the Java `JmsTemplate` to wrap
  */
 class JmsTemplate(val javaTemplate: JmsOperations) {
 
+	/**
+	 * Create a new JmsTemplate, given a ConnectionFactory.
+	 *
+	 * @param connectionFactory the ConnectionFactory to obtain Connections from
+	 */
 	def this(connectionFactory: ConnectionFactory) {
 		this (new org.springframework.jms.core.JmsTemplate(connectionFactory))
 	}
