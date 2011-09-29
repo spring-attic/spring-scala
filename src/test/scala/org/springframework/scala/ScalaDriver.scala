@@ -16,24 +16,18 @@
 
 package org.springframework.scala
 
-import java.net.URI
-import org.springframework.http.HttpMethod
-import org.springframework.http.client.ClientHttpResponse
-import org.springframework.util.FileCopyUtils
-import java.io.InputStreamReader
 import web.client.RestTemplate
-
 
 object ScalaDriver {
 
-  def main(args: Array[String]) {
-    val template = new RestTemplate()
-    //    template.delete("http://localhost")
-    val result = template.execute(new URI("http://localhost"), HttpMethod.GET, null) {
-      response: ClientHttpResponse => FileCopyUtils.copyToString(new InputStreamReader(response.getBody))
-    }
-    println(result.getClass)
+	def main(args: Array[String]) {
+		val template = new RestTemplate()
+		template.getForAny[String]("http://localhost") foreach println
+		//    template.delete("http://localhost")
+		//    val result = template.execute(new URI("http://localhost"), HttpMethod.GET, null) {
+		//      response: ClientHttpResponse => FileCopyUtils.copyToString(new InputStreamReader(response.getBody))
+		//    }
 
 
-  }
+	}
 }

@@ -18,41 +18,75 @@ package org.springframework.scala.web.client
 
 import java.net.URI
 import scalaj.collection.Imports._
-import org.springframework.web.client.{RequestCallback, ResponseExtractor}
 import org.springframework.http.HttpMethod
-import org.springframework.http.client.ClientHttpResponse
-
+import org.springframework.http.client.{ClientHttpRequestFactory, ClientHttpResponse}
+import org.springframework.web.client.{RequestCallback, ResponseExtractor}
+/**
+ * @author Arjen Poutsma
+ * @since 1.0
+ * @constructor Creates a `RestTemplate` that wraps the given Java template
+ * @param javaTemplate the Java `RestTemplate` to wrap
+ */
 class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperations) {
 
-  def this() {
-    this (new org.springframework.web.client.RestTemplate())
-  }
+	/**
+	 * Create a new instance of the `RestTemplate` given the ClientHttpRequestFactory to obtain requests from
+	 *
+	 * @param requestFactory HTTP request factory to use
+	 */
+	def this(requestFactory: ClientHttpRequestFactory) {
+		this (new org.springframework.web.client.RestTemplate(requestFactory))
+	}
 
-  // DELETE
-  def delete(url: String, urlVariables: Any*) {
-    javaTemplate.delete(url, asInstanceOfAnyRef(urlVariables): _*)
-  }
+	/**
+	 * Create a new instance of the `RestTemplate` using default settings.
+	 */
+	def this() {
+		this (new org.springframework.web.client.RestTemplate())
+	}
 
-  def delete[T](url: String, urlVariables: Map[String, T]) {
-    javaTemplate.delete(url, urlVariables.asJava[String, T])
-  }
+	// GET
 
-  def delete(url: URI) {
-    javaTemplate.delete(url)
-  }
+	/**
+	 * Retrieve a representation by doing a GET on the specified URL.
+	 * The response (if any) is converted and returned.
+	 *
+	 * URI Template variables are expanded using the given URI variables, if any.
+	 * 
+	 * @param url the URL
+	 * @param uriVariables the variables to expand the template
+	 * @return the converted object
+	 */
+	def getForAny[T <: AnyRef](url: String, uriVariables: Any*)(implicit manifest: ClassManifest[T]): Option[T] = {
+		val responseType: Class[T] = manifest.erasure.asInstanceOf[Class[T]]
+		Option(javaTemplate.getForObject(url, responseType, asInstanceOfAnyRef(uriVariables): _*))
+	}
 
-  def execute[T](url: URI, method: HttpMethod, requestCallback: RequestCallback)
-                (responseClosure: ClientHttpResponse => T) = {
-    javaTemplate.execute(url, method, requestCallback, new ResponseExtractor[T] {
-      def extractData(response: ClientHttpResponse) = {
-        responseClosure(response)
-      }
-    })
-  }
+		// DELETE
+	def delete(url: String, urlVariables: Any*) {
+		javaTemplate.delete(url, asInstanceOfAnyRef(urlVariables): _*)
+	}
 
-  private def asInstanceOfAnyRef(seq: Seq[Any]) = {
-    seq.map(_.asInstanceOf[AnyRef]);
-  }
+	def delete[T](url: String, urlVariables: Map[String, T]) {
+		javaTemplate.delete(url, urlVariables.asJava[String, T])
+	}
+
+	def delete(url: URI) {
+		javaTemplate.delete(url)
+	}
+
+	def execute[T](url: URI, method: HttpMethod, requestCallback: RequestCallback)
+	              (responseClosure: ClientHttpResponse => T) = {
+		javaTemplate.execute(url, method, requestCallback, new ResponseExtractor[T] {
+			def extractData(response: ClientHttpResponse) = {
+				responseClosure(response)
+			}
+		})
+	}
+
+	private def asInstanceOfAnyRef(seq: Seq[Any]) = {
+		seq.map(_.asInstanceOf[AnyRef]);
+	}
 
 
 }
