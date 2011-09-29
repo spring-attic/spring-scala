@@ -130,6 +130,13 @@
             <artifactId>spring-web</artifactId>
             <version>${spring.framework.version}</version>
         </dependency>
+        <!-- Java EE dependencies -->
+        <dependency>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Testing dependencies -->
         <dependency>
             <groupId>org.scalatest</groupId>
