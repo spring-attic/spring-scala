@@ -17,16 +17,40 @@
 package org.springframework.scala
 
 import web.client.RestTemplate
+import java.net.URI
+import org.springframework.http.HttpMethod
+import org.springframework.util.FileCopyUtils
+import org.springframework.http.client.{ClientHttpResponse, ClientHttpRequest}
+import java.io.InputStreamReader
 
 object ScalaDriver {
 
 	def main(args: Array[String]) {
 		val template = new RestTemplate()
-		template.getForAny[String]("http://localhost") foreach println
-		//    template.delete("http://localhost")
-		//    val result = template.execute(new URI("http://localhost"), HttpMethod.GET, null) {
-		//      response: ClientHttpResponse => FileCopyUtils.copyToString(new InputStreamReader(response.getBody))
-		//    }
+//		println("1")
+//		template.getForAny[String]("http://{host}", "localhost") foreach println
+//		println("2")
+//		template.getForAny[String]("http://{host}", Map("host" -> "localhost")) foreach println
+//		println("3")
+//		template.getForAny[String](new URI("http://localhost")) foreach println
+//		println("4")
+//		val entity = template.getForEntity[String]("http://localhost")
+//		entity.headers.asScala foreach println
+//		println(entity.body)
+
+		val r = template.exchange[String]("http://localhost", HttpMethod.GET, None)
+		println("r = " + r.getBody)
+
+		val t = template.exchange[String]("http://localhost", HttpMethod.GET,  None)
+		println("t = " + t.getBody)
+
+
+		val result = template.execute(new URI("http://localhost"), HttpMethod.GET) {
+			request: ClientHttpRequest => Unit
+		} {
+			response: ClientHttpResponse => FileCopyUtils.copyToString(new InputStreamReader(response.getBody))
+		}
+		println(result foreach  println )
 
 
 	}
