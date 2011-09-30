@@ -22,7 +22,7 @@ import javax.jms.{Queue, QueueBrowser, Destination, Message, Session, Connection
 /**
  * Scala-based convenience wrapper for the Spring [[org.springframework.jms.core.JmsTemplate]], taking
  * advantage of functions and Scala types.
-
+ *
  * @author Arjen Poutsma
  * @since 1.0
  * @constructor Creates a `JmsTemplate` that wraps the given Java template
