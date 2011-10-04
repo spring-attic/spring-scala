@@ -38,7 +38,7 @@ trait TransactionManagement {
 	val transactionManager: PlatformTransactionManager
 
 	/**
-	 * Execute the given within a transaction.
+	 * Execute the given function within a transaction.
 	 *
 	 * @tparam T the return type of the function
 	 * @param function the function to be executed transactionally
