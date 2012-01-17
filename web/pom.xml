@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+         <groupId>org.springframework.scala</groupId>
+         <artifactId>spring-scala-parent</artifactId>
+         <version>0.1.RELEASE-SNAPSHOT</version>
+         <relativePath>../parent/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>spring-web</artifactId>
+    <packaging>jar</packaging>
+    <name>Spring Web Scala</name>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.scalaj</groupId>
+            <artifactId>scalaj-collection_${scala.version}</artifactId>
+        </dependency>
+    </dependencies>
+</project>
