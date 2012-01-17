@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.scala</groupId>
     <artifactId>spring-scala</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <version>0.1.RELEASE-SNAPSHOT</version>
     <name>Spring Scala</name>
-    <inceptionYear>2011</inceptionYear>
     <developers>
         <developer>
             <id>apoutsma</id>
@@ -21,6 +19,24 @@
             </roles>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <id>tareqabedrabbo</id>
+            <name>Tareq Abed Rabbo</name>
+            <email>tareq.abedrabbo@gmail.com</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>0</timezone>
+        </developer>
+        <developer>
+            <id>rstoyanchev</id>
+            <name>Rossen Stoyanchev</name>
+            <email>rstoyanchev@vmware.com</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>-5</timezone>
+        </developer>
     </developers>
     <licenses>
         <license>
@@ -29,145 +45,12 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <distributionManagement>
-        <repository>
-            <id>spring-release</id>
-            <name>Spring Release Repository</name>
-            <url>s3://maven.springframework.org/release</url>
-        </repository>
-        <snapshotRepository>
-            <id>spring-s3</id>
-            <name>Spring Snapshot Repository</name>
-            <url>s3://maven.springframework.org/snapshot</url>
-        </snapshotRepository>
-    </distributionManagement>
-    <scm>
-        <connection>scm:svn:https://src.springframework.org/svn/spring-ws/trunk</connection>
-        <developerConnection>scm:svn:https://src.springframework.org/svn/spring-ws/trunk/</developerConnection>
-        <url>https://fisheye.springframework.org/browse/spring-ws/trunk</url>
-    </scm>
-    <properties>
-        <spring.framework.version>3.0.6.RELEASE</spring.framework.version>
-        <scala.version>2.9.1</scala.version>
-        <scala.plugin.version>2.15.2</scala.plugin.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    <repositories>
-        <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </repository>
-    </repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>scala-tools.org</id>
-			<name>Scala-tools Maven2 Repository</name>
-			<url>http://scala-tools.org/repo-releases</url>
-		</pluginRepository>
-	</pluginRepositories>
-    <build>
-        <sourceDirectory>src/main/scala</sourceDirectory>
-        <testSourceDirectory>src/test/scala</testSourceDirectory>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.scala-tools</groupId>
-                    <artifactId>maven-scala-plugin</artifactId>
-                    <version>${scala.plugin.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <executions>
-                  <execution>
-                    <goals>
-                      <goal>compile</goal>
-                      <goal>testCompile</goal>
-                    </goals>
-                  </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    <reporting>
-      <plugins>
-        <plugin>
-          <groupId>org.scala-tools</groupId>
-          <artifactId>maven-scala-plugin</artifactId>
-            <version>${scala.plugin.version}</version>
-        </plugin>
-      </plugins>
-    </reporting>
-    <dependencies>
-        <!-- Scala dependencies -->
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.scalaj</groupId>
-          <artifactId>scalaj-collection_${scala.version}</artifactId>
-          <version>1.2</version>
-        </dependency>
-        <!-- Spring dependencies -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.framework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jms</artifactId>
-            <version>${spring.framework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.framework.version}</version>
-        </dependency>
-        <!-- Java EE dependencies -->
-        <dependency>
-            <groupId>javax.jms</groupId>
-            <artifactId>jms</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- Testing dependencies -->
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.version}</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>3.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.framework.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.hsqldb</groupId>
-          <artifactId>hsqldb-j5</artifactId>
-          <version>2.2.4</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-		
+    <modules>
+        <module>parent</module>
+        <module>tx</module>
+        <module>jms</module>
+        <module>jdbc</module>
+        <module>web</module>
+        <module>mvc</module>
+    </modules>
 </project>
