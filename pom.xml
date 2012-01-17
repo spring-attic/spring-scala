@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.scala</groupId>
     <artifactId>spring-scala</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <version>0.1.RELEASE-SNAPSHOT</version>
     <name>Spring Scala</name>
-    <inceptionYear>2011</inceptionYear>
     <developers>
         <developer>
             <id>apoutsma</id>
@@ -20,6 +18,24 @@
                 <role>Developer</role>
             </roles>
             <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>tareqabedrabbo</id>
+            <name>Tareq Abed Rabbo</name>
+            <email>tareq.abedrabbo@gmail.com</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>0</timezone>
+        </developer>
+        <developer>
+            <id>rstoyanchev</id>
+            <name>Rossen Stoyanchev</name>
+            <email>rstoyanchev@vmware.com</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>-5</timezone>
         </developer>
     </developers>
     <licenses>
@@ -185,4 +201,12 @@
         </dependency>
     </dependencies>
 		
+    <modules>
+        <module>parent</module>
+        <module>tx</module>
+        <module>jms</module>
+        <module>jdbc</module>
+        <module>web</module>
+        <module>mvc</module>
+    </modules>
 </project>
