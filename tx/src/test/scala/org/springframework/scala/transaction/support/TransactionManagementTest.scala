@@ -16,8 +16,8 @@ package org.springframework.scala.transaction.support
  * limitations under the License.
  */
 
-import collection.immutable.Map
-import scalaj.collection.Imports._
+import scala.collection.immutable.Map
+import scala.collection.JavaConverters._
 import org.springframework.transaction.annotation.{Isolation, Propagation}
 import org.scalatest.FunSuite
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -26,37 +26,35 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 
 class TransactionManagementTest extends FunSuite with TransactionManagement {
 
-	private val db = new EmbeddedDatabaseBuilder().addDefaultScripts().build()
+  private val db = new EmbeddedDatabaseBuilder().addDefaultScripts().build()
 
-	private val template = new SimpleJdbcTemplate(db)
+  private val template = new SimpleJdbcTemplate(db)
 
-	val transactionManager = new DataSourceTransactionManager(db)
+  val transactionManager = new DataSourceTransactionManager(db)
 
-	test("default") {
-		transactional() {
-			status => {
-				val args = Map("id" -> 3, "first_name" -> "John", "last_name" -> "Johnson").asJava
-				template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)",
-					args)
-			}
-		}
-		expect(1) {
-			template.queryForInt("SELECT COUNT(ID) FROM USERS WHERE ID = 3")
-		}
-	}
+  test("default") {
+    transactional() {
+      status => {
+        val args = Map("id" -> 3, "first_name" -> "John", "last_name" -> "Johnson").asJava
+        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", args)
+      }
+    }
+    expect(1) {
+      template.queryForInt("SELECT COUNT(ID) FROM USERS WHERE ID = 3")
+    }
+  }
 
-	test("custom parameters") {
-		transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ) {
-			status => {
-				val args = Map("id" -> 4, "first_name" -> "John", "last_name" -> "Johnson").asJava
-				template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)",
-					args)
-			}
-		}
-		expect(1) {
-			template.queryForInt("SELECT COUNT(ID) FROM USERS WHERE ID = 4")
-		}
+  test("custom parameters") {
+    transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ) {
+      status => {
+        val args = Map("id" -> 4, "first_name" -> "John", "last_name" -> "Johnson").asJava
+        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", args)
+      }
+    }
+    expect(1) {
+      template.queryForInt("SELECT COUNT(ID) FROM USERS WHERE ID = 4")
+    }
 
-	}
+  }
 
 }
