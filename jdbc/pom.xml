@@ -17,10 +17,6 @@
             <artifactId>spring-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.scalaj</groupId>
-            <artifactId>scalaj-collection_${scala.version}</artifactId>
-        </dependency>
-        <dependency>
           <groupId>org.hsqldb</groupId>
           <artifactId>hsqldb-j5</artifactId>
           <scope>test</scope>

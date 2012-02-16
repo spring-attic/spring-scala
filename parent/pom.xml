@@ -134,11 +134,6 @@
                 <artifactId>scala-library</artifactId>
                 <version>${scala.version}</version>
             </dependency>
-            <dependency>
-              <groupId>org.scalaj</groupId>
-              <artifactId>scalaj-collection_${scala.version}</artifactId>
-              <version>1.2</version>
-            </dependency>
             <!-- JEE dependencies -->
             <dependency>
                 <groupId>javax.servlet</groupId>
