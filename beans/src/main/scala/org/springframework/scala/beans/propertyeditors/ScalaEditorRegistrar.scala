@@ -17,15 +17,22 @@ package org.springframework.scala.beans.propertyeditors
  */
 
 import org.springframework.beans.{PropertyEditorRegistry, PropertyEditorRegistrar}
-import scala.collection.mutable.ArrayBuffer
+import collection.mutable.{ListBuffer, ArrayBuffer}
+import collection.immutable.VectorBuilder
 
 /**
+ * Property editor registrar for Scala property editors.
  * @author Arjen Poutsma
  */
 class ScalaEditorRegistrar extends PropertyEditorRegistrar {
 
   def registerCustomEditors(registry: PropertyEditorRegistry) {
-    registry.registerCustomEditor(classOf[ArrayBuffer[Any]], new SeqEditor(classOf[ArrayBuffer[Any]]))
-    registry.registerCustomEditor(classOf[Seq[Any]], new SeqEditor(classOf[Seq[Any]]))
+	  registry.registerCustomEditor(classOf[Seq[Any]], new ScalaCollectionEditor(new ArrayBuffer[Any]()))
+	  registry.registerCustomEditor(classOf[ArrayBuffer[Any]], new ScalaCollectionEditor(new ArrayBuffer[Any]()))
+
+	  registry.registerCustomEditor(classOf[List[Any]], new ScalaCollectionEditor(new ListBuffer[Any]()))
+
+	  registry.registerCustomEditor(classOf[Vector[Any]], new ScalaCollectionEditor(new VectorBuilder[Any]()))
   }
+
 }

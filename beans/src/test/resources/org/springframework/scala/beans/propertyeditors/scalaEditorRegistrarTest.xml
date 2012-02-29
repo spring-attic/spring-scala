@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="configurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="propertyEditorRegistrars">
+                <bean class="org.springframework.scala.beans.propertyeditors.ScalaEditorRegistrar"/>
+        </property>
+    </bean>
+    
+    <bean id="collectionBean" class="org.springframework.scala.beans.propertyeditors.CollectionBean">
+        <property name="seq" value="one"/>
+        <property name="list" ref="javaList"/>
+        <property name="vector" value="one"/>
+        <property name="arrayBuffer1" ref="javaList"/>
+        <property name="arrayBuffer2" ref="javaList"/>
+    </bean>
+
+    <util:list id="javaList">
+        <value>one</value>
+        <value>two</value>
+        <value>three</value>
+    </util:list>
+
+</beans>
