@@ -23,15 +23,34 @@ import org.springframework.context.support.ClassPathXmlApplicationContext
  * @author Arjen Poutsma
  */
 class ScalaEditorRegistrarTest extends FunSuite {
-	
+
+	val applicationContext = new ClassPathXmlApplicationContext("scalaEditorRegistrarTest.xml", getClass)
+
+	test("primitives") {
+		val bean = applicationContext.getBean("primitivesBean", classOf[PrimitivesBean])
+		assert(bean.byte == 42)
+		assert(bean.short == 42)
+		assert(bean.int == 42)
+		assert(bean.long == 42)
+		assert(bean.char == '4')
+		assert(bean.float == 42)
+		assert(bean.double == 42)
+		assert(bean.bool)
+		assert(bean.string == "foo")
+	}
+
+	test("types") {
+		val bean = applicationContext.getBean("typesBean", classOf[ScalaTypesBean])
+		assert(bean.regex.toString() == "\\d")
+	}
+
 	test("collections") {
-    val applicationContext = new ClassPathXmlApplicationContext("scalaEditorRegistrarTest.xml", getClass)
-		val bean = applicationContext.getBean("collectionBean", classOf[CollectionBean])
+		val bean = applicationContext.getBean("collectionBean", classOf[ScalaCollectionsBean])
 		assert(!bean.seq.isEmpty)
 		assert(bean.list.contains("one"))
 		assert(bean.list.contains("two"))
 		assert(bean.list.contains("three"))
-		
+
 		bean.arrayBuffer1.remove(1)
 
 		assert(bean.arrayBuffer1.contains("one"))
@@ -42,6 +61,6 @@ class ScalaEditorRegistrarTest extends FunSuite {
 		assert(bean.arrayBuffer2.contains("two"))
 		assert(bean.arrayBuffer2.contains("three"))
 	}
-	
+
 
 }

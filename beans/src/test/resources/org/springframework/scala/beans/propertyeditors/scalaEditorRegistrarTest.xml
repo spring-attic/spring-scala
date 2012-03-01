@@ -11,7 +11,23 @@
         </property>
     </bean>
     
-    <bean id="collectionBean" class="org.springframework.scala.beans.propertyeditors.CollectionBean">
+    <bean id="primitivesBean" class="org.springframework.scala.beans.propertyeditors.PrimitivesBean">
+        <property name="byte" value="42"/>
+        <property name="short" value="42"/>
+        <property name="int" value="42"/>
+        <property name="long" value="42"/>
+        <property name="char" value="4"/>
+        <property name="float" value="42"/>
+        <property name="double" value="42"/>
+        <property name="bool" value="true"/>
+        <property name="string" value="foo"/>
+    </bean>
+    
+    <bean id="typesBean" class="org.springframework.scala.beans.propertyeditors.ScalaTypesBean">
+        <property name="regex" value="\d"/>
+    </bean>
+    
+    <bean id="collectionBean" class="org.springframework.scala.beans.propertyeditors.ScalaCollectionsBean">
         <property name="seq" value="one"/>
         <property name="list" ref="javaList"/>
         <property name="vector" value="one"/>

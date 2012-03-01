@@ -16,17 +16,24 @@ package org.springframework.scala.beans.propertyeditors
  * limitations under the License.
  */
 
+import scala.collection.mutable.{ListBuffer, ArrayBuffer}
+import scala.collection.immutable.VectorBuilder
+import scala.util.matching.Regex
+
 import org.springframework.beans.{PropertyEditorRegistry, PropertyEditorRegistrar}
-import collection.mutable.{ListBuffer, ArrayBuffer}
-import collection.immutable.VectorBuilder
 
 /**
  * Property editor registrar for Scala property editors.
+ *
  * @author Arjen Poutsma
  */
 class ScalaEditorRegistrar extends PropertyEditorRegistrar {
 
   def registerCustomEditors(registry: PropertyEditorRegistry) {
+	  // Types
+	  registry.registerCustomEditor(classOf[Regex], new RegexEditor())
+
+	  // Collections
 	  registry.registerCustomEditor(classOf[Seq[Any]], new ScalaCollectionEditor(new ArrayBuffer[Any]()))
 	  registry.registerCustomEditor(classOf[ArrayBuffer[Any]], new ScalaCollectionEditor(new ArrayBuffer[Any]()))
 
