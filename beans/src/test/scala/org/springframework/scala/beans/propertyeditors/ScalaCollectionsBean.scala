@@ -19,7 +19,7 @@ package org.springframework.scala.beans.propertyeditors
 import reflect.BeanProperty
 import collection.mutable.ArrayBuffer
 
-class CollectionBean {
+class ScalaCollectionsBean {
 
 	@BeanProperty
 	var seq: Seq[String] = Seq()
