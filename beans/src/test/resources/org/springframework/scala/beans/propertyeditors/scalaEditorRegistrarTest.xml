@@ -28,7 +28,6 @@
     </bean>
     
     <bean id="collectionBean" class="org.springframework.scala.beans.propertyeditors.CollectionsBean">
-<!--
         <property name="seq" ref="javaList"/>
         <property name="immutableSeq" ref="javaList"/>
         <property name="mutableSeq" ref="javaList"/>
@@ -48,7 +47,6 @@
         <property name="set" ref="javaSet"/>
         <property name="immutableSet" ref="javaSet"/>
         <property name="mutableSet" ref="javaSet"/>
--->
 
         <property name="map" ref="javaMap"/>
 
