@@ -23,16 +23,35 @@
         <property name="string" value="foo"/>
     </bean>
     
-    <bean id="typesBean" class="org.springframework.scala.beans.propertyeditors.ScalaTypesBean">
+    <bean id="typesBean" class="org.springframework.scala.beans.propertyeditors.TypesBean">
         <property name="regex" value="\d"/>
     </bean>
     
-    <bean id="collectionBean" class="org.springframework.scala.beans.propertyeditors.ScalaCollectionsBean">
-        <property name="seq" value="one"/>
-        <property name="list" ref="javaList"/>
-        <property name="vector" value="one"/>
-        <property name="arrayBuffer1" ref="javaList"/>
-        <property name="arrayBuffer2" ref="javaList"/>
+    <bean id="collectionBean" class="org.springframework.scala.beans.propertyeditors.CollectionsBean">
+<!--
+        <property name="seq" ref="javaList"/>
+        <property name="immutableSeq" ref="javaList"/>
+        <property name="mutableSeq" ref="javaList"/>
+
+        <property name="indexedSeq" ref="javaList"/>
+        <property name="immutableIndexedSeq" ref="javaList"/>
+        <property name="mutableIndexedSeq" ref="javaList"/>
+
+        <property name="resizableArray" ref="javaList"/>
+
+        <property name="linearSeq" ref="javaList"/>
+        <property name="immutableLinearSeq" ref="javaList"/>
+        <property name="mutableLinearSeq" ref="javaList"/>
+
+        <property name="buffer" ref="javaList"/>
+
+        <property name="set" ref="javaSet"/>
+        <property name="immutableSet" ref="javaSet"/>
+        <property name="mutableSet" ref="javaSet"/>
+-->
+
+        <property name="map" ref="javaMap"/>
+
     </bean>
 
     <util:list id="javaList">
@@ -40,5 +59,15 @@
         <value>two</value>
         <value>three</value>
     </util:list>
+
+    <util:set id="javaSet">
+        <value>one</value>
+        <value>two</value>
+        <value>three</value>
+    </util:set>
+
+    <util:map id="javaMap">
+        <entry key="foo" value="bar"/>
+    </util:map>
 
 </beans>

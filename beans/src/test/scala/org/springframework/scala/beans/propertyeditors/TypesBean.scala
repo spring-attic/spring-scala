@@ -17,23 +17,15 @@
 package org.springframework.scala.beans.propertyeditors
 
 import reflect.BeanProperty
-import collection.mutable.ArrayBuffer
+import util.matching.Regex
 
-class ScalaCollectionsBean {
-
+/**
+ * @author Arjen Poutsma
+ */
+class TypesBean {
+	
 	@BeanProperty
-	var seq: Seq[String] = Seq()
-
-	@BeanProperty
-	var list: List[String] = List()
-
-	@BeanProperty
-	var vector: Vector[String] = Vector()
-
-	@BeanProperty
-	var arrayBuffer1: ArrayBuffer[String] = ArrayBuffer()
-
-	@BeanProperty
-	var arrayBuffer2: ArrayBuffer[String] = ArrayBuffer()
+	var regex: Regex = null
+	
 
 }
