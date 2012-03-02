@@ -17,8 +17,8 @@
 package org.springframework.scala.beans.propertyeditors
 
 import java.beans.PropertyEditorSupport
-import scala.collection.mutable.Builder
-import scala.collection.JavaConversions.collectionAsScalaIterable;
+import scala.collection.JavaConversions._
+import scala.collection.mutable.Builder;
 
 /**
  * Property editor for Scala collections, converting any source collection to a given
@@ -26,11 +26,11 @@ import scala.collection.JavaConversions.collectionAsScalaIterable;
  *
  * @author Arjen Poutsma
  * @tparam T  the type of elements in the collection
- * @param builder the builder used to build the collection
+ * @param builderFunction function that creates a [[scala.collection.mutable.Builder]]
  * @param nullAsEmptyCollection whether to convert an incoming `null` value to an empty
  * collection (of the appropriate type)
  */
-class ScalaCollectionEditor[T](val builder: Builder[T, _],
+class ScalaCollectionEditor[T](val builderFunction: () => Builder[T, _],
                                val nullAsEmptyCollection: Boolean = false)
 		extends PropertyEditorSupport {
 
@@ -39,7 +39,7 @@ class ScalaCollectionEditor[T](val builder: Builder[T, _],
 	}
 
 	override def setValue(value: AnyRef) {
-		builder.clear()
+		val builder = builderFunction()
 		value match {
 			case null if !nullAsEmptyCollection => {
 				super.setValue(null)
@@ -57,9 +57,6 @@ class ScalaCollectionEditor[T](val builder: Builder[T, _],
 				builder += el
 			}
 		}
-		builder.result() match {
-			case c: scala.collection.mutable.Cloneable[T] => super.setValue(c.clone())
-			case x => super.setValue(x)
-		}
+		super.setValue(builder.result())
 	}
 }

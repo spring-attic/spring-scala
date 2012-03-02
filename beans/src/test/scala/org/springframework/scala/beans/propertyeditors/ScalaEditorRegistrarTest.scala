@@ -40,26 +40,48 @@ class ScalaEditorRegistrarTest extends FunSuite {
 	}
 
 	test("types") {
-		val bean = applicationContext.getBean("typesBean", classOf[ScalaTypesBean])
+		val bean = applicationContext.getBean("typesBean", classOf[TypesBean])
 		assert(bean.regex.toString() == "\\d")
 	}
 
 	test("collections") {
-		val bean = applicationContext.getBean("collectionBean", classOf[ScalaCollectionsBean])
-		assert(!bean.seq.isEmpty)
-		assert(bean.list.contains("one"))
-		assert(bean.list.contains("two"))
-		assert(bean.list.contains("three"))
+		val bean = applicationContext.getBean("collectionBean", classOf[CollectionsBean])
+		testSeq(bean.seq)
+		testSeq(bean.immutableSeq)
+		testSeq(bean.mutableSeq)
 
-		bean.arrayBuffer1.remove(1)
+		testSeq(bean.indexedSeq)
+		testSeq(bean.immutableIndexedSeq)
+		testSeq(bean.mutableIndexedSeq)
 
-		assert(bean.arrayBuffer1.contains("one"))
-		assert(!bean.arrayBuffer1.contains("two"))
-		assert(bean.arrayBuffer1.contains("three"))
+		testSeq(bean.resizableArray)
 
-		assert(bean.arrayBuffer2.contains("one"))
-		assert(bean.arrayBuffer2.contains("two"))
-		assert(bean.arrayBuffer2.contains("three"))
+		testSeq(bean.linearSeq)
+		testSeq(bean.immutableLinearSeq)
+		testSeq(bean.mutableLinearSeq)
+
+		testSeq(bean.buffer)
+
+		testSet(bean.set)
+		testSet(bean.immutableSet)
+		testSet(bean.mutableSet)
+
+	}
+	
+	private def testSeq(seq: Seq[String]) {
+		assert(seq != null)
+		assert(seq.size == 3)
+		assert(seq.contains("one"))
+		assert(seq.contains("two"))
+		assert(seq.contains("three"))
+	}
+
+	private def testSet(seq: scala.collection.Set[String]) {
+		assert(seq != null)
+		assert(seq.size == 3)
+		assert(seq.contains("one"))
+		assert(seq.contains("two"))
+		assert(seq.contains("three"))
 	}
 
 

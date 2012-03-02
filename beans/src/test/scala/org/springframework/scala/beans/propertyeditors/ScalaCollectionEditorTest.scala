@@ -17,52 +17,21 @@
 package org.springframework.scala.beans.propertyeditors
 
 import org.scalatest.FunSuite
-import collection.immutable.VectorBuilder
-import collection.mutable.{ListBuffer, SetBuilder, Builder, ArrayBuffer}
 
 class ScalaCollectionEditorTest extends FunSuite {
 
 	test("null as empty collection") {
-		val editor = new ScalaCollectionEditor(new ArrayBuffer[String](), true)
+		val editor = new ScalaCollectionEditor(Seq.newBuilder[String] _, true)
 		editor.setValue(null)
-		val result = editor.getValue.asInstanceOf[ArrayBuffer[String]]
+		val result = editor.getValue.asInstanceOf[Seq[String]]
 		assert(result.isEmpty)
 	}
 
 	test("null not as empty collection") {
-		val editor = new ScalaCollectionEditor(new ArrayBuffer[String](), false)
+		val editor = new ScalaCollectionEditor(Seq.newBuilder[String] _, false)
 		editor.setValue(null)
 		val result = editor.getValue
 		assert(result == null)
-	}
-
-	test("array buffer") {
-		doTest(new ArrayBuffer[String]())
-	}
-
-	test("list buffer") {
-		doTest(new ListBuffer[String]())
-	}
-
-	test("vector") {
-		doTest(new VectorBuilder[String]())
-	}
-
-	test("set") {
-		doTest(new SetBuilder(Set.empty[String]))
-	}
-
-	private def doTest[To](builder: Builder[String, To]) {
-		val editor = new ScalaCollectionEditor[String](builder)
-		val value: String = "foo"
-		editor.setValue(value)
-		val result = editor.getValue
-		result match {
-			case seq: Seq[String] => assert(seq.contains(value))
-			case set: Set[String] => assert(set.toSeq.contains(value))
-			case x => fail("Unexpected result: [" + x.getClass + "]")
-		}
-
 	}
 
 
