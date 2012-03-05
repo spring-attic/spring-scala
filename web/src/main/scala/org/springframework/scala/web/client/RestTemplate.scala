@@ -44,13 +44,6 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
     this(new org.springframework.web.client.RestTemplate(requestFactory))
   }
 
-  /**
-   * Create a new instance of the `RestTemplate` using default settings.
-   */
-  def this() {
-    this(new org.springframework.web.client.RestTemplate())
-  }
-
   // GET
   /**
    * Retrieve a representation by doing a GET on the specified URL.
