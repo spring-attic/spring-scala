@@ -31,7 +31,7 @@ import scala.collection.mutable.Builder
  * collection (of the appropriate type). Defaults to `false`.
  */
 class ScalaCollectionEditor[T, U](val builderFunction: () => Builder[T, _],
-                               val nullAsEmptyCollection: Boolean = false)
+                                  val nullAsEmptyCollection: Boolean = false)
 		extends PropertyEditorSupport {
 
 	override def setAsText(text: String) {
@@ -55,7 +55,7 @@ class ScalaCollectionEditor[T, U](val builderFunction: () => Builder[T, _],
 				builder ++= collectionAsScalaIterable(javaCollection);
 			}
 			case javaMap: java.util.Map[T, U] => {
-				val mapBuilder = builder.asInstanceOf[Builder[(T,  U), _]]
+				val mapBuilder = builder.asInstanceOf[Builder[(T, U), _]]
 				mapBuilder ++= mapAsScalaMap(javaMap)
 			}
 			case el: T => {
