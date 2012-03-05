@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="configurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="propertyEditorRegistrars">
+                <bean class="org.springframework.scala.beans.propertyeditors.ScalaEditorRegistrar"/>
+        </property>
+    </bean>
+    
+    <bean id="primitivesBean" class="org.springframework.scala.beans.propertyeditors.PrimitivesBean">
+        <property name="byte" value="42"/>
+        <property name="short" value="42"/>
+        <property name="int" value="42"/>
+        <property name="long" value="42"/>
+        <property name="char" value="4"/>
+        <property name="float" value="42"/>
+        <property name="double" value="42"/>
+        <property name="bool" value="true"/>
+        <property name="string" value="foo"/>
+    </bean>
+    
+    <bean id="typesBean" class="org.springframework.scala.beans.propertyeditors.TypesBean">
+        <property name="regex" value="\d"/>
+    </bean>
+    
+    <bean id="collectionBean" class="org.springframework.scala.beans.propertyeditors.CollectionsBean">
+        <property name="seq" ref="javaList"/>
+        <property name="immutableSeq" ref="javaList"/>
+        <property name="mutableSeq" ref="javaList"/>
+
+        <property name="indexedSeq" ref="javaList"/>
+        <property name="immutableIndexedSeq" ref="javaList"/>
+        <property name="mutableIndexedSeq" ref="javaList"/>
+
+        <property name="resizableArray" ref="javaList"/>
+
+        <property name="linearSeq" ref="javaList"/>
+        <property name="immutableLinearSeq" ref="javaList"/>
+        <property name="mutableLinearSeq" ref="javaList"/>
+
+        <property name="buffer" ref="javaList"/>
+
+        <property name="set" ref="javaSet"/>
+        <property name="immutableSet" ref="javaSet"/>
+        <property name="mutableSet" ref="javaSet"/>
+
+        <property name="map" ref="javaMap"/>
+        <property name="immutableMap" ref="javaMap"/>
+        <property name="mutableMap" ref="javaMap"/>
+    </bean>
+
+    <util:list id="javaList">
+        <value>one</value>
+        <value>two</value>
+        <value>three</value>
+    </util:list>
+
+    <util:set id="javaSet">
+        <value>one</value>
+        <value>two</value>
+        <value>three</value>
+    </util:set>
+
+    <util:map id="javaMap">
+        <entry key="foo" value="bar"/>
+    </util:map>
+
+</beans>
