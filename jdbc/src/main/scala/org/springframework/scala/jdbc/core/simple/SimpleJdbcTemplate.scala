@@ -16,9 +16,9 @@ package org.springframework.scala.jdbc.core.simple
  * limitations under the License.
  */
 
-import scalaj.collection.Imports._
 import scala.collection.Map
 import scala.collection.Seq
+import scala.collection.JavaConverters._
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations
 import javax.sql.DataSource
 import java.sql.ResultSet
