@@ -57,12 +57,18 @@ class ScalaEditorRegistrar extends PropertyEditorRegistrar {
 	  registry.registerCustomEditor(classOf[scala.collection.immutable.Set[Any]], new ScalaCollectionEditor(scala.collection.immutable.Set.newBuilder[Any] _))
 	  registry.registerCustomEditor(classOf[scala.collection.mutable.Set[Any]], new ScalaCollectionEditor(scala.collection.mutable.Set.newBuilder[Any] _))
 
-/*
+	  /*
+	   TODO: make SortedSets work
 	  // SortedSet
 	  registry.registerCustomEditor(classOf[scala.collection.SortedSet[Any]], new ScalaCollectionEditor(scala.collection.SortedSet.newBuilder[String] _))
 	  registry.registerCustomEditor(classOf[scala.collection.immutable.SortedSet[Any]], new ScalaCollectionEditor(scala.collection.immutable.SortedSet.newBuilder[String] _))
-	  registry.registerCustomEditor(classOf[scala.collection.mutable.Set[Any]], new ScalaCollectionEditor(scala.collection.mutable.Set.newBuilder[Any] _))
-*/
+	  */
+
+	  // Map
+	  registry.registerCustomEditor(classOf[scala.collection.Map[Any, Any]], new ScalaCollectionEditor(scala.collection.Map.newBuilder[Any, Any] _))
+	  registry.registerCustomEditor(classOf[scala.collection.immutable.Map[Any, Any]], new ScalaCollectionEditor(scala.collection.immutable.Map.newBuilder[Any, Any] _))
+	  registry.registerCustomEditor(classOf[scala.collection.mutable.Map[Any, Any]], new ScalaCollectionEditor(scala.collection.mutable.Map.newBuilder[Any, Any] _))
+
 
   }
 }
