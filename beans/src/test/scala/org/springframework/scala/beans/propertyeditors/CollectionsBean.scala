@@ -62,4 +62,15 @@ class CollectionsBean {
 	@BeanProperty
 	var mutableSet: scala.collection.mutable.Set[String] = null
 
+	@BeanProperty
+	var map: scala.collection.Map[String, String] = null
+
+	@BeanProperty
+	var immutableMap: scala.collection.immutable.Map[String, String] = null
+
+	@BeanProperty
+	var mutableMap: scala.collection.mutable.Map[String, String] = null
+
+
+
 }

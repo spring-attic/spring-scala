@@ -18,7 +18,7 @@ package org.springframework.scala.beans.propertyeditors
 
 import java.beans.PropertyEditorSupport
 import scala.collection.JavaConversions._
-import scala.collection.mutable.Builder;
+import scala.collection.mutable.Builder
 
 /**
  * Property editor for Scala collections, converting any source collection to a given
@@ -28,9 +28,9 @@ import scala.collection.mutable.Builder;
  * @tparam T  the type of elements in the collection
  * @param builderFunction function that creates a [[scala.collection.mutable.Builder]]
  * @param nullAsEmptyCollection whether to convert an incoming `null` value to an empty
- * collection (of the appropriate type)
+ * collection (of the appropriate type). Defaults to `false`.
  */
-class ScalaCollectionEditor[T](val builderFunction: () => Builder[T, _],
+class ScalaCollectionEditor[T, U](val builderFunction: () => Builder[T, _],
                                val nullAsEmptyCollection: Boolean = false)
 		extends PropertyEditorSupport {
 
@@ -46,12 +46,17 @@ class ScalaCollectionEditor[T](val builderFunction: () => Builder[T, _],
 				return
 			}
 			case null if nullAsEmptyCollection => {
+				builder.clear()
 			}
 			case source: TraversableOnce[T] => {
 				builder ++= source
 			}
 			case javaCollection: java.util.Collection[T] => {
-				builder ++= javaCollection;
+				builder ++= collectionAsScalaIterable(javaCollection);
+			}
+			case javaMap: java.util.Map[T, U] => {
+				val mapBuilder = builder.asInstanceOf[Builder[(T,  U), _]]
+				mapBuilder ++= mapAsScalaMap(javaMap)
 			}
 			case el: T => {
 				builder += el

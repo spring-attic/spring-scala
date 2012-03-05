@@ -66,6 +66,9 @@ class ScalaEditorRegistrarTest extends FunSuite {
 		testSet(bean.immutableSet)
 		testSet(bean.mutableSet)
 
+		testMap(bean.map)
+		testMap(bean.immutableMap)
+		testMap(bean.mutableMap)
 	}
 	
 	private def testSeq(seq: Seq[String]) {
@@ -76,12 +79,19 @@ class ScalaEditorRegistrarTest extends FunSuite {
 		assert(seq.contains("three"))
 	}
 
-	private def testSet(seq: scala.collection.Set[String]) {
-		assert(seq != null)
-		assert(seq.size == 3)
-		assert(seq.contains("one"))
-		assert(seq.contains("two"))
-		assert(seq.contains("three"))
+	private def testSet(set: scala.collection.Set[String]) {
+		assert(set != null)
+		assert(set.size == 3)
+		assert(set.contains("one"))
+		assert(set.contains("two"))
+		assert(set.contains("three"))
+	}
+	
+	private def testMap(map: scala.collection.Map[String, String]) {
+		assert(map != null)
+		assert(map.size == 1)
+		assert(map.contains("foo"))
+		assert(map.get("foo").orNull == "bar")
 	}
 
 
