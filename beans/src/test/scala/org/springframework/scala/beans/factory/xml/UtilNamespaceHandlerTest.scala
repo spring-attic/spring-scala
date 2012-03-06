@@ -18,14 +18,4 @@ class UtilNamespaceHandlerTest extends FunSuite {
 		assert(seq.contains("two"))
 	}
 
-	test("list") {
-		val list = applicationContext.getBean("list", classOf[java.util.List[_]])
-		assert(list != null)
-		assert(list.size == 2)
-		assert(list.contains("one"))
-		assert(list.contains("two"))
-	}
-
-
-
 }
