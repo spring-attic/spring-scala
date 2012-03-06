@@ -16,12 +16,5 @@
         <value>two</value>
     </scala-util:seq>
 
-<!--
-    <java-util:list id="list">
-        <value>one</value>
-        <value>two</value>
-    </java-util:list>
--->
-
 </beans>
 
