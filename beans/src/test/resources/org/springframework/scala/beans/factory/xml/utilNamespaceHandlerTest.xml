@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:scala-util="http://www.springframework.org/schema/scala/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/scala/util http://www.springframework.org/schema/scala/util/scala-util.xsd">
+
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="propertyEditorRegistrars">
+                <bean class="org.springframework.scala.beans.propertyeditors.ScalaEditorRegistrar"/>
+        </property>
+    </bean>
+
+    <scala-util:seq id="seq">
+        <value>one</value>
+        <value>two</value>
+    </scala-util:seq>
+
+<!--
+    <java-util:list id="list">
+        <value>one</value>
+        <value>two</value>
+    </java-util:list>
+-->
+
+</beans>
+

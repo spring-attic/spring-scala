@@ -1,2 +1,2 @@
-http\://www.springframework.org/schema/scala/util/spring-util-1.0.xsd=org/springframework/scala/beans/factory/xml/scala-util-1.0.xsd
-http\://www.springframework.org/schema/scala/util/spring-util.xsd=org/springframework/scala/beans/factory/xml/scala-util-1.0.xsd
+http\://www.springframework.org/schema/scala/util/scala-util-1.0.xsd=org/springframework/scala/beans/factory/xml/scala-util-1.0.xsd
+http\://www.springframework.org/schema/scala/util/scala-util.xsd=org/springframework/scala/beans/factory/xml/scala-util-1.0.xsd
