@@ -27,7 +27,7 @@
 				<xsd:extension base="beans:listOrSetType">
 					<xsd:attribute name="id" type="xsd:ID"/>
 <!--
-					<xsd:attribute name="list-class" type="xsd:string">
+					<xsd:attribute name="seq-class" type="xsd:string">
 						<xsd:annotation>
 							<xsd:appinfo>
 								<tool:annotation>
@@ -53,5 +53,49 @@
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
+
+    <xsd:element name="set">
+    		<xsd:annotation>
+    			<xsd:documentation source="java:org.springframework.scala.beans.factory.config.SetFactoryBean">
+    	Builds a Set instance of the specified type, populated with the specified content.
+    			</xsd:documentation>
+    			<xsd:appinfo>
+    				<tool:annotation>
+    					<tool:exports type="scala.collection.Set"/>
+    				</tool:annotation>
+    			</xsd:appinfo>
+    		</xsd:annotation>
+    		<xsd:complexType>
+    			<xsd:complexContent>
+    				<xsd:extension base="beans:listOrSetType">
+    					<xsd:attribute name="id" type="xsd:string"/>
+<!--
+    					<xsd:attribute name="set-class" type="xsd:string">
+    						<xsd:annotation>
+    							<xsd:appinfo>
+    								<tool:annotation>
+    									<tool:expected-type type="java.lang.Class"/>
+    									<tool:assignable-to type="java.util.Set"/>
+    								</tool:annotation>
+    							</xsd:appinfo>
+    						</xsd:annotation>
+    					</xsd:attribute>
+-->
+    					<xsd:attribute name="scope" type="xsd:string">
+    						<xsd:annotation>
+    							<xsd:documentation><![CDATA[
+    	The scope of this collection bean: typically "singleton" (one shared instance,
+    	which will be returned by all calls to getBean with the given id), or
+    	"prototype" (independent instance resulting from each call to getBean).
+    	Default is "singleton". Further scopes, such as "request" or "session",
+    	might be supported by extended bean factories (e.g. in a web environment).
+    							]]></xsd:documentation>
+    						</xsd:annotation>
+    					</xsd:attribute>
+    				</xsd:extension>
+    			</xsd:complexContent>
+    		</xsd:complexType>
+    	</xsd:element>
+
 
 </xsd:schema>

@@ -16,5 +16,10 @@
         <value>two</value>
     </scala-util:seq>
 
+    <scala-util:set id="set">
+        <value>one</value>
+        <value>two</value>
+    </scala-util:set>
+
 </beans>
 
