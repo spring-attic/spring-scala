@@ -21,5 +21,9 @@
         <value>two</value>
     </scala-util:set>
 
+    <scala-util:map id="map">
+        <entry key="one" value="two"/>
+    </scala-util:map>
+
 </beans>
 
