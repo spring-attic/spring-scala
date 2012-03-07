@@ -4,7 +4,7 @@ import org.springframework.util.StringUtils
 import org.w3c.dom.Element
 import org.springframework.beans.factory.xml.{ParserContext, AbstractSingleBeanDefinitionParser, NamespaceHandlerSupport}
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
-import org.springframework.scala.beans.factory.config.{SetFactoryBean, SeqFactoryBean}
+import org.springframework.scala.beans.factory.config.{MapFactoryBean, SetFactoryBean, SeqFactoryBean}
 
 /**
  * @author Arjen Poutsma
@@ -16,9 +16,17 @@ class UtilNamespaceHandler extends NamespaceHandlerSupport {
 	def init() {
 		registerBeanDefinitionParser("seq", new SeqBeanDefinitionParser())
 		registerBeanDefinitionParser("set", new SetBeanDefinitionParser())
+		registerBeanDefinitionParser("map", new MapBeanDefinitionParser())
 	}
 
-	private class SeqBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+	private def parseScope(element: Element, builder: BeanDefinitionBuilder) {
+		val scope: String = element.getAttribute(SCOPE_ATTRIBUTE)
+		if (StringUtils.hasLength(scope)) {
+			builder.setScope(scope)
+		}
+	}
+
+	class SeqBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 		protected override def getBeanClass(element: Element) = classOf[SeqFactoryBean[_]]
 
@@ -34,10 +42,7 @@ class UtilNamespaceHandler extends NamespaceHandlerSupport {
 					 builder.addPropertyValue("targetListClass", listClass)
 				 }
 	 */
-			val scope: String = element.getAttribute(SCOPE_ATTRIBUTE)
-			if (StringUtils.hasLength(scope)) {
-				builder.setScope(scope)
-			}
+			parseScope(element, builder)
 		}
 	}
 
@@ -57,10 +62,27 @@ class UtilNamespaceHandler extends NamespaceHandlerSupport {
 					 builder.addPropertyValue("targetSetClass", setClass)
 				 }
 	 */
-			val scope: String = element.getAttribute(SCOPE_ATTRIBUTE)
-			if (StringUtils.hasLength(scope)) {
-				builder.setScope(scope)
-			}
+			parseScope(element, builder)
+		}
+	}
+
+	private class MapBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+
+		protected override def getBeanClass(element: Element): Class[_] = classOf[MapFactoryBean[_, _]]
+
+		protected override def doParse(element: Element,
+		                               parserContext: ParserContext,
+		                               builder: BeanDefinitionBuilder) {
+			val parsedMap: java.util.Map[_, _] = parserContext.getDelegate
+					.parseMapElement(element, builder.getRawBeanDefinition)
+			builder.addConstructorArgValue(parsedMap)
+			/*
+					 val mapClass: String = element.getAttribute("map-class")
+					 if (StringUtils.hasText(mapClass)) {
+						 builder.addPropertyValue("targetMapClass", mapClass)
+					 }
+	 */
+			parseScope(element, builder)
 		}
 	}
 

@@ -26,4 +26,12 @@ class UtilNamespaceHandlerTest extends FunSuite {
 		assert(set.contains("two"))
 	}
 
+	test("map") {
+		val map = applicationContext.getBean("map", classOf[scala.collection.Map[String, String]])
+		assert(map != null)
+		assert(map.size == 1)
+		assert(map.contains("one"))
+		assert(map("one") == "two")
+	}
+
 }

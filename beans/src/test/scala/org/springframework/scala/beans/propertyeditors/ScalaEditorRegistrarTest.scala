@@ -91,7 +91,7 @@ class ScalaEditorRegistrarTest extends FunSuite {
 		assert(map != null)
 		assert(map.size == 1)
 		assert(map.contains("foo"))
-		assert(map.get("foo").orNull == "bar")
+		assert(map("foo") == "bar")
 	}
 
 
