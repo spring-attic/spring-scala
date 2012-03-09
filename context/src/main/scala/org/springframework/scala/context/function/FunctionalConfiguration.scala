@@ -29,6 +29,17 @@ trait FunctionalConfiguration {
 
 	val applicationContext = new StaticApplicationContext()
 
+	/**
+	 * Registers a bean with the given name,
+	 *
+	 * @param name the name of the bean. If not specified, a name will be generated.
+	 * @param aliases aliases for the bean, if any
+	 * @param scope the scope. Defaults to ``singleton``.
+	 * @param lazyInit whether the bean is to be lazily initialized. Defaults to ``false``.
+	 * @param autowire whether the bean is to be autowired. Defaults to no autowiring.
+	 * @param beanFunction the bean creation function
+	 * @tparam T the bean type
+	 */
 	protected def bean[T](name: String = "",
 	                      aliases: Seq[String] = Seq(),
 	                      scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
