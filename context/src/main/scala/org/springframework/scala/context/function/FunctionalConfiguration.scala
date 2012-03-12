@@ -29,6 +29,11 @@ trait FunctionalConfiguration {
 
 	val applicationContext = new StaticApplicationContext()
 
+	def getBean[T](beanName: String): T = {
+		val beanClass = manifest.erasure.asInstanceOf[Class[T]]
+		applicationContext.getBean(beanName, beanClass)
+	}
+
 	/**
 	 * Registers a bean creation function with the given name, aliases, and other
 	 * attributes.

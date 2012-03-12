@@ -21,11 +21,26 @@ package org.springframework.scala.context.function
  */
 class MyConfiguration extends FunctionalConfiguration {
 
-	bean(name = "arjen", aliases = Seq("poutsma")) {
-		new Person("Arjen", "Poutsma")
+	for (x <- Range(1, 5)) {
+		bean("bean" + x) {
+			x
+		}
 	}
+
+	bean(name = "arjen", aliases = Seq("poutsma")) {
+		val arjen = new Person("Arjen", "Poutsma")
+		arjen.father = getBean("henk")
+		arjen
+	}
+
+	bean(name = "henk") {
+		new Person("Henk", "Poutsma")
+	}
+
+
 
 	bean(autowire = Autowire.ByType) {
 		new Person("John", "Doe")
 	}
+	
 }
