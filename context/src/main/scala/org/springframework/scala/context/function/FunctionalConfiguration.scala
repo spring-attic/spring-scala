@@ -16,22 +16,40 @@
 
 package org.springframework.scala.context.function
 
-import Autowire._
-import org.springframework.context.support.StaticApplicationContext
-import org.springframework.beans.factory.config.{BeanDefinition, ConfigurableBeanFactory}
 import org.springframework.util.StringUtils
-import org.springframework.beans.factory.support.{BeanDefinitionRegistry, BeanDefinitionReaderUtils, GenericBeanDefinition}
+import org.springframework.beans.factory.config.{BeanDefinition, ConfigurableBeanFactory}
+import org.springframework.beans.factory.support.{DefaultListableBeanFactory, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
+import org.springframework.scala.beans.factory.function.FunctionalGenericBeanDefinition
+import org.springframework.scala.beans.factory.config.TypedBeanReference
 
 /**
  * @author Arjen Poutsma
  */
-trait FunctionalConfiguration {
+abstract class FunctionalConfiguration(val beanFactory: DefaultListableBeanFactory = new
+				DefaultListableBeanFactory()) {
 
-	val applicationContext = new StaticApplicationContext()
-
-	def getBean[T](beanName: String): T = {
+	/**
+	 * Return an instance, which may be shared or independent, of the specified bean.
+	 *
+	 * Translates aliases back to the corresponding canonical bean name.
+	 * Will ask the parent factory if the bean cannot be found in this factory instance.
+	 * @param name the name of the bean to retrieve
+	 * @param manifest an implicit ``Manifest`` representing the type of the specified
+	 * type parameter.
+	 * @return an instance of the bean
+	 * @throws NoSuchBeanDefinitionException if there's no such bean definition
+	 * @throws BeanNotOfRequiredTypeException if the bean is not of the required type
+	 * @throws BeansException if the bean could not be created
+	 */
+	def getBean[T](name: String)(implicit manifest: Manifest[T]): T = {
 		val beanClass = manifest.erasure.asInstanceOf[Class[T]]
-		applicationContext.getBean(beanName, beanClass)
+		beanFactory.getBean(name, beanClass)
+	}
+
+	implicit def registration2Bean[T](beanRegistration: TypedBeanReference[T])
+	                                 (implicit manifest: Manifest[T]): T = {
+		val beanClass = manifest.erasure.asInstanceOf[Class[T]]
+		beanFactory.getBean(beanRegistration.getBeanName, beanClass)
 	}
 
 	/**
@@ -42,31 +60,31 @@ trait FunctionalConfiguration {
 	 * @param aliases aliases for the bean, if any
 	 * @param scope the scope. Defaults to ``singleton``.
 	 * @param lazyInit whether the bean is to be lazily initialized. Defaults to ``false``.
-	 * @param autowire whether the bean is to be autowired. Defaults to no autowiring.
 	 * @param beanFunction the bean creation function
 	 * @tparam T the bean type
 	 */
 	protected def bean[T](name: String = "",
 	                      aliases: Seq[String] = Seq(),
 	                      scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
-	                      lazyInit: Boolean = false,
-	                      autowire: Autowire = No)
+	                      lazyInit: Boolean = false)
 	                     (beanFunction: => T)
-	                     (implicit manifest: Manifest[T]) {
+	                     (implicit manifest: Manifest[T]): TypedBeanReference[T] = {
 		val beanClass = manifest.erasure.asInstanceOf[Class[T]]
 
-		val bd = new GenericBeanDefinition()
-		bd.setBeanClass(classOf[Function0FactoryBean[T]])
+		val bd = new FunctionalGenericBeanDefinition(beanFunction, beanClass)
 		bd.setScope(scope)
 		bd.setLazyInit(lazyInit)
-		bd.setAutowireMode(autowire.id)
-		bd.getConstructorArgumentValues.addIndexedArgumentValue(0, beanFunction _)
-		bd.getConstructorArgumentValues.addIndexedArgumentValue(1, beanClass)
 
-		val beanName = getBeanName(name, bd, applicationContext)
+		val beanName = getBeanName(name, bd, beanFactory)
 
-		applicationContext.registerBeanDefinition(beanName, bd)
-		aliases.foreach(applicationContext.registerAlias(beanName, _))
+		beanFactory.registerBeanDefinition(beanName, bd)
+		aliases.foreach(beanFactory.registerAlias(beanName, _))
+
+		new TypedBeanReference[T] {
+			def getBeanName = beanName
+
+			def getSource = null
+		}
 	}
 
 	private def getBeanName(name: String,
@@ -76,7 +94,7 @@ trait FunctionalConfiguration {
 			name
 		}
 		else {
-			BeanDefinitionReaderUtils.generateBeanName(definition, registry);
+			BeanDefinitionReaderUtils.generateBeanName(definition, registry)
 		}
 	}
 

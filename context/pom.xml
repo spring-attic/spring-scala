@@ -13,6 +13,10 @@
     <name>Spring Context Scala</name>
     <dependencies>
         <dependency>
+            <groupId>org.springframework.scala</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
         </dependency>
