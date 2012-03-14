@@ -66,6 +66,11 @@
     <dependencyManagement>
         <dependencies>
             <!-- Spring Scala dependencies -->
+            <dependency>
+                <groupId>org.springframework.scala</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <!-- Spring dependencies -->
             <dependency>
                 <groupId>org.springframework</groupId>
