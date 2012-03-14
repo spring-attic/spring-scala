@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package org.springframework.scala.context.function
+package org.springframework.scala.beans.factory.function
 
-import org.springframework.beans.factory.config.AbstractFactoryBean
+import org.springframework.beans.factory.config.BeanDefinition
 
 /**
+ * Extended [[org.springframework.beans.factory.config.BeanDefinition]]
+ * interface that exposes a bean creation function.
+ *
  * @author Arjen Poutsma
+ * @see FunctionalGenericBeanDefinition
  */
-class Function0FactoryBean[T](val function: Function0[T], val objectType: Class[T])
-		extends AbstractFactoryBean[T] {
+trait FunctionalBeanDefinition[T] extends BeanDefinition {
 
-	def getObjectType = objectType
-
-	def createInstance() = function()
+	/**
+	 * Returns the bean creation function.
+	 * @return the bean creation function
+	 */
+	def beanCreationFunction: () => T
 }
+
