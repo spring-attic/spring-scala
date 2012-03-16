@@ -18,15 +18,13 @@ package org.springframework.scala.context.function
 
 import org.springframework.util.StringUtils
 import org.springframework.beans.factory.config.{BeanDefinition, ConfigurableBeanFactory}
-import org.springframework.beans.factory.support.{DefaultListableBeanFactory, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 import org.springframework.scala.beans.factory.function.FunctionalGenericBeanDefinition
-import org.springframework.scala.beans.factory.config.TypedBeanReference
+import org.springframework.beans.factory.support.{DefaultListableBeanFactory, BeanDefinitionReaderUtils}
 
 /**
  * @author Arjen Poutsma
  */
-abstract class FunctionalConfiguration(val beanFactory: DefaultListableBeanFactory = new
-				DefaultListableBeanFactory()) {
+abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListableBeanFactory) {
 
 	/**
 	 * Return an instance, which may be shared or independent, of the specified bean.
@@ -46,12 +44,6 @@ abstract class FunctionalConfiguration(val beanFactory: DefaultListableBeanFacto
 		beanFactory.getBean(name, beanClass)
 	}
 
-	implicit def registration2Bean[T](beanRegistration: TypedBeanReference[T])
-	                                 (implicit manifest: Manifest[T]): T = {
-		val beanClass = manifest.erasure.asInstanceOf[Class[T]]
-		beanFactory.getBean(beanRegistration.getBeanName, beanClass)
-	}
-
 	/**
 	 * Registers a bean creation function with the given name, aliases, and other
 	 * attributes.
@@ -64,39 +56,34 @@ abstract class FunctionalConfiguration(val beanFactory: DefaultListableBeanFacto
 	 * @tparam T the bean type
 	 */
 	protected def bean[T](name: String = "",
-	                      aliases: Seq[String] = Seq(),
-	                      scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
-	                      lazyInit: Boolean = false)
-	                     (beanFunction: => T)
-	                     (implicit manifest: Manifest[T]): TypedBeanReference[T] = {
+	                       aliases: Seq[String] = Seq(),
+	                       scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
+	                       lazyInit: Boolean = false)
+	                      (beanFunction: => T)
+	                      (implicit manifest: Manifest[T]): () => T = {
 		val beanClass = manifest.erasure.asInstanceOf[Class[T]]
 
 		val bd = new FunctionalGenericBeanDefinition(beanFunction, beanClass)
 		bd.setScope(scope)
 		bd.setLazyInit(lazyInit)
 
-		val beanName = getBeanName(name, bd, beanFactory)
+		val beanName = getBeanName(name, bd)
 
 		beanFactory.registerBeanDefinition(beanName, bd)
 		aliases.foreach(beanFactory.registerAlias(beanName, _))
 
-		new TypedBeanReference[T] {
-			def getBeanName = beanName
-
-			def getSource = null
+		() => {
+			getBean(beanName)
 		}
 	}
 
-	private def getBeanName(name: String,
-	                        definition: BeanDefinition,
-	                        registry: BeanDefinitionRegistry): String = {
+	private def getBeanName(name: String, definition: BeanDefinition): String = {
 		if (StringUtils.hasLength(name)) {
 			name
 		}
 		else {
-			BeanDefinitionReaderUtils.generateBeanName(definition, registry)
+			BeanDefinitionReaderUtils.generateBeanName(definition, beanFactory)
 		}
 	}
-
 
 }
