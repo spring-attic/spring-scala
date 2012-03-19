@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-package org.springframework.scala.beans.factory.function
+package org.springframework.scala.beans.factory.function;
 
-import org.springframework.beans.factory.support.GenericBeanDefinition
+import scala.Function0;
 
 /**
+ * Simple static wrapper for a Scala {@link Function0}.
+ * <p/>
+ * Used by the {@link FunctionalGenericBeanDefinition} as a provider of a static
+ * factory method. In Java, because the Spring bean factory natively does not handle Scala
+ * Objects well.
+ *
  * @author Arjen Poutsma
+ * @see FunctionalGenericBeanDefinition
  */
-class FunctionalGenericBeanDefinition[T](val beanFunction: () => T)
-		extends GenericBeanDefinition with FunctionalBeanDefinition[T] {
+public class Function0Wrapper {
 
-	setBeanClass(classOf[Function0Wrapper])
-	getConstructorArgumentValues.addIndexedArgumentValue(0, beanFunction)
-	setFactoryMethodName("apply")
+	private Function0Wrapper() {
+	}
 
-	def beanCreationFunction = beanFunction
+	public static <T> T apply(Function0<T> function) {
+		return function.apply();
+	}
+
 }
