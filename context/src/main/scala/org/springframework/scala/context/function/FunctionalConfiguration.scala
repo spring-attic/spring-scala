@@ -61,9 +61,7 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	                       lazyInit: Boolean = false)
 	                      (beanFunction: => T)
 	                      (implicit manifest: Manifest[T]): () => T = {
-		val beanClass = manifest.erasure.asInstanceOf[Class[T]]
-
-		val bd = new FunctionalGenericBeanDefinition(beanFunction, beanClass)
+		val bd = new FunctionalGenericBeanDefinition(beanFunction _)
 		bd.setScope(scope)
 		bd.setLazyInit(lazyInit)
 
