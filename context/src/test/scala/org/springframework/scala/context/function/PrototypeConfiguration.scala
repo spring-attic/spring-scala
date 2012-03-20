@@ -32,7 +32,6 @@ package org.springframework.scala.context.function
  * limitations under the License.
  */
 
-import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.beans.factory.support.DefaultListableBeanFactory
 
 /**
@@ -53,8 +52,7 @@ object PrototypeConfiguration {
 			singletonCount
 		}
 
-		val p = bean(name = "prototype",
-			scope = BeanDefinition.SCOPE_PROTOTYPE) {
+		val p = prototype(name = "prototype") {
 			prototypeCount += 1
 			prototypeCount
 		}
