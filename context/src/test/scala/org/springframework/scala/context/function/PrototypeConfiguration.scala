@@ -48,36 +48,31 @@ object PrototypeConfiguration {
 
 	class Config extends FunctionalConfiguration {
 
-		val singleton = bean(name = "singleton") {
+		val s = singleton(name = "singleton") {
 			singletonCount += 1
 			singletonCount
 		}
 
-		val prototype = bean(name = "prototype",
+		val p = bean(name = "prototype",
 			scope = BeanDefinition.SCOPE_PROTOTYPE) {
 			prototypeCount += 1
 			prototypeCount
 		}
 
-		val prototypeVal = prototype()
 	}
 
 	def main(args: Array[String]) {
 		val config = new Config
 
-		val singleton1 = config.singleton()
-		val singleton2 = config.singleton()
+		val singleton1 = config.s
+		val singleton2 = config.s
 		assert(singleton1 == singleton2)
 		assert(singletonCount == 1)
 
-		val prototype1 = config.prototype()
-		val prototype2 = config.prototype()
+		val prototype1 = config.p()
+		val prototype2 = config.p()
 		assert(prototype1 != prototype2)
-		assert(prototypeCount > 1)
-
-		val prototypeInstance1 = config.prototypeVal
-		val prototypeInstance2 = config.prototypeVal
-		assert(prototypeInstance1 == prototypeInstance2) // <-- Undesirable
+		assert(prototypeCount == 2)
 	}
 
 }

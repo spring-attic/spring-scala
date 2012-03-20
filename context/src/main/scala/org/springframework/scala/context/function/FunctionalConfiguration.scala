@@ -53,14 +53,15 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	 * @param scope the scope. Defaults to ``singleton``.
 	 * @param lazyInit whether the bean is to be lazily initialized. Defaults to ``false``.
 	 * @param beanFunction the bean creation function
+	 * @return a function that returns the registered bean
 	 * @tparam T the bean type
 	 */
 	protected def bean[T](name: String = "",
-	                       aliases: Seq[String] = Seq(),
-	                       scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
-	                       lazyInit: Boolean = false)
-	                      (beanFunction: => T)
-	                      (implicit manifest: Manifest[T]): () => T = {
+	                      aliases: Seq[String] = Seq(),
+	                      scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
+	                      lazyInit: Boolean = false)
+	                     (beanFunction: => T)
+	                     (implicit manifest: Manifest[T]): () => T = {
 		val bd = new FunctionalGenericBeanDefinition(beanFunction _)
 		bd.setScope(scope)
 		bd.setLazyInit(lazyInit)
@@ -73,6 +74,26 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 		() => {
 			getBean(beanName)
 		}
+	}
+
+	/**
+	 * Registers a singleton bean creation function with the given name, aliases, and other
+	 * attributes.
+	 *
+	 * @param name the name of the bean. If not specified, a name will be generated.
+	 * @param aliases aliases for the bean, if any
+	 * @param lazyInit whether the bean is to be lazily initialized. Defaults to ``false``.
+	 * @param beanFunction the bean creation function
+	 * @return the singleton instance of the registered bean
+	 * @tparam T the bean type
+	 */
+	protected def singleton[T](name: String = "",
+	                           aliases: Seq[String] = Seq(),
+	                           lazyInit: Boolean = false)
+	                          (beanFunction: => T)
+	                          (implicit manifest: Manifest[T]): T = {
+		bean(name, aliases, ConfigurableBeanFactory.SCOPE_SINGLETON, lazyInit)(beanFunction)
+				.apply()
 	}
 
 	private def getBeanName(name: String, definition: BeanDefinition): String = {
