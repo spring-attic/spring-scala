@@ -96,6 +96,25 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 				.apply()
 	}
 
+	/**
+	 * Registers a prototype bean creation function with the given name, aliases, and other
+	 * attributes.
+	 *
+	 * @param name the name of the bean. If not specified, a name will be generated.
+	 * @param aliases aliases for the bean, if any
+	 * @param lazyInit whether the bean is to be lazily initialized. Defaults to ``false``.
+	 * @param beanFunction the bean creation function
+	 * @return a function that returns the registered bean
+	 * @tparam T the bean type
+	 */
+	protected def prototype[T](name: String = "",
+	                           aliases: Seq[String] = Seq(),
+	                           lazyInit: Boolean = false)
+	                          (beanFunction: => T)
+	                          (implicit manifest: Manifest[T]): () => T = {
+		bean(name, aliases, ConfigurableBeanFactory.SCOPE_PROTOTYPE, lazyInit)(beanFunction)
+	}
+
 	private def getBeanName(name: String, definition: BeanDefinition): String = {
 		if (StringUtils.hasLength(name)) {
 			name
