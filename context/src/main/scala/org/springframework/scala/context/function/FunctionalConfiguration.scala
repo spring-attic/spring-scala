@@ -144,14 +144,13 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	 * @param initFunction the initialization function
 	 * @tparam T the bean type
 	 */
-	protected def init[T](bean: BeanLookupFunction[T])(initFunction: (T) => Unit) {
+	protected def init[T](bean: BeanLookupFunction[T])(initFunction: (T) => T) {
 		val bpp = initDestroyFunctionBeanPostProcessor()
-		bpp.registerInitFunction(bean.beanName,
-			initFunction.asInstanceOf[Function1[Any, Unit]])
+		bpp.registerInitFunction(bean.beanName, initFunction)
 	}
 
 	/**
-	 * Registers an destruction function for the given bean.
+	 * Registers a destruction function for the given bean.
 	 *
 	 * @param bean the bean to register an destruction function for
 	 * @param destroyFunction the destruction function
@@ -159,8 +158,7 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	 */
 	protected def destroy[T](bean: BeanLookupFunction[T])(destroyFunction: (T) => Unit) {
 		val bpp = initDestroyFunctionBeanPostProcessor()
-		bpp.registerDestroyFunction(bean.beanName,
-			destroyFunction.asInstanceOf[Function1[Any, Unit]])
+		bpp.registerDestroyFunction(bean.beanName, destroyFunction)
 	}
 
 	private def initDestroyFunctionBeanPostProcessor(): InitDestroyFunctionBeanPostProcessor = {
