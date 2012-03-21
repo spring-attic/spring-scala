@@ -19,6 +19,8 @@ package org.springframework.scala.context.function
 import org.scalatest.FunSuite
 import org.springframework.beans.factory.support.DefaultListableBeanFactory
 import org.springframework.beans.factory.config.BeanDefinition
+import org.springframework.scala.beans.factory.function.InitDestroyFunctionBeanPostProcessor
+import org.springframework.context.support.GenericApplicationContext
 
 /**
  * @author Arjen Poutsma
@@ -107,6 +109,39 @@ class FunctionalConfigurationTest extends FunSuite {
 		assert(beanFromConfig1 != beanFromBeanFactory)
 		assert(beanFromConfig2 != beanFromBeanFactory)
 		assert(3 == count)
+	}
+
+	test("init and destroy") {
+		implicit val beanFactory = new DefaultListableBeanFactory()
+		beanFactory.registerSingleton("initDestroyFunction",
+			new InitDestroyFunctionBeanPostProcessor)
+
+		var initCalled = false;
+		var destroyCalled = false;
+
+		new FunctionalConfiguration {
+
+			val foo = bean("foo") {
+				new Person("John", "Doe")
+			}
+
+			init(foo)(p => {
+				initCalled = true
+				println("Initializing " + p.firstName)
+			})
+
+			destroy(foo)(p => {
+				destroyCalled = true
+				println("Destroying " + p.firstName)
+			})
+		}
+
+		val appContext = new GenericApplicationContext(beanFactory)
+		appContext.refresh()
+		appContext.getBean("foo")
+		assert(initCalled)
+		appContext.close()
+		assert(destroyCalled)
 	}
 
 
