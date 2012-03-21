@@ -128,6 +128,7 @@ class FunctionalConfigurationTest extends FunSuite {
 			init(foo)(p => {
 				initCalled = true
 				println("Initializing " + p.firstName)
+				new MyPerson(p)
 			})
 
 			destroy(foo)(p => {
@@ -138,10 +139,15 @@ class FunctionalConfigurationTest extends FunSuite {
 
 		val appContext = new GenericApplicationContext(beanFactory)
 		appContext.refresh()
-		appContext.getBean("foo")
+		val foo = appContext.getBean("foo", classOf[Person])
+		assert(foo.isInstanceOf[MyPerson])
 		assert(initCalled)
 		appContext.close()
 		assert(destroyCalled)
+	}
+
+	class MyPerson(p: Person) extends Person(p.firstName, p.lastName) {
+		
 	}
 
 
