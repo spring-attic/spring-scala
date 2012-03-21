@@ -146,7 +146,50 @@ class FunctionalConfigurationTest extends FunSuite {
 		assert(destroyCalled)
 	}
 
-	class MyPerson(p: Person) extends Person(p.firstName, p.lastName) {
+  /*
+   * The test verifies that I can configure the equivalent of ``init-method`` and ``destroy-method`` of arbitrary
+    * bean by simply supplying a function that operates on the bean. In the example above, we have the functions
+    * (with temporary names ``initFunction`` and ``destroyFunction``) that we can chain and that ultimately return ``BeanFunction[T]``
+   */
+  test("init and destroy with inline calls") {
+    implicit val beanFactory = new DefaultListableBeanFactory()
+    beanFactory.registerSingleton("initDestroyFunction",
+      new InitDestroyFunctionBeanPostProcessor)
+
+    new FunctionalConfiguration {
+
+      /*
+       * <bean class="InitialisablePerson" init-method="initialise" destroy-method="destroy" />
+       */
+      val foo = bean("foo") {
+        new InitialisablePerson("John", "Doe")
+      } initFunction { _.initialise() } destroyFunction { _.destroy() }
+
+    }
+
+    val appContext = new GenericApplicationContext(beanFactory)
+    appContext.refresh()
+    val foo = appContext.getBean("foo", classOf[InitialisablePerson])
+    // after initialising the ApplicationContext, the ``initialised`` property should be true
+    assert(foo.initialised)
+    appContext.close()
+    // similarly, after closing the ApplicaitonContext, it should be false.
+    assert(!foo.initialised)
+  }
+
+  class InitialisablePerson(firstName: String, lastName: String) extends Person(firstName, lastName) {
+    var initialised = false
+
+    def initialise() {
+      initialised = true
+    }
+
+    def destroy() {
+      initialised = false
+    }
+  }
+
+  class MyPerson(p: Person) extends Person(p.firstName, p.lastName) {
 		
 	}
 

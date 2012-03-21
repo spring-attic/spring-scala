@@ -161,6 +161,13 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 		bpp.registerDestroyFunction(bean.beanName, destroyFunction)
 	}
 
+  /**
+   * Exposes the ``InitDestroyFunctionBeanPostProcessor`` so that the subclasses can use the (temporary!)
+   * ``BeanLookupFunction.initFunction`` and ``BeanLookupFunction.destroyFunction`` without having to specify this instance
+   * explicitly.
+   */
+  protected implicit lazy val _initDestroyFunctionBeanPostProcessor = initDestroyFunctionBeanPostProcessor()
+
 	private def initDestroyFunctionBeanPostProcessor(): InitDestroyFunctionBeanPostProcessor = {
 		val bpps = beanFactory.getBeansOfType(classOf[InitDestroyFunctionBeanPostProcessor])
 		assert(bpps.size() == 1)
