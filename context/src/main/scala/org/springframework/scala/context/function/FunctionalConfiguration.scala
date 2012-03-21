@@ -18,8 +18,8 @@ package org.springframework.scala.context.function
 
 import org.springframework.util.StringUtils
 import org.springframework.beans.factory.config.{BeanDefinition, ConfigurableBeanFactory}
-import org.springframework.scala.beans.factory.function.FunctionalGenericBeanDefinition
 import org.springframework.beans.factory.support.{DefaultListableBeanFactory, BeanDefinitionReaderUtils}
+import org.springframework.scala.beans.factory.function.FunctionalGenericBeanDefinition
 
 /**
  * @author Arjen Poutsma
@@ -40,8 +40,8 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	 * @throws BeansException if the bean could not be created
 	 */
 	def getBean[T](name: String)(implicit manifest: Manifest[T]): T = {
-		val beanClass = manifest.erasure.asInstanceOf[Class[T]]
-		beanFactory.getBean(name, beanClass)
+		val beanType = manifest.erasure.asInstanceOf[Class[T]]
+		beanFactory.getBean(name, beanType)
 	}
 
 	/**
@@ -62,7 +62,20 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	                      lazyInit: Boolean = false)
 	                     (beanFunction: => T)
 	                     (implicit manifest: Manifest[T]): () => T = {
-		val bd = new FunctionalGenericBeanDefinition(beanFunction _)
+
+		registerBean(name, aliases, scope, lazyInit, beanFunction _, manifest)
+	}
+
+	private def registerBean[T](name: String,
+	                            aliases: Seq[String],
+	                            scope: String,
+	                            lazyInit: Boolean,
+	                            beanFunction: () => T,
+	                            manifest: Manifest[T]): () => T = {
+
+		val beanType = manifest.erasure.asInstanceOf[Class[T]]
+
+		val bd = new FunctionalGenericBeanDefinition(beanFunction)
 		bd.setScope(scope)
 		bd.setLazyInit(lazyInit)
 
@@ -72,7 +85,16 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 		aliases.foreach(beanFactory.registerAlias(beanName, _))
 
 		() => {
-			getBean(beanName)
+			beanFactory.getBean(beanName, beanType)
+		}
+	}
+
+	private def getBeanName(name: String, definition: BeanDefinition): String = {
+		if (StringUtils.hasLength(name)) {
+			name
+		}
+		else {
+			BeanDefinitionReaderUtils.generateBeanName(definition, beanFactory)
 		}
 	}
 
@@ -92,8 +114,9 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	                           lazyInit: Boolean = false)
 	                          (beanFunction: => T)
 	                          (implicit manifest: Manifest[T]): T = {
-		bean(name, aliases, ConfigurableBeanFactory.SCOPE_SINGLETON, lazyInit)(beanFunction)
-				.apply()
+
+		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_SINGLETON, lazyInit,
+			beanFunction _, manifest).apply()
 	}
 
 	/**
@@ -112,16 +135,9 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	                           lazyInit: Boolean = false)
 	                          (beanFunction: => T)
 	                          (implicit manifest: Manifest[T]): () => T = {
-		bean(name, aliases, ConfigurableBeanFactory.SCOPE_PROTOTYPE, lazyInit)(beanFunction)
+		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_PROTOTYPE, lazyInit,
+			beanFunction _, manifest)
 	}
 
-	private def getBeanName(name: String, definition: BeanDefinition): String = {
-		if (StringUtils.hasLength(name)) {
-			name
-		}
-		else {
-			BeanDefinitionReaderUtils.generateBeanName(definition, beanFactory)
-		}
-	}
 
 }
