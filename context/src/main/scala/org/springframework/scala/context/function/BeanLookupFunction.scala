@@ -17,6 +17,7 @@
 package org.springframework.scala.context.function
 
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.scala.beans.factory.function.InitDestroyFunctionBeanPostProcessor
 
 /**
  *
@@ -24,9 +25,26 @@ import org.springframework.beans.factory.BeanFactory
  */
 class BeanLookupFunction[T](val beanName: String,
                             val beanType: Class[T],
-                            val beanFactory: BeanFactory) extends Function0[T] {
+                            val beanFactory: BeanFactory) extends (() => T) {
 
-	def apply(): T = {
-		beanFactory.getBean(beanName, beanType)
-	}
+  def apply(): T = {
+    beanFactory.getBean(beanName, beanType)
+  }
+
+  // these are the newly added init methods. I also wanted to decouple this class from having to carry some kind of
+  // callback that gets the ``InitDestroyBeanPostProcessor``. Instead, we take it as implicit parameter and expose it
+  // as the lazy implicit val in the ``FunctionalConfiguration``
+  // I also want to have the functions return ``Any``; I'm not actually interested in the result
+
+  def initFunction(f: T => Any)(implicit bpp: InitDestroyFunctionBeanPostProcessor) = {
+    bpp.registerInitFunction(beanName, { t: T => f(t); t })
+
+    this
+  }
+  def destroyFunction(f: T => Any)(implicit bpp: InitDestroyFunctionBeanPostProcessor) = {
+    bpp.registerDestroyFunction(beanName, { t: T => f(t) })
+
+    this
+  }
+
 }
