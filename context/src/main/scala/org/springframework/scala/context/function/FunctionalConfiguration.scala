@@ -18,8 +18,8 @@ package org.springframework.scala.context.function
 
 import org.springframework.util.StringUtils
 import org.springframework.beans.factory.config.{BeanDefinition, ConfigurableBeanFactory}
+import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBeanPostProcessor, FunctionalGenericBeanDefinition}
 import org.springframework.beans.factory.support.{DefaultListableBeanFactory, BeanDefinitionReaderUtils}
-import org.springframework.scala.beans.factory.function.FunctionalGenericBeanDefinition
 
 /**
  * @author Arjen Poutsma
@@ -61,7 +61,7 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	                      scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
 	                      lazyInit: Boolean = false)
 	                     (beanFunction: => T)
-	                     (implicit manifest: Manifest[T]): () => T = {
+	                     (implicit manifest: Manifest[T]): BeanLookupFunction[T] = {
 
 		registerBean(name, aliases, scope, lazyInit, beanFunction _, manifest)
 	}
@@ -71,7 +71,7 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	                            scope: String,
 	                            lazyInit: Boolean,
 	                            beanFunction: () => T,
-	                            manifest: Manifest[T]): () => T = {
+	                            manifest: Manifest[T]): BeanLookupFunction[T] = {
 
 		val beanType = manifest.erasure.asInstanceOf[Class[T]]
 
@@ -84,9 +84,7 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 		beanFactory.registerBeanDefinition(beanName, bd)
 		aliases.foreach(beanFactory.registerAlias(beanName, _))
 
-		() => {
-			beanFactory.getBean(beanName, beanType)
-		}
+		new BeanLookupFunction[T](beanName, beanType, beanFactory)
 	}
 
 	private def getBeanName(name: String, definition: BeanDefinition): String = {
@@ -134,9 +132,41 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	                           aliases: Seq[String] = Seq(),
 	                           lazyInit: Boolean = false)
 	                          (beanFunction: => T)
-	                          (implicit manifest: Manifest[T]): () => T = {
+	                          (implicit manifest: Manifest[T]): BeanLookupFunction[T] = {
 		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_PROTOTYPE, lazyInit,
 			beanFunction _, manifest)
+	}
+
+	/**
+	 * Registers an initialization function for the given bean.
+	 *
+	 * @param bean the bean to register an initialization function for
+	 * @param initFunction the initialization function
+	 * @tparam T the bean type
+	 */
+	protected def init[T](bean: BeanLookupFunction[T])(initFunction: (T) => Unit) {
+		val bpp = initDestroyFunctionBeanPostProcessor()
+		bpp.registerInitFunction(bean.beanName,
+			initFunction.asInstanceOf[Function1[Any, Unit]])
+	}
+
+	/**
+	 * Registers an destruction function for the given bean.
+	 *
+	 * @param bean the bean to register an destruction function for
+	 * @param destroyFunction the destruction function
+	 * @tparam T the bean type
+	 */
+	protected def destroy[T](bean: BeanLookupFunction[T])(destroyFunction: (T) => Unit) {
+		val bpp = initDestroyFunctionBeanPostProcessor()
+		bpp.registerDestroyFunction(bean.beanName,
+			destroyFunction.asInstanceOf[Function1[Any, Unit]])
+	}
+
+	private def initDestroyFunctionBeanPostProcessor(): InitDestroyFunctionBeanPostProcessor = {
+		val bpps = beanFactory.getBeansOfType(classOf[InitDestroyFunctionBeanPostProcessor])
+		assert(bpps.size() == 1)
+		bpps.values().iterator().next()
 	}
 
 
