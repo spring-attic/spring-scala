@@ -211,4 +211,12 @@
         <module>web</module>
         <module>mvc</module>
     </modules>
+    <profiles>
+        <profile>
+            <id>samples</id>
+            <modules>
+                <module>samples</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
