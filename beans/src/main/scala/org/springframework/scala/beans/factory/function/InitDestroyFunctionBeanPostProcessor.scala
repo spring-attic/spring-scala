@@ -40,7 +40,7 @@ class InitDestroyFunctionBeanPostProcessor
 		extends DestructionAwareBeanPostProcessor with PriorityOrdered {
 
 	val initFunctions = new
-					HashMap[String, Function1[Any, AnyRef]] with SynchronizedMap[String, Function1[Any, AnyRef]]
+					HashMap[String, Function1[Any, Unit]] with SynchronizedMap[String, Function1[Any, Unit]]
 
 	val destroyFunctions = new
 					HashMap[String, Function1[Any, Unit]] with SynchronizedMap[String, Function1[Any, Unit]]
@@ -51,18 +51,18 @@ class InitDestroyFunctionBeanPostProcessor
 	/**
 	 * Registers an initialization function for the bean with the given name.
 	 *
-	 * Initialization functions are defined as `(T) => T`, i.e. a function that takes the
-	 * bean as parameter, and returns either the original bean or a wrapped one.
+	 * Initialization functions are defined as `(T) => Unit`, i.e. a function that takes the
+	 	 * bean as parameter, but does not return anything.
 	 *
 	 * @param beanName the name of the bean to register the initialization function for
 	 * @param initFunction the initialization function
 	 * @tparam T the bean type
 	 */
-	def registerInitFunction[T](beanName: String, initFunction: (T) => T) {
+	def registerInitFunction[T](beanName: String, initFunction: (T) => Unit) {
 		Assert.hasLength(beanName, "'beanName' must not be empty");
 		Assert.notNull(initFunction, "'initFunction' must not be null");
 
-		initFunctions += beanName -> initFunction.asInstanceOf[Function1[Any, AnyRef]]
+		initFunctions += beanName -> initFunction.asInstanceOf[Function1[Any, Unit]]
 	}
 
 	/**
@@ -83,10 +83,8 @@ class InitDestroyFunctionBeanPostProcessor
 	}
 
 	def postProcessBeforeInitialization(bean: AnyRef, beanName: String): AnyRef = {
-		initFunctions.get(beanName) match {
-			case Some(function) => function.apply(bean)
-			case None => bean
-		}
+		initFunctions.get(beanName).foreach(_.apply(bean))
+		bean
 	}
 
 	def postProcessAfterInitialization(bean: AnyRef, beanName: String) = bean

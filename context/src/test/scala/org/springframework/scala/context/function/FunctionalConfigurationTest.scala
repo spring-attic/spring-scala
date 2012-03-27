@@ -111,87 +111,71 @@ class FunctionalConfigurationTest extends FunSuite {
 		assert(3 == count)
 	}
 
-	test("init and destroy") {
+	test("init() and destroy()") {
 		implicit val beanFactory = new DefaultListableBeanFactory()
 		beanFactory.registerSingleton("initDestroyFunction",
 			new InitDestroyFunctionBeanPostProcessor)
 
-		var initCalled = false;
-		var destroyCalled = false;
-
 		new FunctionalConfiguration {
 
 			val foo = bean("foo") {
-				new Person("John", "Doe")
+				new InitializablePerson("John", "Doe")
 			}
 
-			init(foo)(p => {
-				initCalled = true
-				println("Initializing " + p.firstName)
-				new MyPerson(p)
-			})
+			init(foo) {
+				_.initialize()
+			}
 
-			destroy(foo)(p => {
-				destroyCalled = true
-				println("Destroying " + p.firstName)
-			})
+			destroy(foo) {
+				_.destroy()
+			}
 		}
 
 		val appContext = new GenericApplicationContext(beanFactory)
 		appContext.refresh()
-		val foo = appContext.getBean("foo", classOf[Person])
-		assert(foo.isInstanceOf[MyPerson])
-		assert(initCalled)
+		val foo = appContext.getBean("foo", classOf[InitializablePerson])
+		assert(foo.initialised)
 		appContext.close()
-		assert(destroyCalled)
+		assert(!foo.initialised)
 	}
 
-  /*
-   * The test verifies that I can configure the equivalent of ``init-method`` and ``destroy-method`` of arbitrary
-    * bean by simply supplying a function that operates on the bean. In the example above, we have the functions
-    * (with temporary names ``initFunction`` and ``destroyFunction``) that we can chain and that ultimately return ``BeanFunction[T]``
-   */
-  test("init and destroy with inline calls") {
-    implicit val beanFactory = new DefaultListableBeanFactory()
-    beanFactory.registerSingleton("initDestroyFunction",
-      new InitDestroyFunctionBeanPostProcessor)
+	test("init and destroy with inline calls") {
+		implicit val beanFactory = new DefaultListableBeanFactory()
+		beanFactory.registerSingleton("initDestroyFunction",
+			new InitDestroyFunctionBeanPostProcessor)
 
-    new FunctionalConfiguration {
+		new FunctionalConfiguration {
 
-      /*
-       * <bean class="InitialisablePerson" init-method="initialise" destroy-method="destroy" />
-       */
-      val foo = bean("foo") {
-        new InitialisablePerson("John", "Doe")
-      } initFunction { _.initialise() } destroyFunction { _.destroy() }
+			val foo = bean("foo") {
+				new InitializablePerson("John", "Doe")
+			} init {
+				_.initialize()
+			} destroy {
+				_.destroy()
+			}
 
-    }
+		}
 
-    val appContext = new GenericApplicationContext(beanFactory)
-    appContext.refresh()
-    val foo = appContext.getBean("foo", classOf[InitialisablePerson])
-    // after initialising the ApplicationContext, the ``initialised`` property should be true
-    assert(foo.initialised)
-    appContext.close()
-    // similarly, after closing the ApplicaitonContext, it should be false.
-    assert(!foo.initialised)
-  }
-
-  class InitialisablePerson(firstName: String, lastName: String) extends Person(firstName, lastName) {
-    var initialised = false
-
-    def initialise() {
-      initialised = true
-    }
-
-    def destroy() {
-      initialised = false
-    }
-  }
-
-  class MyPerson(p: Person) extends Person(p.firstName, p.lastName) {
-		
+		val appContext = new GenericApplicationContext(beanFactory)
+		appContext.refresh()
+		val foo = appContext.getBean("foo", classOf[InitializablePerson])
+		assert(foo.initialised)
+		appContext.close()
+		assert(!foo.initialised)
 	}
 
+	class InitializablePerson(firstName: String, lastName: String)
+			extends Person(firstName, lastName) {
+
+		var initialised = false
+
+		def initialize() {
+			initialised = true
+		}
+
+		def destroy() {
+			initialised = false
+		}
+	}
 
 }
