@@ -144,7 +144,7 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 	 * @param initFunction the initialization function
 	 * @tparam T the bean type
 	 */
-	protected def init[T](bean: BeanLookupFunction[T])(initFunction: (T) => T) {
+	protected def init[T](bean: BeanLookupFunction[T])(initFunction: (T) => Unit) {
 		val bpp = initDestroyFunctionBeanPostProcessor()
 		bpp.registerInitFunction(bean.beanName, initFunction)
 	}
