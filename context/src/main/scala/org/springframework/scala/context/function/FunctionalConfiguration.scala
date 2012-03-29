@@ -17,9 +17,9 @@
 package org.springframework.scala.context.function
 
 import org.springframework.util.StringUtils
-import org.springframework.beans.factory.config.{BeanDefinition, ConfigurableBeanFactory}
 import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBeanPostProcessor, FunctionalGenericBeanDefinition}
 import org.springframework.beans.factory.support.{DefaultListableBeanFactory, BeanDefinitionReaderUtils}
+import org.springframework.beans.factory.config.{BeanDefinitionHolder, BeanDefinition, ConfigurableBeanFactory}
 
 /**
  * @author Arjen Poutsma
@@ -75,14 +75,16 @@ abstract class FunctionalConfiguration(implicit val beanFactory: DefaultListable
 
 		val beanType = manifest.erasure.asInstanceOf[Class[T]]
 
-		val bd = new FunctionalGenericBeanDefinition(beanFunction)
-		bd.setScope(scope)
-		bd.setLazyInit(lazyInit)
+		val fbd = new FunctionalGenericBeanDefinition(beanFunction)
+		fbd.setScope(scope)
+		fbd.setLazyInit(lazyInit)
 
-		val beanName = getBeanName(name, bd)
+		val beanName = getBeanName(name, fbd)
 
-		beanFactory.registerBeanDefinition(beanName, bd)
-		aliases.foreach(beanFactory.registerAlias(beanName, _))
+		val definitionHolder = new BeanDefinitionHolder(fbd, beanName, aliases
+				.toArray)
+
+		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.beanFactory);
 
 		new BeanLookupFunction[T](beanName, beanType, beanFactory)
 	}
