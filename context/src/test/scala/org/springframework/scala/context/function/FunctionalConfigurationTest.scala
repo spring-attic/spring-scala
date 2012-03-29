@@ -58,7 +58,7 @@ class FunctionalConfigurationTest extends FunSuite {
 		val config = new Config
 		val beanFromConfig = config.foo
 		val beanFromBeanFactory = beanFactory.getBean("foo", classOf[Person])
-		assert(beanFromConfig == beanFromBeanFactory)
+		assert(beanFromConfig eq beanFromBeanFactory)
 		assert(1 == count)
 	}
 
@@ -77,9 +77,9 @@ class FunctionalConfigurationTest extends FunSuite {
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
 		val beanFromBeanFactory = beanFactory.getBean("foo", classOf[Person])
-		assert(beanFromConfig1 != beanFromConfig2)
-		assert(beanFromConfig1 != beanFromBeanFactory)
-		assert(beanFromConfig2 != beanFromBeanFactory)
+		assert(!(beanFromConfig1 eq beanFromConfig2))
+		assert(!(beanFromConfig1 eq beanFromBeanFactory))
+		assert(!(beanFromConfig2 eq beanFromBeanFactory))
 		assert(3 == count)
 	}
 
@@ -98,8 +98,8 @@ class FunctionalConfigurationTest extends FunSuite {
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
 		val beanFromBeanFactory = beanFactory.getBean("foo", classOf[Person])
-		assert(beanFromConfig1 == beanFromConfig2)
-		assert(beanFromConfig1 == beanFromBeanFactory)
+		assert(beanFromConfig1 eq beanFromConfig2)
+		assert(beanFromConfig1 eq beanFromBeanFactory)
 		assert(1 == count)
 	}
 
@@ -118,9 +118,9 @@ class FunctionalConfigurationTest extends FunSuite {
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
 		val beanFromBeanFactory = beanFactory.getBean("foo", classOf[Person])
-		assert(beanFromConfig1 != beanFromConfig2)
-		assert(beanFromConfig1 != beanFromBeanFactory)
-		assert(beanFromConfig2 != beanFromBeanFactory)
+		assert(!(beanFromConfig1 eq beanFromConfig2))
+		assert(!(beanFromConfig1 eq beanFromBeanFactory))
+		assert(!(beanFromConfig2 eq beanFromBeanFactory))
 		assert(3 == count)
 	}
 
