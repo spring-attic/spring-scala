@@ -27,8 +27,24 @@ import org.springframework.context.support.GenericApplicationContext
  */
 class FunctionalConfigurationTest extends FunSuite {
 
+	implicit val beanFactory = new DefaultListableBeanFactory()
+
+	test("bean() aliases") {
+		class Config extends FunctionalConfiguration {
+
+			bean(name = "foo", aliases = Seq("bar")) {
+				"Foo"
+			}
+		}
+
+		new Config
+		val foo = beanFactory.getBean("foo", classOf[String])
+		val bar = beanFactory.getBean("bar", classOf[String])
+
+		assert(foo eq bar)
+	}
+
 	test("singleton()") {
-		implicit val beanFactory = new DefaultListableBeanFactory()
 		var count = 0;
 
 		class Config extends FunctionalConfiguration {
@@ -47,7 +63,6 @@ class FunctionalConfigurationTest extends FunSuite {
 	}
 
 	test("prototype()") {
-		implicit val beanFactory = new DefaultListableBeanFactory()
 		var count = 0;
 
 		class Config extends FunctionalConfiguration {
@@ -69,7 +84,6 @@ class FunctionalConfigurationTest extends FunSuite {
 	}
 
 	test("singleton bean()") {
-		implicit val beanFactory = new DefaultListableBeanFactory()
 		var count = 0;
 
 		class Config extends FunctionalConfiguration {
@@ -90,7 +104,6 @@ class FunctionalConfigurationTest extends FunSuite {
 	}
 
 	test("prototype bean()") {
-		implicit val beanFactory = new DefaultListableBeanFactory()
 		var count = 0;
 
 		class Config extends FunctionalConfiguration {
@@ -112,7 +125,6 @@ class FunctionalConfigurationTest extends FunSuite {
 	}
 
 	test("init() and destroy()") {
-		implicit val beanFactory = new DefaultListableBeanFactory()
 		beanFactory.registerSingleton("initDestroyFunction",
 			new InitDestroyFunctionBeanPostProcessor)
 
@@ -140,7 +152,6 @@ class FunctionalConfigurationTest extends FunSuite {
 	}
 
 	test("init and destroy with inline calls") {
-		implicit val beanFactory = new DefaultListableBeanFactory()
 		beanFactory.registerSingleton("initDestroyFunction",
 			new InitDestroyFunctionBeanPostProcessor)
 
