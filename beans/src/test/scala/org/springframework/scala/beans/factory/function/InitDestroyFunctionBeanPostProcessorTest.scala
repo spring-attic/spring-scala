@@ -32,8 +32,14 @@ class InitDestroyFunctionBeanPostProcessorTest extends FunSuite {
 		var function1Invoked = false
 		var function2Invoked = false
 
-		bpp.registerInitFunction(beanName, (s: String) => {function1Invoked = true})
-		bpp.registerInitFunction(beanName, (s: String) => {function2Invoked = true})
+		bpp.registerInitFunction(beanName, (s: String) => {
+			assert(!function2Invoked)
+			function1Invoked = true
+		})
+		bpp.registerInitFunction(beanName, (s: String) => {
+			assert(function1Invoked)
+			function2Invoked = true
+		})
 
 		val result = bpp.postProcessBeforeInitialization(bean, beanName)
 
@@ -47,8 +53,14 @@ class InitDestroyFunctionBeanPostProcessorTest extends FunSuite {
 		var function1Invoked = false
 		var function2Invoked = false
 
-		bpp.registerDestroyFunction(beanName, (s: String) => {function1Invoked = true})
-		bpp.registerDestroyFunction(beanName, (s: String) => {function2Invoked = true})
+		bpp.registerDestroyFunction(beanName, (s: String) => {
+			assert(!function2Invoked)
+			function1Invoked = true
+		})
+		bpp.registerDestroyFunction(beanName, (s: String) => {
+			assert(function1Invoked)
+			function2Invoked = true
+		})
 
 		bpp.postProcessBeforeDestruction("bar", beanName)
 
