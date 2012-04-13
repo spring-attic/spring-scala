@@ -16,20 +16,18 @@
 
 package org.springframework.scala.context.function
 
-import org.scalatest.FunSuite
-import org.springframework.beans.factory.support.DefaultListableBeanFactory
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.scala.beans.factory.function.InitDestroyFunctionBeanPostProcessor
 import org.springframework.context.support.GenericApplicationContext
+import org.scalatest.{BeforeAndAfterEach, FunSuite}
 
 /**
  * @author Arjen Poutsma
  */
-class FunctionalConfigurationTest extends FunSuite {
-
-	implicit val beanFactory = new DefaultListableBeanFactory()
+class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 
 	test("bean() aliases") {
+		implicit val applicationContext = new GenericApplicationContext()
 		class Config extends FunctionalConfiguration {
 
 			bean(name = "foo", aliases = Seq("bar")) {
@@ -38,13 +36,14 @@ class FunctionalConfigurationTest extends FunSuite {
 		}
 
 		new Config
-		val foo = beanFactory.getBean("foo", classOf[String])
-		val bar = beanFactory.getBean("bar", classOf[String])
+		val foo = applicationContext.getBean("foo", classOf[String])
+		val bar = applicationContext.getBean("bar", classOf[String])
 
 		assert(foo eq bar)
 	}
 
 	test("singleton()") {
+		implicit val applicationContext = new GenericApplicationContext()
 		var count = 0;
 
 		class Config extends FunctionalConfiguration {
@@ -57,12 +56,13 @@ class FunctionalConfigurationTest extends FunSuite {
 
 		val config = new Config
 		val beanFromConfig = config.foo
-		val beanFromBeanFactory = beanFactory.getBean("foo", classOf[Person])
+		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
 		assert(beanFromConfig eq beanFromBeanFactory)
 		assert(1 == count)
 	}
 
 	test("prototype()") {
+		implicit val applicationContext = new GenericApplicationContext()
 		var count = 0;
 
 		class Config extends FunctionalConfiguration {
@@ -76,7 +76,7 @@ class FunctionalConfigurationTest extends FunSuite {
 		val config = new Config
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
-		val beanFromBeanFactory = beanFactory.getBean("foo", classOf[Person])
+		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
 		assert(!(beanFromConfig1 eq beanFromConfig2))
 		assert(!(beanFromConfig1 eq beanFromBeanFactory))
 		assert(!(beanFromConfig2 eq beanFromBeanFactory))
@@ -84,6 +84,7 @@ class FunctionalConfigurationTest extends FunSuite {
 	}
 
 	test("singleton bean()") {
+		implicit val applicationContext = new GenericApplicationContext()
 		var count = 0;
 
 		class Config extends FunctionalConfiguration {
@@ -97,13 +98,14 @@ class FunctionalConfigurationTest extends FunSuite {
 		val config = new Config
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
-		val beanFromBeanFactory = beanFactory.getBean("foo", classOf[Person])
+		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
 		assert(beanFromConfig1 eq beanFromConfig2)
 		assert(beanFromConfig1 eq beanFromBeanFactory)
 		assert(1 == count)
 	}
 
 	test("prototype bean()") {
+		implicit val applicationContext = new GenericApplicationContext()
 		var count = 0;
 
 		class Config extends FunctionalConfiguration {
@@ -117,42 +119,16 @@ class FunctionalConfigurationTest extends FunSuite {
 		val config = new Config
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
-		val beanFromBeanFactory = beanFactory.getBean("foo", classOf[Person])
+		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
 		assert(!(beanFromConfig1 eq beanFromConfig2))
 		assert(!(beanFromConfig1 eq beanFromBeanFactory))
 		assert(!(beanFromConfig2 eq beanFromBeanFactory))
 		assert(3 == count)
 	}
 
-	test("init() and destroy()") {
-		beanFactory.registerSingleton("initDestroyFunction",
-			new InitDestroyFunctionBeanPostProcessor)
-
-		new FunctionalConfiguration {
-
-			val foo = bean("foo") {
-				new InitializablePerson("John", "Doe")
-			}
-
-			init(foo) {
-				_.initialize()
-			}
-
-			destroy(foo) {
-				_.destroy()
-			}
-		}
-
-		val appContext = new GenericApplicationContext(beanFactory)
-		appContext.refresh()
-		val foo = appContext.getBean("foo", classOf[InitializablePerson])
-		assert(foo.initialised)
-		appContext.close()
-		assert(!foo.initialised)
-	}
-
-	test("init and destroy with inline calls") {
-		beanFactory.registerSingleton("initDestroyFunction",
+	test("init and destroy") {
+		implicit val applicationContext = new GenericApplicationContext()
+		applicationContext.getDefaultListableBeanFactory.registerSingleton("initDestroyFunction",
 			new InitDestroyFunctionBeanPostProcessor)
 
 		new FunctionalConfiguration {
@@ -166,27 +142,40 @@ class FunctionalConfigurationTest extends FunSuite {
 			}
 
 		}
+		applicationContext.refresh()
 
-		val appContext = new GenericApplicationContext(beanFactory)
-		appContext.refresh()
-		val foo = appContext.getBean("foo", classOf[InitializablePerson])
+		val foo = applicationContext.getBean("foo", classOf[InitializablePerson])
 		assert(foo.initialised)
-		appContext.close()
+		applicationContext.close()
 		assert(!foo.initialised)
 	}
 
-	class InitializablePerson(firstName: String, lastName: String)
-			extends Person(firstName, lastName) {
+	test("profile") {
+		implicit val applicationContext = new GenericApplicationContext()
+		applicationContext.getEnvironment.addActiveProfile("profile1")
 
-		var initialised = false
+		val config = new FunctionalConfiguration() {
 
-		def initialize() {
-			initialised = true
+			val foo = profile("profile1") {
+				bean("foo") {
+					"Foo"
+				}
+			}
+
+			val bar = profile("profile2") {
+				bean("bar") {
+					"Bar"
+				}
+			}
 		}
-
-		def destroy() {
-			initialised = false
-		}
+		assert(applicationContext.containsBean("foo"))
+		assert(!applicationContext.containsBean("bar"))
+		assert("Foo" == applicationContext.getBean("foo"))
+		assert(config.foo.isDefined)
+		assert(config.bar.isEmpty)
+		assert("Foo" == config.foo.get())
+		assert(None == config.bar)
 	}
+
 
 }

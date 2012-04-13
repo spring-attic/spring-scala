@@ -21,12 +21,14 @@ import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBean
 import org.springframework.beans.factory.config.{BeanDefinitionHolder, BeanDefinition, ConfigurableBeanFactory}
 import org.springframework.beans.factory.support.{BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 import org.springframework.beans.factory.{ListableBeanFactory, BeanFactory}
+import org.springframework.core.env.EnvironmentCapable
 
 /**
  * @author Arjen Poutsma
  */
 abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinitionRegistry,
-                                       implicit val factory: BeanFactory) {
+                                       implicit val factory: BeanFactory,
+                                       implicit val environmentCapable: EnvironmentCapable) {
 
 	/**
 	 * Return an instance, which may be shared or independent, of the specified bean.
@@ -60,8 +62,7 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 	 */
 	protected def bean[T](name: String = "",
 	                      aliases: Seq[String] = Seq(),
-	                      scope: String = ConfigurableBeanFactory
-			                      .SCOPE_SINGLETON,
+	                      scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
 	                      lazyInit: Boolean = false)
 	                     (beanFunction: => T)
 	                     (implicit manifest: Manifest[T]): BeanLookupFunction[T] = {
@@ -87,14 +88,12 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 		val definitionHolder = new
 						BeanDefinitionHolder(fbd, beanName, aliases.toArray)
 
-		BeanDefinitionReaderUtils
-				.registerBeanDefinition(definitionHolder, this.beanRegistry);
+		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.beanRegistry);
 
 		new BeanLookupFunction[T](beanName, beanType, factory)
 	}
 
-	private def getBeanName(name: String,
-	                        definition: BeanDefinition): String = {
+	private def getBeanName(name: String, definition: BeanDefinition): String = {
 		if (StringUtils.hasLength(name)) {
 			name
 		}
@@ -120,8 +119,8 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 	                          (beanFunction: => T)
 	                          (implicit manifest: Manifest[T]): T = {
 
-		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_SINGLETON,
-			lazyInit, beanFunction _, manifest).apply()
+		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_SINGLETON, lazyInit,
+			beanFunction _, manifest).apply()
 	}
 
 	/**
@@ -140,34 +139,29 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 	                           lazyInit: Boolean = false)
 	                          (beanFunction: => T)
 	                          (implicit manifest: Manifest[T]): BeanLookupFunction[T] = {
-		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_PROTOTYPE,
-			lazyInit, beanFunction _, manifest)
+		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_PROTOTYPE, lazyInit,
+			beanFunction _, manifest)
 	}
 
 	/**
-	 * Registers an initialization function for the given bean.
+	 * Indicates that the wrapped bean(s) are eligible for registration when one or more
+	 * specified profiles are active.
 	 *
-	 * @param bean the bean to register an initialization function for
-	 * @param initFunction the initialization function
+	 * @param profiles the set of profiles for which this
+	 * @param function the bean lookup function
 	 * @tparam T the bean type
+	 * @return an option value containing the specified bean lookup function; or `None` if
+	 *         the given profiles are not active
 	 */
-	protected def init[T](bean: BeanLookupFunction[T])
-	                     (initFunction: (T) => Unit) {
-		val bpp = initDestroyFunctionBeanPostProcessor()
-		bpp.registerInitFunction(bean.beanName, initFunction)
-	}
-
-	/**
-	 * Registers a destruction function for the given bean.
-	 *
-	 * @param bean the bean to register an destruction function for
-	 * @param destroyFunction the destruction function
-	 * @tparam T the bean type
-	 */
-	protected def destroy[T](bean: BeanLookupFunction[T])
-	                        (destroyFunction: (T) => Unit) {
-		val bpp = initDestroyFunctionBeanPostProcessor()
-		bpp.registerDestroyFunction(bean.beanName, destroyFunction)
+	protected def profile[T](profiles: String*)
+	                        (function: => BeanLookupFunction[T]): Option[BeanLookupFunction[T]] = {
+		val env = environmentCapable.getEnvironment
+		if (env.acceptsProfiles(profiles: _*)) {
+			Option(function)
+		}
+		else {
+			None
+		}
 	}
 
 	/**
@@ -181,8 +175,7 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 		// TODO: get BPP from well-known bean name
 		factory match {
 			case lbf: ListableBeanFactory => {
-				val bpps = lbf.getBeansOfType(
-					classOf[InitDestroyFunctionBeanPostProcessor])
+				val bpps = lbf.getBeansOfType(classOf[InitDestroyFunctionBeanPostProcessor])
 				assert(bpps.size() == 1)
 				bpps.values().iterator().next()
 

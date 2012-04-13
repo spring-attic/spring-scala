@@ -26,3 +26,17 @@ class Person(val firstName: String, val lastName: String) {
 
 	override def toString = firstName + " " + lastName
 }
+
+class InitializablePerson(firstName: String, lastName: String)
+		extends Person(firstName, lastName) {
+
+	var initialised = false
+
+	def initialize() {
+		initialised = true
+	}
+
+	def destroy() {
+		initialised = false
+	}
+}
