@@ -36,7 +36,8 @@ class BeanLookupFunction[T](val beanName: String,
 	 *
 	 * @param initFunction the initialization function
 	 */
-	def init(initFunction: T => Unit)(implicit bpp: InitDestroyFunctionBeanPostProcessor) = {
+	def init(initFunction: T => Unit)
+	        (implicit bpp: InitDestroyFunctionBeanPostProcessor) = {
 		bpp.registerInitFunction(beanName, initFunction)
 
 		this
