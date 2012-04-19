@@ -16,27 +16,18 @@
 
 package org.springframework.scala.context.function
 
+import org.scalatest.FunSuite
+
 /**
- * Function that looks up a bean in a bean factory. Also allows
- * for registration of init and destroy methods.
- *
  * @author Arjen Poutsma
- * @see FunctionalConfiguration
  */
-trait BeanLookupFunction[T] extends Function0[T] {
+class FunctionalConfigApplicationContextTest extends FunSuite {
 
-	/**
-	 * Registers an initialization function.
-	 *
-	 * @param initFunction the initialization function
-	 */
-	def init(initFunction: T => Unit): BeanLookupFunction[T]
-
-	/**
-	 * Registers a destruction function.
-	 *
-	 * @param destroyFunction the destruction function
-	 */
-	def destroy(destroyFunction: T => Unit): BeanLookupFunction[T]
+	test("register") {
+		val appContext = new FunctionalConfigApplicationContext(classOf[MyConfig])
+//		appContext.registerClasses(classOf[MyConfig])
+		val foo = appContext.getBean("foo")
+		assert("Foo" == foo)
+	}
 
 }
