@@ -55,7 +55,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 		}
 
 		val config = new Config
-		val beanFromConfig = config.foo
+		val beanFromConfig: Person = config.foo
 		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
 		assert(beanFromConfig eq beanFromBeanFactory)
 		assert(1 == count)
@@ -126,9 +126,34 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 		assert(3 == count)
 	}
 
+	test("references") {
+		implicit val applicationContext = new GenericApplicationContext()
+
+		val config = new FunctionalConfiguration() {
+			val jack = bean() {
+				new Person("Jack", "Doe")
+			}
+
+			val jane = bean() {
+				new Person("Jane", "Doe")
+			}
+
+			val john = bean() {
+				val person = new Person("John", "Doe")
+				person.father = jack()
+				person.mother = jane()
+				person
+			}
+		}
+		val john = config.john()
+		assert(john.father eq config.jack())
+		assert(john.mother eq config.jane())
+	}
+
 	test("init and destroy") {
 		implicit val applicationContext = new GenericApplicationContext()
-		applicationContext.getDefaultListableBeanFactory.registerSingleton("initDestroyFunction",
+		applicationContext.getDefaultListableBeanFactory
+				.registerSingleton("initDestroyFunction",
 			new InitDestroyFunctionBeanPostProcessor)
 
 		new FunctionalConfiguration {
@@ -140,7 +165,6 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 			} destroy {
 				_.destroy()
 			}
-
 		}
 		applicationContext.refresh()
 
@@ -154,15 +178,15 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 		implicit val applicationContext = new GenericApplicationContext()
 		applicationContext.getEnvironment.addActiveProfile("profile1")
 
-		val config = new FunctionalConfiguration() {
+		new FunctionalConfiguration() {
 
-			val foo = profile("profile1") {
+			profile("profile1") {
 				bean("foo") {
 					"Foo"
 				}
 			}
 
-			val bar = profile("profile2") {
+			profile("profile2") {
 				bean("bar") {
 					"Bar"
 				}
@@ -171,10 +195,22 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 		assert(applicationContext.containsBean("foo"))
 		assert(!applicationContext.containsBean("bar"))
 		assert("Foo" == applicationContext.getBean("foo"))
-		assert(config.foo.isDefined)
-		assert(config.bar.isEmpty)
-		assert("Foo" == config.foo.get())
-		assert(None == config.bar)
+	}
+
+	test("importResource") {
+		implicit val applicationContext = new GenericApplicationContext()
+
+		val config = new FunctionalConfiguration() {
+
+			importResource(
+				"classpath:/org/springframework/scala/context/function/imported.xml")
+
+			val john = bean() {
+				new Person(getBean("firstName"), getBean("lastName"))
+			}
+		}
+		assert("John" == config.john().firstName)
+		assert("Doe" == config.john().lastName)
 	}
 
 

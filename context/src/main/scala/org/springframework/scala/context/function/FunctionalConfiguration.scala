@@ -19,15 +19,16 @@ package org.springframework.scala.context.function
 import org.springframework.util.StringUtils
 import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBeanPostProcessor, FunctionalGenericBeanDefinition}
 import org.springframework.beans.factory.config.{BeanDefinitionHolder, BeanDefinition, ConfigurableBeanFactory}
-import org.springframework.beans.factory.support.{BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 import org.springframework.beans.factory.{ListableBeanFactory, BeanFactory}
 import org.springframework.core.env.EnvironmentCapable
+import org.springframework.beans.factory.support.{BeanDefinitionRegistry, BeanDefinitionReaderUtils}
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 
 /**
  * @author Arjen Poutsma
  */
 abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinitionRegistry,
-                                       implicit val factory: BeanFactory,
+                                       implicit val beanFactory: BeanFactory,
                                        implicit val environmentCapable: EnvironmentCapable) {
 
 	/**
@@ -45,7 +46,7 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 	 */
 	def getBean[T](name: String)(implicit manifest: Manifest[T]): T = {
 		val beanType = manifest.erasure.asInstanceOf[Class[T]]
-		factory.getBean(name, beanType)
+		beanFactory.getBean(name, beanType)
 	}
 
 	/**
@@ -90,7 +91,19 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.beanRegistry);
 
-		new BeanLookupFunction[T](beanName, beanType, factory)
+		new BeanLookupFunction[T] {
+			def apply() = beanFactory.getBean(beanName, beanType)
+
+			def init(initFunction: T => Unit): BeanLookupFunction[T] = {
+				_initDestroyFunctionBeanPostProcessor.registerInitFunction(beanName, initFunction)
+				this
+			}
+
+			def destroy(destroyFunction: T => Unit): BeanLookupFunction[T] = {
+				_initDestroyFunctionBeanPostProcessor.registerDestroyFunction(beanName, destroyFunction)
+				this
+			}
+		}
 	}
 
 	private def getBeanName(name: String, definition: BeanDefinition): String = {
@@ -153,8 +166,7 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 	 * @return an option value containing the specified bean lookup function; or `None` if
 	 *         the given profiles are not active
 	 */
-	protected def profile[T](profiles: String*)
-	                        (function: => BeanLookupFunction[T]): Option[BeanLookupFunction[T]] = {
+	protected def profile[T](profiles: String*)(function: => T): Option[T] = {
 		val env = environmentCapable.getEnvironment
 		if (env.acceptsProfiles(profiles: _*)) {
 			Option(function)
@@ -164,16 +176,21 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 		}
 	}
 
+	protected def importResource(resources: String*) {
+		val beanDefinitionReader = new XmlBeanDefinitionReader(beanRegistry)
+		beanDefinitionReader.loadBeanDefinitions(resources: _*)
+	}
+
 	/**
 	 * Exposes the ``InitDestroyFunctionBeanPostProcessor`` so that the subclasses can use the (temporary!)
 	 * ``BeanLookupFunction.initFunction`` and ``BeanLookupFunction.destroyFunction`` without having to specify this instance
 	 * explicitly.
 	 */
-	protected implicit lazy val _initDestroyFunctionBeanPostProcessor = initDestroyFunctionBeanPostProcessor()
+	private lazy val _initDestroyFunctionBeanPostProcessor = initDestroyFunctionBeanPostProcessor()
 
 	private def initDestroyFunctionBeanPostProcessor(): InitDestroyFunctionBeanPostProcessor = {
 		// TODO: get BPP from well-known bean name
-		factory match {
+		beanFactory match {
 			case lbf: ListableBeanFactory => {
 				val bpps = lbf.getBeansOfType(classOf[InitDestroyFunctionBeanPostProcessor])
 				assert(bpps.size() == 1)
