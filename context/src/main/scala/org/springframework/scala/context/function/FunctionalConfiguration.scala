@@ -18,18 +18,27 @@ package org.springframework.scala.context.function
 
 import org.springframework.util.StringUtils
 import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBeanPostProcessor, FunctionalGenericBeanDefinition}
-import org.springframework.beans.factory.config.{BeanDefinitionHolder, BeanDefinition, ConfigurableBeanFactory}
+import org.springframework.beans.factory.config.{BeanDefinitionHolder, ConfigurableBeanFactory}
 import org.springframework.beans.factory.{ListableBeanFactory, BeanFactory}
-import org.springframework.core.env.EnvironmentCapable
-import org.springframework.beans.factory.support.{BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+import org.springframework.context.support.GenericApplicationContext
+import org.springframework.core.env.Environment
+import org.springframework.beans.factory.support.{BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 
 /**
  * @author Arjen Poutsma
  */
-abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinitionRegistry,
-                                       implicit val beanFactory: BeanFactory,
-                                       implicit val environmentCapable: EnvironmentCapable) {
+trait FunctionalConfiguration extends DelayedInit {
+
+	private var body: Option[Function0[Unit]] = None
+
+	private var _applicationContext: GenericApplicationContext = _
+
+	private def beanFactory: BeanFactory = _applicationContext
+
+	private def beanRegistry: BeanDefinitionRegistry = _applicationContext
+
+	private def environment: Environment = _applicationContext.getEnvironment
 
 	/**
 	 * Return an instance, which may be shared or independent, of the specified bean.
@@ -71,12 +80,12 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 		registerBean(name, aliases, scope, lazyInit, beanFunction _, manifest)
 	}
 
-	private def registerBean[T](name: String,
-	                            aliases: Seq[String],
-	                            scope: String,
-	                            lazyInit: Boolean,
-	                            beanFunction: () => T,
-	                            manifest: Manifest[T]): BeanLookupFunction[T] = {
+	private[springframework] def registerBean[T](name: String,
+	                                             aliases: Seq[String],
+	                                             scope: String,
+	                                             lazyInit: Boolean,
+	                                             beanFunction: () => T,
+	                                             manifest: Manifest[T]): BeanLookupFunction[T] = {
 
 		val beanType = manifest.erasure.asInstanceOf[Class[T]]
 
@@ -84,34 +93,29 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 		fbd.setScope(scope)
 		fbd.setLazyInit(lazyInit)
 
-		val beanName = getBeanName(name, fbd)
+		val beanName = if (StringUtils.hasLength(name)) name
+		else BeanDefinitionReaderUtils.generateBeanName(fbd, beanRegistry)
 
 		val definitionHolder = new
 						BeanDefinitionHolder(fbd, beanName, aliases.toArray)
 
-		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.beanRegistry);
+		BeanDefinitionReaderUtils
+				.registerBeanDefinition(definitionHolder, this.beanRegistry);
 
 		new BeanLookupFunction[T] {
 			def apply() = beanFactory.getBean(beanName, beanType)
 
 			def init(initFunction: T => Unit): BeanLookupFunction[T] = {
-				_initDestroyFunctionBeanPostProcessor.registerInitFunction(beanName, initFunction)
+				_initDestroyFunctionBeanPostProcessor
+						.registerInitFunction(beanName, initFunction)
 				this
 			}
 
 			def destroy(destroyFunction: T => Unit): BeanLookupFunction[T] = {
-				_initDestroyFunctionBeanPostProcessor.registerDestroyFunction(beanName, destroyFunction)
+				_initDestroyFunctionBeanPostProcessor
+						.registerDestroyFunction(beanName, destroyFunction)
 				this
 			}
-		}
-	}
-
-	private def getBeanName(name: String, definition: BeanDefinition): String = {
-		if (StringUtils.hasLength(name)) {
-			name
-		}
-		else {
-			BeanDefinitionReaderUtils.generateBeanName(definition, beanRegistry)
 		}
 	}
 
@@ -132,8 +136,8 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 	                          (beanFunction: => T)
 	                          (implicit manifest: Manifest[T]): T = {
 
-		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_SINGLETON, lazyInit,
-			beanFunction _, manifest).apply()
+		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_SINGLETON,
+			lazyInit, beanFunction _, manifest).apply()
 	}
 
 	/**
@@ -152,8 +156,8 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 	                           lazyInit: Boolean = false)
 	                          (beanFunction: => T)
 	                          (implicit manifest: Manifest[T]): BeanLookupFunction[T] = {
-		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_PROTOTYPE, lazyInit,
-			beanFunction _, manifest)
+		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_PROTOTYPE,
+			lazyInit, beanFunction _, manifest)
 	}
 
 	/**
@@ -167,16 +171,28 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 	 *         the given profiles are not active
 	 */
 	protected def profile[T](profiles: String*)(function: => T): Option[T] = {
-		val env = environmentCapable.getEnvironment
-		if (env.acceptsProfiles(profiles: _*)) {
+		if (environment.acceptsProfiles(profiles: _*)) {
 			Option(function)
-		}
-		else {
+		} else {
 			None
 		}
 	}
 
-	protected def importResource(resources: String*) {
+	/**
+	 * Imports one or more resources containing XML bean definitions.
+	 *
+	 * This method provides functionality similar to the
+	 * ``&lt;import/&gt;`` element in Spring XML.  It is typically used when
+	 * designing
+	 * [[org.springframework.scala.context.function.FunctionalConfiguration]]
+	 * classes to be bootstrapped by
+	 * [[org.springframework.scala.context.function.FunctionalConfigApplicationContext]],
+	 * but where some XML functionality such as namespaces is still necessary.
+	 *
+	 * @param resources the resource paths to import.  Resource-loading prefixes
+	 *                  such as ``classpath:`` and ``file:``, etc may be used.
+	 */
+	protected def importXml(resources: String*) {
 		val beanDefinitionReader = new XmlBeanDefinitionReader(beanRegistry)
 		beanDefinitionReader.loadBeanDefinitions(resources: _*)
 	}
@@ -192,7 +208,8 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 		// TODO: get BPP from well-known bean name
 		beanFactory match {
 			case lbf: ListableBeanFactory => {
-				val bpps = lbf.getBeansOfType(classOf[InitDestroyFunctionBeanPostProcessor])
+				val bpps = lbf
+						.getBeansOfType(classOf[InitDestroyFunctionBeanPostProcessor])
 				assert(bpps.size() == 1)
 				bpps.values().iterator().next()
 
@@ -200,5 +217,18 @@ abstract class FunctionalConfiguration(implicit val beanRegistry: BeanDefinition
 		}
 	}
 
+	/**
+	 * Registers this functional configuration class with the given application context.
+	 *
+	 * @param applicationContext the application context
+	 */
+	private[context] def register(applicationContext: GenericApplicationContext) {
+		this._applicationContext = applicationContext
+		body.foreach(_())
+	}
+
+	final override def delayedInit(body: => Unit) {
+		this.body = Some(() => body)
+	}
 
 }

@@ -26,16 +26,21 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite}
  */
 class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 
+	var applicationContext: GenericApplicationContext = _
+
+	override protected def beforeEach() {
+		applicationContext = new GenericApplicationContext()
+	}
+
 	test("bean() aliases") {
-		implicit val applicationContext = new GenericApplicationContext()
-		class Config extends FunctionalConfiguration {
+		val config = new FunctionalConfiguration {
 
 			bean(name = "foo", aliases = Seq("bar")) {
 				"Foo"
 			}
 		}
+		config.register(applicationContext)
 
-		new Config
 		val foo = applicationContext.getBean("foo", classOf[String])
 		val bar = applicationContext.getBean("bar", classOf[String])
 
@@ -43,10 +48,9 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("singleton()") {
-		implicit val applicationContext = new GenericApplicationContext()
 		var count = 0;
 
-		class Config extends FunctionalConfiguration {
+		val config = new FunctionalConfiguration {
 
 			val foo = singleton("foo") {
 				count += 1
@@ -54,7 +58,8 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 			}
 		}
 
-		val config = new Config
+		config.register(applicationContext)
+
 		val beanFromConfig: Person = config.foo
 		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
 		assert(beanFromConfig eq beanFromBeanFactory)
@@ -62,10 +67,9 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("prototype()") {
-		implicit val applicationContext = new GenericApplicationContext()
 		var count = 0;
 
-		class Config extends FunctionalConfiguration {
+		val config = new FunctionalConfiguration {
 
 			val foo = prototype("foo") {
 				count += 1
@@ -73,7 +77,8 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 			}
 		}
 
-		val config = new Config
+		config.register(applicationContext)
+
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
 		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
@@ -84,18 +89,17 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("singleton bean()") {
-		implicit val applicationContext = new GenericApplicationContext()
 		var count = 0;
 
-		class Config extends FunctionalConfiguration {
+		val config = new FunctionalConfiguration {
 
 			val foo = bean("foo") {
 				count += 1
 				new Person("John", "Doe")
 			}
 		}
+		config.register(applicationContext)
 
-		val config = new Config
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
 		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
@@ -105,10 +109,9 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("prototype bean()") {
-		implicit val applicationContext = new GenericApplicationContext()
 		var count = 0;
 
-		class Config extends FunctionalConfiguration {
+		val config = new FunctionalConfiguration {
 
 			val foo = bean("foo", scope = BeanDefinition.SCOPE_PROTOTYPE) {
 				count += 1
@@ -116,7 +119,8 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 			}
 		}
 
-		val config = new Config
+		config.register(applicationContext)
+
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
 		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
@@ -127,8 +131,6 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("references") {
-		implicit val applicationContext = new GenericApplicationContext()
-
 		val config = new FunctionalConfiguration() {
 			val jack = bean() {
 				new Person("Jack", "Doe")
@@ -145,6 +147,8 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 				person
 			}
 		}
+		config.register(applicationContext)
+
 		val john = config.john()
 		assert(john.father eq config.jack())
 		assert(john.mother eq config.jane())
@@ -156,7 +160,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 				.registerSingleton("initDestroyFunction",
 			new InitDestroyFunctionBeanPostProcessor)
 
-		new FunctionalConfiguration {
+		val config = new FunctionalConfiguration {
 
 			val foo = bean("foo") {
 				new InitializablePerson("John", "Doe")
@@ -166,6 +170,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 				_.destroy()
 			}
 		}
+		config.register(applicationContext)
 		applicationContext.refresh()
 
 		val foo = applicationContext.getBean("foo", classOf[InitializablePerson])
@@ -175,10 +180,9 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("profile") {
-		implicit val applicationContext = new GenericApplicationContext()
 		applicationContext.getEnvironment.addActiveProfile("profile1")
 
-		new FunctionalConfiguration() {
+		val config = new FunctionalConfiguration() {
 
 			profile("profile1") {
 				bean("foo") {
@@ -192,26 +196,26 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 				}
 			}
 		}
+		config.register(applicationContext)
+
 		assert(applicationContext.containsBean("foo"))
 		assert(!applicationContext.containsBean("bar"))
 		assert("Foo" == applicationContext.getBean("foo"))
 	}
 
 	test("importResource") {
-		implicit val applicationContext = new GenericApplicationContext()
-
 		val config = new FunctionalConfiguration() {
 
-			importResource(
-				"classpath:/org/springframework/scala/context/function/imported.xml")
+			importXml(
+				"classpath:/org/springframework/scala/context/function/imported.xml")()
 
 			val john = bean() {
 				new Person(getBean("firstName"), getBean("lastName"))
 			}
 		}
+		config.register(applicationContext)
 		assert("John" == config.john().firstName)
 		assert("Doe" == config.john().lastName)
 	}
-
 
 }
