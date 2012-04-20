@@ -16,29 +16,30 @@
 
 package org.springframework.scala.context.function
 
-import org.springframework.util.StringUtils
 import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBeanPostProcessor, FunctionalGenericBeanDefinition}
-import org.springframework.beans.factory.config.{BeanDefinitionHolder, ConfigurableBeanFactory}
 import org.springframework.beans.factory.{ListableBeanFactory, BeanFactory}
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.core.env.Environment
-import org.springframework.beans.factory.support.{BeanDefinitionRegistry, BeanDefinitionReaderUtils}
+import org.springframework.beans.factory.support.{BeanDefinitionReader, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
+import org.springframework.util.StringUtils
+import org.springframework.util.Assert.notNull
+import org.springframework.util.Assert.state
+import org.springframework.beans.factory.config.{BeanDefinition, BeanDefinitionHolder, ConfigurableBeanFactory}
+import scala.collection.mutable.ListBuffer
 
 /**
  * @author Arjen Poutsma
  */
 trait FunctionalConfiguration extends DelayedInit {
 
-	private var body: Option[Function0[Unit]] = None
+	private val initCode = new ListBuffer[() => Unit]
 
-	private var _applicationContext: GenericApplicationContext = _
+	private var beanFactory: BeanFactory = _
 
-	private def beanFactory: BeanFactory = _applicationContext
+	private var beanRegistry: BeanDefinitionRegistry = _
 
-	private def beanRegistry: BeanDefinitionRegistry = _applicationContext
-
-	private def environment: Environment = _applicationContext.getEnvironment
+	private var environment: Environment = _
 
 	/**
 	 * Return an instance, which may be shared or independent, of the specified bean.
@@ -54,6 +55,7 @@ trait FunctionalConfiguration extends DelayedInit {
 	 * @throws BeansException if the bean could not be created
 	 */
 	def getBean[T](name: String)(implicit manifest: Manifest[T]): T = {
+		state(beanFactory != null, "BeanFactory has not been register yet. ")
 		val beanType = manifest.erasure.asInstanceOf[Class[T]]
 		beanFactory.getBean(name, beanType)
 	}
@@ -86,6 +88,8 @@ trait FunctionalConfiguration extends DelayedInit {
 	                                             lazyInit: Boolean,
 	                                             beanFunction: () => T,
 	                                             manifest: Manifest[T]): BeanLookupFunction[T] = {
+		state(beanRegistry != null, "BeanRegistry has not been register yet. " +
+				"Did you make sure the return value is marked as 'lazy'?")
 
 		val beanType = manifest.erasure.asInstanceOf[Class[T]]
 
@@ -93,8 +97,7 @@ trait FunctionalConfiguration extends DelayedInit {
 		fbd.setScope(scope)
 		fbd.setLazyInit(lazyInit)
 
-		val beanName = if (StringUtils.hasLength(name)) name
-		else BeanDefinitionReaderUtils.generateBeanName(fbd, beanRegistry)
+		val beanName: String = getBeanName(name, fbd)
 
 		val definitionHolder = new
 						BeanDefinitionHolder(fbd, beanName, aliases.toArray)
@@ -116,6 +119,14 @@ trait FunctionalConfiguration extends DelayedInit {
 						.registerDestroyFunction(beanName, destroyFunction)
 				this
 			}
+		}
+	}
+
+	private def getBeanName(name: String, fbd: BeanDefinition): String = {
+		if (StringUtils.hasLength(name)) {
+			name
+		} else {
+			BeanDefinitionReaderUtils.generateBeanName(fbd, beanRegistry)
 		}
 	}
 
@@ -193,7 +204,13 @@ trait FunctionalConfiguration extends DelayedInit {
 	 *                  such as ``classpath:`` and ``file:``, etc may be used.
 	 */
 	protected def importXml(resources: String*) {
-		val beanDefinitionReader = new XmlBeanDefinitionReader(beanRegistry)
+		importResource(new XmlBeanDefinitionReader(_), resources: _*)
+	}
+
+	protected def importResource(readerFunction: BeanDefinitionRegistry => BeanDefinitionReader,
+	                             resources: String*) {
+		notNull(readerFunction, "'readerFunction' must not be null")
+		val beanDefinitionReader = readerFunction(beanRegistry)
 		beanDefinitionReader.loadBeanDefinitions(resources: _*)
 	}
 
@@ -223,12 +240,20 @@ trait FunctionalConfiguration extends DelayedInit {
 	 * @param applicationContext the application context
 	 */
 	private[context] def register(applicationContext: GenericApplicationContext) {
-		this._applicationContext = applicationContext
-		body.foreach(_())
+		register(applicationContext, applicationContext, applicationContext.getEnvironment)
+	}
+
+	private[context] def register(beanFactory: BeanFactory,
+	                              beanRegistry: BeanDefinitionRegistry,
+	                              environment: Environment) {
+		this.beanFactory = beanFactory
+		this.beanRegistry = beanRegistry
+		this.environment = environment
+		initCode.foreach(_())
 	}
 
 	final override def delayedInit(body: => Unit) {
-		this.body = Some(() => body)
+		initCode += (() => body)
 	}
 
 }
