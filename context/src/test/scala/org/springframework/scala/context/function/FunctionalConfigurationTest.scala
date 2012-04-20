@@ -154,6 +154,53 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 		assert(john.mother eq config.jane())
 	}
 
+	test("composition through mixin") {
+		trait FirstNameConfig extends FunctionalConfiguration {
+			lazy val firstName = bean() {
+				"John"
+			}
+		}
+		trait LastNameConfig extends FunctionalConfiguration {
+			lazy val lastName = bean() {
+				"Doe"
+			}
+		}
+		val config = new FirstNameConfig with LastNameConfig {
+			val john = bean() {
+				new Person(firstName(), lastName())
+			}
+		}
+		config.register(applicationContext)
+
+		val john = config.john()
+		assert("John" == john.firstName)
+		assert("Doe" == john.lastName)
+	}
+
+	test("composition through inheritance") {
+		class FirstNameConfig extends FunctionalConfiguration {
+			val firstName = bean() {
+				"John"
+			}
+		}
+		class LastNameConfig extends FirstNameConfig {
+			val lastName = bean() {
+				"Doe"
+			}
+		}
+		class Config extends LastNameConfig {
+			val john = bean() {
+				new Person(firstName(), lastName())
+			}
+		}
+		val config = new Config
+		config.register(applicationContext)
+
+		val john = config.john()
+		assert("John" == john.firstName)
+		assert("Doe" == john.lastName)
+	}
+
 	test("init and destroy") {
 		implicit val applicationContext = new GenericApplicationContext()
 		applicationContext.getDefaultListableBeanFactory
@@ -207,7 +254,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 		val config = new FunctionalConfiguration() {
 
 			importXml(
-				"classpath:/org/springframework/scala/context/function/imported.xml")()
+				"classpath:/org/springframework/scala/context/function/imported.xml")
 
 			val john = bean() {
 				new Person(getBean("firstName"), getBean("lastName"))
