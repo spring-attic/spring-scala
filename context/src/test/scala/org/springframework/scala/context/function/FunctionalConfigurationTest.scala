@@ -48,7 +48,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("singleton()") {
-		var count = 0;
+		var count = 0
 
 		val config = new FunctionalConfiguration {
 
@@ -67,7 +67,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("prototype()") {
-		var count = 0;
+		var count = 0
 
 		val config = new FunctionalConfiguration {
 
@@ -89,7 +89,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("singleton bean()") {
-		var count = 0;
+		var count = 0
 
 		val config = new FunctionalConfiguration {
 
@@ -109,7 +109,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("prototype bean()") {
-		var count = 0;
+		var count = 0
 
 		val config = new FunctionalConfiguration {
 
@@ -131,27 +131,27 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("references") {
-		val config = new FunctionalConfiguration() {
-			val jack = bean() {
-				new Person("Jack", "Doe")
-			}
+val config = new FunctionalConfiguration() {
+	val jack = bean() {
+		new Person("Jack", "Doe")
+	}
 
-			val jane = bean() {
-				new Person("Jane", "Doe")
-			}
+	val jane = bean() {
+		new Person("Jane", "Doe")
+	}
 
-			val john = bean() {
-				val person = new Person("John", "Doe")
-				person.father = jack()
-				person.mother = jane()
-				person
-			}
-		}
-		config.register(applicationContext)
+	val john = bean() {
+		val person = new Person("John", "Doe")
+		person.father = jack()
+		person.mother = jane()
+		person
+	}
+}
+config.register(applicationContext)
 
-		val john = config.john()
-		assert(john.father eq config.jack())
-		assert(john.mother eq config.jane())
+val john = config.john()
+assert(john.father eq config.jack())
+assert(john.mother eq config.jane())
 	}
 
 	test("composition through mixin") {
