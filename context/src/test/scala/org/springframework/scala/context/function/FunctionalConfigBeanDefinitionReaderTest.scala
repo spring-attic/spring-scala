@@ -16,11 +16,16 @@
 
 package org.springframework.scala.context.function
 
+import org.scalatest.FunSuite
+import org.springframework.beans.factory.support.DefaultBeanNameGenerator
+
 /**
  * @author Arjen Poutsma
  */
-class MyConfig extends FunctionalConfiguration {
-	bean("foo") {
-		"Foo"
-	}
+class FunctionalConfigBeanDefinitionReaderTest extends FunSuite {
+
+	val reader = new FunctionalConfigBeanDefinitionReader(null)
+
+	reader.beanNameGenerator = new DefaultBeanNameGenerator
+
 }

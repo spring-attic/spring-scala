@@ -23,11 +23,26 @@ import org.scalatest.FunSuite
  */
 class FunctionalConfigApplicationContextTest extends FunSuite {
 
-	test("register") {
-		val appContext = new FunctionalConfigApplicationContext(classOf[MyConfig])
-//		appContext.registerClasses(classOf[MyConfig])
+	test("classesConstructor") {
+		val appContext = new FunctionalConfigApplicationContext(
+			classOf[MyFunctionalConfiguration])
 		val foo = appContext.getBean("foo")
 		assert("Foo" == foo)
 	}
+
+	test("registerClasses") {
+		val appContext = new FunctionalConfigApplicationContext()
+		appContext.registerClasses(classOf[MyFunctionalConfiguration])
+		val foo = appContext.getBean("foo")
+		assert("Foo" == foo)
+	}
+
+	test("registerConfigurations") {
+		val appContext = new FunctionalConfigApplicationContext()
+		appContext.registerConfigurations(new MyFunctionalConfiguration)
+		val foo = appContext.getBean("foo")
+		assert("Foo" == foo)
+	}
+
 
 }
