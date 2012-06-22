@@ -156,11 +156,13 @@ assert(john.mother eq config.jane())
 
 	test("composition through mixin") {
 		trait FirstNameConfig extends FunctionalConfiguration {
+
 			lazy val firstName = bean() {
 				"John"
 			}
 		}
 		trait LastNameConfig extends FunctionalConfiguration {
+
 			lazy val lastName = bean() {
 				"Doe"
 			}
@@ -179,16 +181,19 @@ assert(john.mother eq config.jane())
 
 	test("composition through inheritance") {
 		class FirstNameConfig extends FunctionalConfiguration {
+
 			val firstName = bean() {
 				"John"
 			}
 		}
 		class LastNameConfig extends FirstNameConfig {
+
 			val lastName = bean() {
 				"Doe"
 			}
 		}
 		class Config extends LastNameConfig {
+
 			val john = bean() {
 				new Person(firstName(), lastName())
 			}
@@ -250,7 +255,7 @@ assert(john.mother eq config.jane())
 		assert("Foo" == applicationContext.getBean("foo"))
 	}
 
-	test("importResource") {
+	test("importXml") {
 		val config = new FunctionalConfiguration() {
 
 			importXml(
@@ -261,6 +266,22 @@ assert(john.mother eq config.jane())
 			}
 		}
 		config.register(applicationContext)
+		assert("John" == config.john().firstName)
+		assert("Doe" == config.john().lastName)
+	}
+
+	test("importClass") {
+		val config = new FunctionalConfiguration() {
+
+			importClass(classOf[MyAnnotatedConfiguration])
+
+			val john = bean() {
+				new Person(getBean("firstName"), getBean("lastName"))
+			}
+		}
+		config.register(applicationContext)
+		applicationContext.refresh()
+
 		assert("John" == config.john().firstName)
 		assert("Doe" == config.john().lastName)
 	}
