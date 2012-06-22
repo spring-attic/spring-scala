@@ -21,12 +21,12 @@ import org.springframework.beans.factory.{ListableBeanFactory, BeanFactory}
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.core.env.Environment
-import org.springframework.beans.factory.support.{BeanDefinitionReader, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 import org.springframework.util.StringUtils
-import org.springframework.util.Assert.notNull
 import org.springframework.util.Assert.state
 import org.springframework.beans.factory.config.{BeanDefinition, BeanDefinitionHolder, ConfigurableBeanFactory}
 import scala.collection.mutable.ListBuffer
+import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
+import org.springframework.beans.factory.support.{BeanNameGenerator, DefaultBeanNameGenerator, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 
 /**
  * @author Arjen Poutsma
@@ -35,11 +35,30 @@ trait FunctionalConfiguration extends DelayedInit {
 
 	private val initCode = new ListBuffer[() => Unit]
 
-	private var beanFactory: BeanFactory = _
+	private var applicationContext: GenericApplicationContext = _
 
-	private var beanRegistry: BeanDefinitionRegistry = _
+	private var beanNameGenerator: BeanNameGenerator = _
 
-	private var environment: Environment = _
+	/**
+	 * Returns the bean factory associated with this functional configuration.
+	 *
+	 * @return the bean factory
+	 */
+	protected def beanFactory: BeanFactory = applicationContext
+
+	/**
+	 * Returns the bean registry associated with this functional configuration.
+	 *
+	 * @return the bean registry
+	 */
+	protected def beanRegistry: BeanDefinitionRegistry = applicationContext
+
+	/**
+	 * Returns the environment associated with this functional configuration.
+	 *
+	 * @return the environment
+	 */
+	protected def environment: Environment = applicationContext.getEnvironment
 
 	/**
 	 * Return an instance, which may be shared or independent, of the specified bean.
@@ -126,7 +145,7 @@ trait FunctionalConfiguration extends DelayedInit {
 		if (StringUtils.hasLength(name)) {
 			name
 		} else {
-			BeanDefinitionReaderUtils.generateBeanName(fbd, beanRegistry)
+			beanNameGenerator.generateBeanName(fbd, beanRegistry)
 		}
 	}
 
@@ -204,14 +223,14 @@ trait FunctionalConfiguration extends DelayedInit {
 	 *                  such as ``classpath:`` and ``file:``, etc may be used.
 	 */
 	protected def importXml(resources: String*) {
-		importResource(new XmlBeanDefinitionReader(_), resources: _*)
+		val beanDefinitionReader = new XmlBeanDefinitionReader(beanRegistry)
+		beanDefinitionReader.loadBeanDefinitions(resources: _*)
 	}
 
-	protected def importResource(readerFunction: BeanDefinitionRegistry => BeanDefinitionReader,
-	                             resources: String*) {
-		notNull(readerFunction, "'readerFunction' must not be null")
-		val beanDefinitionReader = readerFunction(beanRegistry)
-		beanDefinitionReader.loadBeanDefinitions(resources: _*)
+	protected def importClass(annotatedClasses: Class[_]*) {
+		val beanDefinitionReader = new
+						AnnotatedBeanDefinitionReader(beanRegistry, environment)
+		beanDefinitionReader.register(annotatedClasses: _*)
 	}
 
 	/**
@@ -239,16 +258,15 @@ trait FunctionalConfiguration extends DelayedInit {
 	 *
 	 * @param applicationContext the application context
 	 */
-	private[context] def register(applicationContext: GenericApplicationContext) {
-		register(applicationContext, applicationContext, applicationContext.getEnvironment)
-	}
+	private[context] def register(applicationContext: GenericApplicationContext,
+	                              beanNameGenerator: BeanNameGenerator = new
+					                              DefaultBeanNameGenerator) {
+		require(applicationContext != null, "'applicationContext' must not be null")
+		require(beanNameGenerator != null, "'beanNameGenerator' must not be null")
 
-	private[context] def register(beanFactory: BeanFactory,
-	                              beanRegistry: BeanDefinitionRegistry,
-	                              environment: Environment) {
-		this.beanFactory = beanFactory
-		this.beanRegistry = beanRegistry
-		this.environment = environment
+		this.applicationContext = applicationContext
+		this.beanNameGenerator = beanNameGenerator
+
 		initCode.foreach(_())
 	}
 
