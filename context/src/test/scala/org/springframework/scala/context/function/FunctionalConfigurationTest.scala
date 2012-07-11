@@ -17,9 +17,9 @@
 package org.springframework.scala.context.function
 
 import org.springframework.beans.factory.config.BeanDefinition
-import org.springframework.scala.beans.factory.function.InitDestroyFunctionBeanPostProcessor
 import org.springframework.context.support.GenericApplicationContext
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
+import org.springframework.beans.factory.support.DefaultBeanNameGenerator
 
 /**
  * @author Arjen Poutsma
@@ -27,6 +27,8 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite}
 class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 
 	var applicationContext: GenericApplicationContext = _
+
+	val beanNameGenerator = new DefaultBeanNameGenerator()
 
 	override protected def beforeEach() {
 		applicationContext = new GenericApplicationContext()
@@ -39,7 +41,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 				"Foo"
 			}
 		}
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 
 		val foo = applicationContext.getBean("foo", classOf[String])
 		val bar = applicationContext.getBean("bar", classOf[String])
@@ -58,7 +60,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 			}
 		}
 
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 
 		val beanFromConfig: Person = config.foo
 		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
@@ -77,7 +79,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 			}
 		}
 
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
@@ -98,7 +100,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 				new Person("John", "Doe")
 			}
 		}
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
@@ -119,7 +121,7 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 			}
 		}
 
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 
 		val beanFromConfig1 = config.foo()
 		val beanFromConfig2 = config.foo()
@@ -131,27 +133,27 @@ class FunctionalConfigurationTest extends FunSuite with BeforeAndAfterEach {
 	}
 
 	test("references") {
-val config = new FunctionalConfiguration() {
-	val jack = bean() {
-		new Person("Jack", "Doe")
-	}
+		val config = new FunctionalConfiguration() {
+			val jack = bean() {
+				new Person("Jack", "Doe")
+			}
 
-	val jane = bean() {
-		new Person("Jane", "Doe")
-	}
+			val jane = bean() {
+				new Person("Jane", "Doe")
+			}
 
-	val john = bean() {
-		val person = new Person("John", "Doe")
-		person.father = jack()
-		person.mother = jane()
-		person
-	}
-}
-config.register(applicationContext)
+			val john = bean() {
+				val person = new Person("John", "Doe")
+				person.father = jack()
+				person.mother = jane()
+				person
+			}
+		}
+		config.register(applicationContext, beanNameGenerator)
 
-val john = config.john()
-assert(john.father eq config.jack())
-assert(john.mother eq config.jane())
+		val john = config.john()
+		assert(john.father eq config.jack())
+		assert(john.mother eq config.jane())
 	}
 
 	test("composition through mixin") {
@@ -172,7 +174,7 @@ assert(john.mother eq config.jane())
 				new Person(firstName(), lastName())
 			}
 		}
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 
 		val john = config.john()
 		assert("John" == john.firstName)
@@ -199,7 +201,7 @@ assert(john.mother eq config.jane())
 			}
 		}
 		val config = new Config
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 
 		val john = config.john()
 		assert("John" == john.firstName)
@@ -207,10 +209,7 @@ assert(john.mother eq config.jane())
 	}
 
 	test("init and destroy") {
-		implicit val applicationContext = new GenericApplicationContext()
-		applicationContext.getDefaultListableBeanFactory
-				.registerSingleton("initDestroyFunction",
-			new InitDestroyFunctionBeanPostProcessor)
+		val applicationContext = new GenericApplicationContext()
 
 		val config = new FunctionalConfiguration {
 
@@ -222,7 +221,7 @@ assert(john.mother eq config.jane())
 				_.destroy()
 			}
 		}
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 		applicationContext.refresh()
 
 		val foo = applicationContext.getBean("foo", classOf[InitializablePerson])
@@ -248,7 +247,7 @@ assert(john.mother eq config.jane())
 				}
 			}
 		}
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 
 		assert(applicationContext.containsBean("foo"))
 		assert(!applicationContext.containsBean("bar"))
@@ -265,7 +264,7 @@ assert(john.mother eq config.jane())
 				new Person(getBean("firstName"), getBean("lastName"))
 			}
 		}
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 		assert("John" == config.john().firstName)
 		assert("Doe" == config.john().lastName)
 	}
@@ -279,7 +278,7 @@ assert(john.mother eq config.jane())
 				new Person(getBean("firstName"), getBean("lastName"))
 			}
 		}
-		config.register(applicationContext)
+		config.register(applicationContext, beanNameGenerator)
 		applicationContext.refresh()
 
 		assert("John" == config.john().firstName)

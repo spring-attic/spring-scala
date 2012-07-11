@@ -20,7 +20,7 @@ import org.springframework.context.support.GenericApplicationContext
 import org.springframework.util.CollectionUtils
 import scala.collection.JavaConversions._
 import org.springframework.beans.BeanUtils
-import org.springframework.beans.factory.support.BeanNameGenerator
+import org.springframework.beans.factory.support.{DefaultBeanNameGenerator, BeanNameGenerator}
 
 /**
  * Standalone application context, accepting
@@ -39,7 +39,7 @@ import org.springframework.beans.factory.support.BeanNameGenerator
  */
 class FunctionalConfigApplicationContext extends GenericApplicationContext {
 
-	private val reader = new FunctionalConfigBeanDefinitionReader(this)
+	var beanNameGenerator: BeanNameGenerator = new DefaultBeanNameGenerator
 
 	/**
 	 * Creates a new ``FunctionalConfigApplicationContext``, deriving bean
@@ -51,18 +51,6 @@ class FunctionalConfigApplicationContext extends GenericApplicationContext {
 		this()
 		registerClasses(configurationClasses: _*)
 		refresh()
-	}
-
-	/**
-	 * Provide a custom [[org.springframework.beans.factory.support.BeanNameGenerator]]
-	 * for use with [[org.springframework.scala.context.function.FunctionalConfigBeanDefinitionReader]].
-	 *
-	 * Default is the [[org.springframework.beans.factory.support.DefaultBeanNameGenerator]].
-	 *
-	 * Any call to this method must occur prior to calls to ``register``.
-	 */
-	def setBeanNameGenerator(beanNameGenerator: BeanNameGenerator) {
-		this.reader.beanNameGenerator = beanNameGenerator
 	}
 
 	/**
@@ -87,7 +75,7 @@ class FunctionalConfigApplicationContext extends GenericApplicationContext {
 	def registerConfigurations(configurations: FunctionalConfiguration*) {
 		require(!CollectionUtils.isEmpty(configurations),
 			"At least one configuration must be specified")
-		this.reader.register(configurations: _*)
+		configurations.foreach(_.register(this, beanNameGenerator))
 	}
 
 }

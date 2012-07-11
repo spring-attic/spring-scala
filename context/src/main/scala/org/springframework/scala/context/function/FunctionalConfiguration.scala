@@ -17,7 +17,7 @@
 package org.springframework.scala.context.function
 
 import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBeanPostProcessor, FunctionalGenericBeanDefinition}
-import org.springframework.beans.factory.{ListableBeanFactory, BeanFactory}
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.core.env.Environment
@@ -26,18 +26,30 @@ import org.springframework.util.Assert.state
 import org.springframework.beans.factory.config.{BeanDefinition, BeanDefinitionHolder, ConfigurableBeanFactory}
 import scala.collection.mutable.ListBuffer
 import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
-import org.springframework.beans.factory.support.{BeanNameGenerator, DefaultBeanNameGenerator, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
+import org.springframework.beans.factory.support.{RootBeanDefinition, BeanNameGenerator, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 
 /**
  * @author Arjen Poutsma
  */
 trait FunctionalConfiguration extends DelayedInit {
 
+	/**
+	 * The bean name of the internally managed init and destroy function processor.
+	 */
+	final val INIT_DESTROY_FUNCTION_PROCESSOR_BEAN_NAME = "org.springframework.scala.beans.factory.function.internalInitDestroyFunctionProcessor"
+
 	private val initCode = new ListBuffer[() => Unit]
 
 	private var applicationContext: GenericApplicationContext = _
 
 	private var beanNameGenerator: BeanNameGenerator = _
+
+	private def initDestroyProcessor: InitDestroyFunctionBeanPostProcessor = {
+		assert(beanFactory.containsBean(INIT_DESTROY_FUNCTION_PROCESSOR_BEAN_NAME),
+		       "Could not find InitDestroyFunctionBeanPostProcessor in application context")
+		beanFactory.getBean(INIT_DESTROY_FUNCTION_PROCESSOR_BEAN_NAME,
+		                    classOf[InitDestroyFunctionBeanPostProcessor])
+	}
 
 	/**
 	 * Returns the bean factory associated with this functional configuration.
@@ -121,21 +133,18 @@ trait FunctionalConfiguration extends DelayedInit {
 		val definitionHolder = new
 						BeanDefinitionHolder(fbd, beanName, aliases.toArray)
 
-		BeanDefinitionReaderUtils
-				.registerBeanDefinition(definitionHolder, this.beanRegistry);
+		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.beanRegistry);
 
 		new BeanLookupFunction[T] {
 			def apply() = beanFactory.getBean(beanName, beanType)
 
 			def init(initFunction: T => Unit): BeanLookupFunction[T] = {
-				_initDestroyFunctionBeanPostProcessor
-						.registerInitFunction(beanName, initFunction)
+				initDestroyProcessor.registerInitFunction(beanName, initFunction)
 				this
 			}
 
 			def destroy(destroyFunction: T => Unit): BeanLookupFunction[T] = {
-				_initDestroyFunctionBeanPostProcessor
-						.registerDestroyFunction(beanName, destroyFunction)
+				initDestroyProcessor.registerDestroyFunction(beanName, destroyFunction)
 				this
 			}
 		}
@@ -166,8 +175,12 @@ trait FunctionalConfiguration extends DelayedInit {
 	                          (beanFunction: => T)
 	                          (implicit manifest: Manifest[T]): T = {
 
-		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_SINGLETON,
-			lazyInit, beanFunction _, manifest).apply()
+		registerBean(name,
+		             aliases,
+		             ConfigurableBeanFactory.SCOPE_SINGLETON,
+		             lazyInit,
+		             beanFunction _,
+		             manifest).apply()
 	}
 
 	/**
@@ -186,8 +199,12 @@ trait FunctionalConfiguration extends DelayedInit {
 	                           lazyInit: Boolean = false)
 	                          (beanFunction: => T)
 	                          (implicit manifest: Manifest[T]): BeanLookupFunction[T] = {
-		registerBean(name, aliases, ConfigurableBeanFactory.SCOPE_PROTOTYPE,
-			lazyInit, beanFunction _, manifest)
+		registerBean(name,
+		             aliases,
+		             ConfigurableBeanFactory.SCOPE_PROTOTYPE,
+		             lazyInit,
+		             beanFunction _,
+		             manifest)
 	}
 
 	/**
@@ -234,40 +251,31 @@ trait FunctionalConfiguration extends DelayedInit {
 	}
 
 	/**
-	 * Exposes the ``InitDestroyFunctionBeanPostProcessor`` so that the subclasses can use the (temporary!)
-	 * ``BeanLookupFunction.initFunction`` and ``BeanLookupFunction.destroyFunction`` without having to specify this instance
-	 * explicitly.
-	 */
-	private lazy val _initDestroyFunctionBeanPostProcessor = initDestroyFunctionBeanPostProcessor()
-
-	private def initDestroyFunctionBeanPostProcessor(): InitDestroyFunctionBeanPostProcessor = {
-		// TODO: get BPP from well-known bean name
-		beanFactory match {
-			case lbf: ListableBeanFactory => {
-				val bpps = lbf
-						.getBeansOfType(classOf[InitDestroyFunctionBeanPostProcessor])
-				assert(bpps.size() == 1)
-				bpps.values().iterator().next()
-
-			}
-		}
-	}
-
-	/**
 	 * Registers this functional configuration class with the given application context.
 	 *
 	 * @param applicationContext the application context
 	 */
 	private[context] def register(applicationContext: GenericApplicationContext,
-	                              beanNameGenerator: BeanNameGenerator = new
-					                              DefaultBeanNameGenerator) {
+	                              beanNameGenerator: BeanNameGenerator) {
+
 		require(applicationContext != null, "'applicationContext' must not be null")
 		require(beanNameGenerator != null, "'beanNameGenerator' must not be null")
 
 		this.applicationContext = applicationContext
 		this.beanNameGenerator = beanNameGenerator
+		registerInitDestroyProcessor()
 
 		initCode.foreach(_())
+	}
+
+	def registerInitDestroyProcessor() {
+		if (!beanRegistry.containsBeanDefinition(INIT_DESTROY_FUNCTION_PROCESSOR_BEAN_NAME)) {
+			val definition = new
+							RootBeanDefinition(classOf[InitDestroyFunctionBeanPostProcessor])
+			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE)
+			beanRegistry
+					.registerBeanDefinition(INIT_DESTROY_FUNCTION_PROCESSOR_BEAN_NAME, definition)
+		}
 	}
 
 	final override def delayedInit(body: => Unit) {
