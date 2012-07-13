@@ -19,10 +19,16 @@ package org.springframework.scala.beans;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 
+import scala.ScalaObject;
+
 import org.springframework.beans.BeanInfoFactory;
 
 /** @author Arjen Poutsma */
 public class ScalaBeanInfoFactory implements BeanInfoFactory {
+
+	public boolean supports(Class<?> beanClass) {
+		return ScalaObject.class.isAssignableFrom(beanClass);
+	}
 
 	public BeanInfo getBeanInfo(Class<?> beanClass) throws IntrospectionException {
 		return new ScalaBeanInfo(beanClass);

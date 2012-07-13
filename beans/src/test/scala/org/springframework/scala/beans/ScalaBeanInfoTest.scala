@@ -36,7 +36,12 @@ class ScalaBeanInfoTest extends FunSuite {
 		assert(propertyDescriptors(2).getName === "readWrite")
     assert(propertyDescriptors(2).getReadMethod.getName  === "readWrite")
     assert(propertyDescriptors(2).getWriteMethod.getName === "readWrite_$eq")
-
   }
+
+	test("supports") {
+		val factory = new ScalaBeanInfoFactory
+		assert(factory.supports(classOf[ScalaBean]))
+		assert(!factory.supports(classOf[ScalaBeanInfo]))
+	}
 
 }

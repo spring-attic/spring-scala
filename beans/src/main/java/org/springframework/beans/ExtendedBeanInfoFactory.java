@@ -20,8 +20,20 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 
-/** @author Arjen Poutsma */
+/**
+ * Implementation of the {@link BeanInfoFactory} that creates {@link ExtendedBeanInfo}
+ * instances.
+ *
+ * @author Arjen Poutsma
+ */
 public class ExtendedBeanInfoFactory implements BeanInfoFactory {
+
+	/**
+	 * Returns {@code true}.
+	 */
+	public boolean supports(Class<?> beanClass) {
+		return true;
+	}
 
 	public BeanInfo getBeanInfo(Class<?> beanClass) throws IntrospectionException {
 		return new ExtendedBeanInfo(Introspector.getBeanInfo(beanClass));
