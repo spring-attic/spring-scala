@@ -35,7 +35,13 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
-/** @author Arjen Poutsma */
+/**
+ * Implementation of {@link BeanInfo} for Scala classes. Decorates a standard {@link
+ * BeanInfo} object by including Scala setter methods (ending in {@code _$eq} in the
+ * collection of {@linkplain #getPropertyDescriptors() property descriptors}.
+ *
+ * @author Arjen Poutsma
+ */
 public class ScalaBeanInfo implements BeanInfo {
 
 	private static final Log logger = LogFactory.getLog(ScalaBeanInfo.class);
@@ -58,8 +64,7 @@ public class ScalaBeanInfo implements BeanInfo {
 
 	private static PropertyDescriptor[] initPropertyDescriptors(BeanInfo beanInfo) {
 		Map<String, PropertyDescriptor> propertyDescriptors =
-				new TreeMap<String, PropertyDescriptor>(
-						new PropertyDescriptorComparator());
+				new TreeMap<String, PropertyDescriptor>(new PropertyNameComparator());
 		for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
 			propertyDescriptors.put(pd.getName(), pd);
 		}
@@ -95,6 +100,7 @@ public class ScalaBeanInfo implements BeanInfo {
 	private static void addScalaGetter(Map<String, PropertyDescriptor> propertyDescriptors,
 	                                   Method readMethod) {
 		String propertyName = readMethod.getName();
+
 		PropertyDescriptor pd = propertyDescriptors.get(propertyName);
 		if (pd != null && pd.getReadMethod() == null) {
 			try {
@@ -122,6 +128,7 @@ public class ScalaBeanInfo implements BeanInfo {
 	                                   Method writeMethod) {
 		String propertyName = writeMethod.getName().substring(0,
 				writeMethod.getName().length() - SCALA_SETTER_SUFFIX.length());
+
 		PropertyDescriptor pd = propertyDescriptors.get(propertyName);
 		if (pd != null && pd.getWriteMethod() == null) {
 			try {
@@ -177,14 +184,21 @@ public class ScalaBeanInfo implements BeanInfo {
 		return delegate.getMethodDescriptors();
 	}
 
-	private static class PropertyDescriptorComparator implements Comparator<String> {
+	/**
+	 * Sorts property names alphanumerically to emulate the behavior of {@link
+	 * java.beans.BeanInfo#getPropertyDescriptors()}.
+	 */
+	private static class PropertyNameComparator implements Comparator<String> {
 
 		public int compare(String left, String right) {
+			byte[] leftBytes = left.getBytes();
+			byte[] rightBytes = right.getBytes();
+
 			for (int i = 0; i < left.length(); i++) {
 				if (right.length() == i) {
 					return 1;
 				}
-				int result = left.getBytes()[i] - right.getBytes()[i];
+				int result = leftBytes[i] - rightBytes[i];
 				if (result != 0) {
 					return result;
 				}

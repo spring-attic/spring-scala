@@ -19,9 +19,28 @@ package org.springframework.beans;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 
-/** @author Arjen Poutsma */
+/**
+ * Strategy for creating {@link BeanInfo} instances.
+ *
+ * @author Arjen Poutsma
+ */
 public interface BeanInfoFactory {
 
+	/**
+	 * Indicates whether a bean with the given class is supported by this factory.
+	 *
+	 * @param beanClass the bean class
+	 * @return {@code true} if supported; false otherwise
+	 */
+	boolean supports(Class<?> beanClass);
+
+	/**
+	 * Returns the bean info for the given class.
+	 *
+	 * @param beanClass the bean class
+	 * @return the bean info
+	 * @throws IntrospectionException in case of exceptions
+	 */
 	BeanInfo getBeanInfo(Class<?> beanClass) throws IntrospectionException;
 
 }
