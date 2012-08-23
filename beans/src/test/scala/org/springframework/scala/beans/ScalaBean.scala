@@ -16,11 +16,15 @@
 
 package org.springframework.scala.beans
 
+import scala.reflect.BeanProperty
+
 class ScalaBean {
 
 	val readOnly: String = "Foo"
 
 	var readWrite: String = "Foo"
 
+	@BeanProperty
+	var beanProperty: String = "Foo"
 
 }

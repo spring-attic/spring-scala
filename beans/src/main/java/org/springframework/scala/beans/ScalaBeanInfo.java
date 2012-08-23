@@ -42,7 +42,7 @@ import org.springframework.util.ReflectionUtils;
  *
  * @author Arjen Poutsma
  */
-public class ScalaBeanInfo implements BeanInfo {
+class ScalaBeanInfo implements BeanInfo {
 
 	private static final Log logger = LogFactory.getLog(ScalaBeanInfo.class);
 
@@ -88,40 +88,15 @@ public class ScalaBeanInfo implements BeanInfo {
 
 	private static boolean isScalaGetter(Method method) {
 		return method.getParameterTypes().length == 0 &&
-				!method.getReturnType().equals(Void.TYPE);
+				!method.getReturnType().equals(Void.TYPE) &&
+				!(method.getName().startsWith("get") ||
+						method.getName().startsWith("is"));
 	}
 
 	private static boolean isScalaSetter(Method method) {
 		return method.getParameterTypes().length == 1 &&
 				method.getReturnType().equals(Void.TYPE) &&
 				method.getName().endsWith(SCALA_SETTER_SUFFIX);
-	}
-
-	private static void addScalaGetter(Map<String, PropertyDescriptor> propertyDescriptors,
-	                                   Method readMethod) {
-		String propertyName = readMethod.getName();
-
-		PropertyDescriptor pd = propertyDescriptors.get(propertyName);
-		if (pd != null && pd.getReadMethod() == null) {
-			try {
-				pd.setReadMethod(readMethod);
-			}
-			catch (IntrospectionException ex) {
-				logger.debug("Could not add read method [" + readMethod + "] for " +
-						"property [" + propertyName + "]: " + ex.getMessage());
-			}
-		}
-		else {
-			try {
-				pd = new PropertyDescriptor(propertyName, readMethod, null);
-				propertyDescriptors.put(propertyName, pd);
-			}
-			catch (IntrospectionException ex) {
-				logger.debug("Could not create new PropertyDescriptor for " +
-						"readMethod [" + readMethod + "] property [" + propertyName +
-						"]: " + ex.getMessage());
-			}
-		}
 	}
 
 	private static void addScalaSetter(Map<String, PropertyDescriptor> propertyDescriptors,
@@ -139,7 +114,7 @@ public class ScalaBeanInfo implements BeanInfo {
 						"property [" + propertyName + "]: " + ex.getMessage());
 			}
 		}
-		else {
+		else if (pd == null) {
 			try {
 				pd = new PropertyDescriptor(propertyName, null, writeMethod);
 				propertyDescriptors.put(propertyName, pd);
@@ -147,6 +122,33 @@ public class ScalaBeanInfo implements BeanInfo {
 			catch (IntrospectionException ex) {
 				logger.debug("Could not create new PropertyDescriptor for " +
 						"writeMethod [" + writeMethod + "] property [" + propertyName +
+						"]: " + ex.getMessage());
+			}
+		}
+	}
+
+	private static void addScalaGetter(Map<String, PropertyDescriptor> propertyDescriptors,
+	                                   Method readMethod) {
+		String propertyName = readMethod.getName();
+
+		PropertyDescriptor pd = propertyDescriptors.get(propertyName);
+		if (pd != null && pd.getReadMethod() == null) {
+			try {
+				pd.setReadMethod(readMethod);
+			}
+			catch (IntrospectionException ex) {
+				logger.debug("Could not add read method [" + readMethod + "] for " +
+						"property [" + propertyName + "]: " + ex.getMessage());
+			}
+		}
+		else if (pd == null) {
+			try {
+				pd = new PropertyDescriptor(propertyName, readMethod, null);
+				propertyDescriptors.put(propertyName, pd);
+			}
+			catch (IntrospectionException ex) {
+				logger.debug("Could not create new PropertyDescriptor for " +
+						"readMethod [" + readMethod + "] property [" + propertyName +
 						"]: " + ex.getMessage());
 			}
 		}
