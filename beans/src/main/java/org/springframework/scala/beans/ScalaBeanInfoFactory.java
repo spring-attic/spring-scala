@@ -23,7 +23,16 @@ import scala.ScalaObject;
 
 import org.springframework.beans.BeanInfoFactory;
 
-/** @author Arjen Poutsma */
+/**
+ * Implementation of the {@code BeanInfoFactory} interface for Scala beans.
+ * <p>
+ * The {@link BeanInfo} returned from {@link #getBeanInfo(Class)} includes {@linkplain
+ * java.beans.BeanInfo#getPropertyDescriptors() property descriptors} for "normal"
+ * JavaBean properties as well as Scala properties (i.e. setter methods that end with
+ * {@code _$eq}).
+ *
+ * @author Arjen Poutsma
+ */
 public class ScalaBeanInfoFactory implements BeanInfoFactory {
 
 	public boolean supports(Class<?> beanClass) {

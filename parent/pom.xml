@@ -8,9 +8,9 @@
     <version>0.1.RELEASE-SNAPSHOT</version>
     <name>Spring Scala - Parent</name>
     <properties>
-        <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
+        <spring.framework.version>3.2.0.BUILD-SNAPSHOT</spring.framework.version>
         <scala.version>2.9.2</scala.version>
-        <scala.plugin.version>2.15.2</scala.plugin.version>
+        <scala.plugin.version>3.1.0</scala.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <repositories>
@@ -20,27 +20,25 @@
             <url>http://scala-tools.org/repo-releases</url>
         </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </pluginRepository>
-    </pluginRepositories>
     <build>
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.scala-tools</groupId>
-                    <artifactId>maven-scala-plugin</artifactId>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
                     <version>${scala.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                	<artifactId>maven-compiler-plugin</artifactId>
+                	<version>2.3.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -58,6 +56,18 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+            	<artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+            	    <execution>
+            		    <phase>compile</phase>
+            			<goals>
+            			    <goal>compile</goal>
+            			</goals>
+                    </execution>
+            	</executions>
             </plugin>
         </plugins>
     </build>
@@ -229,6 +239,12 @@
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
                 <version>3.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.7</version>
                 <scope>test</scope>
             </dependency>
             <!-- Other dependencies -->
