@@ -36,7 +36,8 @@ trait FunctionalConfiguration extends DelayedInit {
 	/**
 	 * The bean name of the internally managed init and destroy function processor.
 	 */
-	final val INIT_DESTROY_FUNCTION_PROCESSOR_BEAN_NAME = "org.springframework.scala.beans.factory.function.internalInitDestroyFunctionProcessor"
+	private final val INIT_DESTROY_FUNCTION_PROCESSOR_BEAN_NAME =
+		"org.springframework.scala.beans.factory.function.internalInitDestroyFunctionProcessor"
 
 	private val initCode = new ListBuffer[() => Unit]
 
@@ -244,6 +245,15 @@ trait FunctionalConfiguration extends DelayedInit {
 		beanDefinitionReader.loadBeanDefinitions(resources: _*)
 	}
 
+	/**
+	 * Imports one or more ``@Configuration`` classes containing ``@Bean`` definitions.
+	 *
+	 * This method provides functionality similar to the
+	 * [[org.springframework.context.annotation.Import]] annotation used in Java
+	 * [[org.springframework.context.annotation.Configuration]] classes.
+	 *
+	 * @param annotatedClasses the ``@Configuration`` classes to import
+	 */
 	protected def importClass(annotatedClasses: Class[_]*) {
 		val beanDefinitionReader = new
 						AnnotatedBeanDefinitionReader(beanRegistry, environment)
@@ -268,7 +278,7 @@ trait FunctionalConfiguration extends DelayedInit {
 		initCode.foreach(_())
 	}
 
-	def registerInitDestroyProcessor() {
+	private def registerInitDestroyProcessor() {
 		if (!beanRegistry.containsBeanDefinition(INIT_DESTROY_FUNCTION_PROCESSOR_BEAN_NAME)) {
 			val definition = new
 							RootBeanDefinition(classOf[InitDestroyFunctionBeanPostProcessor])
