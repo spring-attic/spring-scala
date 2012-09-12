@@ -16,6 +16,8 @@
 
 package org.springframework.scala.beans;
 
+import java.beans.IntrospectionException;
+
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -43,10 +45,10 @@ public class ScalaBeanInfoFactoryTest {
 	}
 
 	@Test
-	public void supports() {
+	public void supports() throws IntrospectionException {
 		ScalaBeanInfoFactory factory = new ScalaBeanInfoFactory();
-		assertTrue(factory.supports(ScalaBean.class));
-		assertFalse(factory.supports(getClass()));
+		assertNotNull(factory.getBeanInfo(ScalaBean.class));
+		assertNull(factory.getBeanInfo(getClass()));
 	}
 
 }
