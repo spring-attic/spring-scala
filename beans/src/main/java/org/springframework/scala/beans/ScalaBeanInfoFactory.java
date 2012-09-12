@@ -35,11 +35,13 @@ import org.springframework.beans.BeanInfoFactory;
  */
 public class ScalaBeanInfoFactory implements BeanInfoFactory {
 
-	public boolean supports(Class<?> beanClass) {
+	public BeanInfo getBeanInfo(Class<?> beanClass) throws IntrospectionException {
+		return supports(beanClass) ? new ScalaBeanInfo(beanClass) : null;
+
+	}
+
+	private boolean supports(Class<?> beanClass) {
 		return ScalaObject.class.isAssignableFrom(beanClass);
 	}
 
-	public BeanInfo getBeanInfo(Class<?> beanClass) throws IntrospectionException {
-		return new ScalaBeanInfo(beanClass);
-	}
 }
