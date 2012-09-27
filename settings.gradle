@@ -1,0 +1,8 @@
+rootProject.name = 'spring-scala'
+
+include 'beans'
+include 'context'
+include 'jdbc'
+include 'jms'
+include 'tx'
+include 'web'

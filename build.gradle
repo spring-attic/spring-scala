@@ -1,0 +1,326 @@
+buildscript {
+    repositories {
+        maven { url 'http://repo.springsource.org/plugins-release' }
+    }
+    dependencies {
+        classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.1.5'
+    }
+}
+
+configure(allprojects) {
+    apply plugin: 'java'
+    apply plugin: 'scala'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+
+    group = 'org.springframework.scala'
+
+    sourceCompatibility=1.5
+    targetCompatibility=1.5
+
+    ext.springVersion = '3.2.0.M2'
+    ext.scalaVersion = '2.9.2'
+
+    [compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:none']
+
+    sourceSets.test.resources.srcDirs = ['src/test/resources', 'src/test/java']
+
+    test.systemProperty("java.awt.headless", "true")
+
+    repositories {
+        maven { url "http://repo.springsource.org/libs-release" }
+        maven { url "http://repo.springsource.org/libs-milestone" }
+        maven { url "http://repo.springsource.org/ebr-maven-external" }
+    }
+
+    dependencies {
+        scalaTools 'org.scala-lang:scala-compiler:2.9.2'
+        scalaTools 'org.scala-lang:scala-library:2.9.2'
+        compile 'org.scala-lang:scala-library:2.9.2'
+        testCompile 'org.scalatest:scalatest_2.9.2:1.6.1'
+    }
+
+    // servlet-api (2.5) and tomcat-servlet-api (3.0) classpath entries should not be
+    // exported to dependent projects in Eclipse to avoid false compilation errors due
+    // to changing APIs across these versions
+    eclipse.classpath.file.whenMerged { classpath ->
+        classpath.entries.findAll { entry -> entry.path.contains('servlet-api') }*.exported = false
+    }
+}
+
+configure(subprojects) { subproject ->
+    apply from: "${rootProject.projectDir}/publish-maven.gradle"
+
+    jar {
+        manifest.attributes['Created-By'] =
+            "${System.getProperty('java.version')} (${System.getProperty('java.specification.vendor')})"
+        manifest.attributes['Implementation-Title'] = subproject.name
+        manifest.attributes['Implementation-Version'] = subproject.version
+
+        from("${rootProject.projectDir}/src/dist") {
+            include "license.txt"
+            include "notice.txt"
+            into "META-INF"
+            expand(copyright: new Date().format('yyyy'), version: project.version)
+        }
+    }
+
+    test << {
+        ant.taskdef(name: 'scalatest', classname: 'org.scalatest.tools.ScalaTestAntTask', classpath: classpath.asPath)
+        ant.scalatest(runpath: testClassesDir, haltonfailure: 'true', fork: 'false') {
+            reporter(type: 'stdout')
+        }
+    }
+
+    scaladoc {
+        title = project.description
+    }
+
+    task sourcesJar(type: Jar, dependsOn:classes) {
+        classifier = 'sources'
+        from sourceSets.main.allJava.srcDirs
+        include '**/*.java', '**/*.scala'
+    }
+
+    task scaladocJar(type: Jar) {
+        classifier = 'scaladoc'
+        from scaladoc
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives scaladocJar
+    }
+}
+
+project('beans') {
+    description = 'Spring Scala Beans'
+    dependencies {
+      compile "commons-logging:commons-logging:1.1.1"
+      compile "org.springframework:spring-beans:${springVersion}"
+      testCompile "org.springframework:spring-context:${springVersion}"
+    }
+}
+
+project('context') {
+    description = 'Spring Scala Context'
+    dependencies {
+      compile project(":beans")
+      compile "org.springframework:spring-context:${springVersion}"
+    }
+}
+
+project('jdbc') {
+    description = 'Spring Scala JDBC'
+    dependencies {
+      compile "org.springframework:spring-jdbc:${springVersion}"
+      testCompile "org.hsqldb:hsqldb-j5:2.2.4"
+    }
+}
+
+project('jms') {
+    description = 'Spring Scala JMS'
+    dependencies {
+      compile "org.springframework:spring-jms:${springVersion}"
+      compile("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1", provided)
+    }
+}
+
+project('tx') {
+    description = 'Spring Scala Transaction'
+    dependencies {
+      compile "org.springframework:spring-tx:${springVersion}"
+      testCompile "org.springframework:spring-jdbc:${springVersion}"
+      testCompile "org.hsqldb:hsqldb-j5:2.2.4"
+    }
+}
+
+project('web') {
+    description = 'Spring Web Transaction'
+    dependencies {
+      compile project(":context")
+      compile "org.springframework:spring-web:${springVersion}"
+      compile("org.apache.tomcat:tomcat-servlet-api:7.0.8", provided) // servlet-api 3.0
+    }
+}
+
+configure(rootProject) {
+    description = 'Spring Scala'
+
+    // don't publish the default jar for the root project
+    configurations.archives.artifacts.clear()
+
+    dependencies { // for integration tests
+        testCompile project(":beans")
+        testCompile project(":context")
+        testCompile project(":jdbc")
+        testCompile project(":jms")
+        testCompile project(":tx")
+        testCompile project(":web")
+   }
+
+    task api(type: ScalaDoc) {
+        group = 'Documentation'
+        description = 'Generates aggregated Javadoc API documentation.'
+        title = "${rootProject.description} ${version} API"
+        options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
+        options.author = true
+        options.header = rootProject.description
+        options.overview = 'src/api/overview.html'
+        options.splitIndex = true
+        options.links(
+            'http://docs.jboss.org/jbossas/javadoc/4.0.5/connector'
+        )
+        source subprojects.collect { project ->
+            project.sourceSets.main.allJava
+        }
+        destinationDir = new File(buildDir, "api")
+        classpath = files(subprojects.collect { project ->
+            project.sourceSets.main.compileClasspath
+        })
+        maxMemory = '1024m'
+    }
+
+    task docsZip(type: Zip) {
+        group = 'Distribution'
+        classifier = 'docs'
+        description = "Builds -${classifier} archive containing api and reference " +
+            "for deployment at static.springframework.org/spring-framework/docs."
+
+        from('src/dist') {
+            include 'changelog.txt'
+        }
+
+/*
+        from (api) {
+            into 'api'
+        }
+*/
+
+        from (reference) {
+            into 'reference'
+        }
+    }
+
+    task schemaZip(type: Zip) {
+        group = 'Distribution'
+        classifier = 'schema'
+        description = "Builds -${classifier} archive containing all " +
+            "XSDs for deployment at static.springframework.org/schema."
+
+        subprojects.each { subproject ->
+            def Properties schemas = new Properties();
+
+            subproject.sourceSets.main.resources.find {
+                it.path.endsWith('META-INF/spring.schemas')
+            }?.withInputStream { schemas.load(it) }
+
+            for (def key : schemas.keySet()) {
+                def shortName = key.replaceAll(/http.*schema.(.*).scala-.*/, '$1')
+                assert shortName != key
+                File xsdFile = subproject.sourceSets.main.resources.find {
+                    it.path.endsWith(schemas.get(key))
+                }
+                assert xsdFile != null
+                into (shortName) {
+                    from xsdFile.path
+                }
+            }
+        }
+    }
+
+
+    task distZip(type: Zip, dependsOn: [docsZip, schemaZip]) {
+        group = 'Distribution'
+        classifier = 'dist'
+        description = "Builds -${classifier} archive, containing all jars and docs, " +
+                      "suitable for community download page."
+
+        ext.baseDir = "${project.name}-${project.version}";
+
+        from('src/dist') {
+            include 'readme.txt'
+            include 'license.txt'
+            include 'notice.txt'
+            into "${baseDir}"
+            expand(copyright: new Date().format('yyyy'), version: project.version)
+        }
+
+        from(zipTree(docsZip.archivePath)) {
+            into "${baseDir}/docs"
+        }
+
+        from(zipTree(schemaZip.archivePath)) {
+            into "${baseDir}/schema"
+        }
+
+        subprojects.each { subproject ->
+            into ("${baseDir}/libs") {
+                from subproject.jar
+                if (subproject.tasks.findByPath('sourcesJar')) {
+                    from subproject.sourcesJar
+                }
+                if (subproject.tasks.findByPath('scaladocJar')) {
+                    from subproject.scaladocJar
+                }
+            }
+        }
+    }
+
+
+    // Create an distribution that contains all dependencies (required and optional).
+    // Not published by default; only for use when building from source.
+
+    task depsZip(type: Zip, dependsOn: distZip) { zipTask ->
+        group = 'Distribution'
+        classifier = 'dist-with-deps'
+        description = "Builds -${classifier} archive, containing everything " +
+            "in the -${distZip.classifier} archive plus all runtime dependencies."
+
+        from zipTree(distZip.archivePath)
+
+        gradle.taskGraph.whenReady { taskGraph ->
+            if (taskGraph.hasTask(":${zipTask.name}")) {
+                def projectNames = rootProject.subprojects*.name
+                def artifacts = new HashSet()
+                subprojects.each { subproject ->
+                    subproject.configurations.runtime.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+                        def dependency = artifact.moduleVersion.id
+                        if (!projectNames.contains(dependency.name)) {
+                            artifacts << artifact.file
+                        }
+                    }
+                }
+
+                zipTask.from(artifacts) {
+                    into "${distZip.baseDir}/deps"
+                }
+            }
+        }
+    }
+
+
+    artifacts {
+        archives docsZip
+        archives schemaZip
+        archives distZip
+    }
+
+/*
+  task test(overwrite: true, dependsOn: testClasses) << {
+    ant.taskdef(name: 'scalatest',
+            classname: 'org.scalatest.tools.ScalaTestAntTask',
+            classpath: sourceSets.test.runtimeClasspath.asPath)
+    ant.scalatest(runpath: sourceSets.test.output.classesDir,
+            haltonfailure: 'true',
+            fork: 'false') {reporter(type: 'stdout')}
+  }
+*/
+
+
+  task wrapper(type: Wrapper) {
+        description = 'Generates gradlew[.bat] scripts'
+        gradleVersion = '1.2'
+    }
+}
+
