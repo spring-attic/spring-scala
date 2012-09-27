@@ -35,15 +35,13 @@ class FunctionalGenericBeanDefinitionTest extends FunSuite with BeforeAndAfterEa
 	}
 
 	override protected def beforeEach() {
-		n = 0;
+		n = 0
 	}
 
 	test("singleton") {
 		val bd = new FunctionalGenericBeanDefinition[Int](beanFunction)
 		bd.setScope(BeanDefinition.SCOPE_SINGLETON)
 		applicationContext.registerBeanDefinition("function", bd)
-
-		assert(classOf[Int] ==  applicationContext.getType("function"))
 
 		val value1 = applicationContext.getBean("function")
 		val value2 = applicationContext.getBean("function")

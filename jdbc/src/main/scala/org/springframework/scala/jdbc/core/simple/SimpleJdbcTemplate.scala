@@ -213,7 +213,7 @@ class SimpleJdbcTemplate(val javaTemplate: SimpleJdbcOperations) {
 	}
 
 	private def asInstanceOfAnyRef(seq: Seq[Any]): Seq[AnyRef] = {
-		seq.map(_.asInstanceOf[AnyRef]);
+		seq.map(_.asInstanceOf[AnyRef])
 	}
 
 	private def asInstanceOfAny(map: Map[String, AnyRef]): Map[String, Any] = {
