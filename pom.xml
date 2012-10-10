@@ -209,7 +209,6 @@
         <module>jms</module>
         <module>jdbc</module>
         <module>web</module>
-        <module>mvc</module>
     </modules>
     <profiles>
         <profile>

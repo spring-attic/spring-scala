@@ -8,14 +8,14 @@
          <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>spring-web</artifactId>
+    <artifactId>spring-scala-web</artifactId>
     <packaging>jar</packaging>
     <name>Spring Web Scala</name>
     <dependencies>
         <!-- Spring Scala dependencies -->
         <dependency>
             <groupId>org.springframework.scala</groupId>
-            <artifactId>spring-context</artifactId>
+            <artifactId>spring-scala-context</artifactId>
         </dependency>
         <!-- Spring dependencies -->
         <dependency>

@@ -8,7 +8,7 @@
          <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>spring-beans</artifactId>
+    <artifactId>spring-scala-beans</artifactId>
     <packaging>jar</packaging>
     <name>Spring Beans Scala</name>
     <dependencies>

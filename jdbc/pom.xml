@@ -8,7 +8,7 @@
          <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>spring-jdbc</artifactId>
+    <artifactId>spring-scala-jdbc</artifactId>
     <packaging>jar</packaging>
     <name>Spring JDBC Scala</name>
     <dependencies>

@@ -90,12 +90,17 @@
             <!-- Spring Scala dependencies -->
             <dependency>
                 <groupId>org.springframework.scala</groupId>
-                <artifactId>spring-beans</artifactId>
+                <artifactId>spring-scala-beans</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.scala</groupId>
-                <artifactId>spring-context</artifactId>
+                <artifactId>spring-scala-context</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.scala</groupId>
+                <artifactId>spring-scala-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <!-- Spring dependencies -->
