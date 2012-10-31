@@ -19,8 +19,11 @@ package org.springframework.scala.beans.factory.function
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
 import org.springframework.core.PriorityOrdered
 import scala.reflect.BeanProperty
-import org.springframework.util.Assert
-import scala.collection.mutable.{Set, MultiMap, SynchronizedMap, HashMap}
+import org.springframework.util.{StringUtils, Assert}
+import scala.collection.mutable.{ListBuffer, SynchronizedMap, HashMap}
+import scala.Predef._
+import scala.AnyRef
+import scala.Some
 
 /**
  * [[org.springframework.beans.factory.config.BeanPostProcessor]] implementation
@@ -39,13 +42,11 @@ import scala.collection.mutable.{Set, MultiMap, SynchronizedMap, HashMap}
 class InitDestroyFunctionBeanPostProcessor
 		extends DestructionAwareBeanPostProcessor with PriorityOrdered {
 
-	val initFunctions = new HashMap[String, Set[Function1[Any, Unit]]]
-			with MultiMap[String, Function1[Any, Unit]]
-			with SynchronizedMap[String, Set[Function1[Any, Unit]]]
+	val initFunctions = new HashMap[String, ListBuffer[Function1[Any, Unit]]]
+			with SynchronizedMap[String, ListBuffer[Function1[Any, Unit]]]
 
-	val destroyFunctions = new HashMap[String, Set[Function1[Any, Unit]]]
-			with MultiMap[String, Function1[Any, Unit]]
-			with SynchronizedMap[String, Set[Function1[Any, Unit]]]
+	val destroyFunctions = new HashMap[String, ListBuffer[Function1[Any, Unit]]]
+			with SynchronizedMap[String, ListBuffer[Function1[Any, Unit]]]
 
 	@BeanProperty
 	var order: Int = org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -61,10 +62,10 @@ class InitDestroyFunctionBeanPostProcessor
 	 * @tparam T the bean type
 	 */
 	def registerInitFunction[T](beanName: String, initFunction: (T) => Unit) {
-		Assert.hasLength(beanName, "'beanName' must not be empty")
-		Assert.notNull(initFunction, "'initFunction' must not be null")
+		assert(StringUtils.hasLength(beanName), "'beanName' must not be empty")
+		assert(initFunction != null, "'initFunction' must not be null")
 
-		initFunctions.addBinding(beanName, initFunction.asInstanceOf[Function1[Any, Unit]])
+		addFunction(initFunctions, beanName, initFunction.asInstanceOf[Function1[Any, Unit]])
 	}
 
 	/**
@@ -81,8 +82,21 @@ class InitDestroyFunctionBeanPostProcessor
 		Assert.hasLength(beanName, "'beanName' must not be empty")
 		Assert.notNull(destroyFunction, "'destroyFunction' must not be null")
 
-		destroyFunctions
-				.addBinding(beanName, destroyFunction.asInstanceOf[Function1[Any, Unit]])
+		addFunction(destroyFunctions, beanName, destroyFunction.asInstanceOf[Function1[Any, Unit]])
+	}
+
+	private def addFunction(functionsMap: HashMap[String, ListBuffer[Function1[Any, Unit]]],
+	                        beanName: String,
+	                        function: (Any) => Unit) {
+
+		functionsMap.get(beanName) match {
+			case None =>
+				val list = new ListBuffer[Function1[Any, Unit]]
+				list += function
+				functionsMap(beanName) = list
+			case Some(list) =>
+				list += function
+		}
 	}
 
 	def postProcessBeforeInitialization(bean: AnyRef, beanName: String): AnyRef = {
