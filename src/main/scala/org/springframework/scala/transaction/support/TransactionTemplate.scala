@@ -20,7 +20,14 @@ import org.springframework.transaction.support.{TransactionCallback, Transaction
 import org.springframework.transaction.{TransactionDefinition, PlatformTransactionManager, TransactionStatus}
 
 /**
+ * Scala-based convenience wrapper for the Spring
+ * [[org.springframework.scala.transaction.support.TransactionTemplate]], taking
+ * advantage of functions and Scala types.
+ *
  * @author Arjen Poutsma
+ * @since 1.0
+ * @constructor Creates a `TransactionTemplate` that wraps the given Java template
+ * @param javaTemplate the Java `TransactionTemplate` to wrap
  */
 class TransactionTemplate(val javaTemplate: TransactionOperations) {
 

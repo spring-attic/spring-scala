@@ -1,8 +1,7 @@
 package org.springframework.scala.beans.factory.config
 
 import org.springframework.beans.factory.config.AbstractFactoryBean
-import scala.collection.mutable.Builder
-import scala.collection.Seq
+import scala.collection.{mutable, Seq}
 
 /**
  * Simple factory for shared [[scala.collection.Seq]] instances. Allows for central setup
@@ -14,7 +13,7 @@ import scala.collection.Seq
  * @param builderFunction function used to create a new sequence builder
  */
 class SeqFactoryBean[T](val sourceSeq: Seq[T],
-                        val builderFunction: () => Builder[T, Seq[T]])
+                        val builderFunction: () => mutable.Builder[T, Seq[T]])
 		extends AbstractFactoryBean[Seq[T]] {
 
 	def this(sourceSeq: Seq[T]) {

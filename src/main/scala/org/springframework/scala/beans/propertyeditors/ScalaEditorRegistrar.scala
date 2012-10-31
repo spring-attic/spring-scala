@@ -1,5 +1,3 @@
-package org.springframework.scala.beans.propertyeditors
-
 /*
  * Copyright 2011-2012 the original author or authors.
  *
@@ -15,6 +13,8 @@ package org.springframework.scala.beans.propertyeditors
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.springframework.scala.beans.propertyeditors
 
 import scala.util.matching.Regex
 

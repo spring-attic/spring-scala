@@ -29,6 +29,21 @@ import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
 import org.springframework.beans.factory.support.{RootBeanDefinition, BeanNameGenerator, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 
 /**
+ * Base trait used to declare one or more Spring Beans that may be processed by the Spring
+ * container.
+ * For example:
+ * {{{
+ *   class PersonConfiguration extends FunctionalConfiguration {
+ *     bean() {
+ *       new Person("John", "Doe")
+ *     }
+ * }
+ * }}}
+ *
+ * Besides the `bean` method, the `FunctionalConfiguration` trait also offers methods to
+ * register singletons, prototypes, importing XML or `@Configuration` classes, bean
+ * profiles and more.
+ *
  * @author Arjen Poutsma
  */
 trait FunctionalConfiguration extends DelayedInit {
@@ -120,8 +135,7 @@ trait FunctionalConfiguration extends DelayedInit {
 	                                             lazyInit: Boolean,
 	                                             beanFunction: () => T,
 	                                             manifest: Manifest[T]): BeanLookupFunction[T] = {
-		state(beanRegistry != null, "BeanRegistry has not been register yet. " +
-				"Did you make sure the return value is marked as 'lazy'?")
+		state(beanRegistry != null, "BeanRegistry has not been registered yet.")
 
 		val beanType = manifest.erasure.asInstanceOf[Class[T]]
 

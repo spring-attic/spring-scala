@@ -18,7 +18,7 @@ package org.springframework.scala.beans.propertyeditors
 
 import java.beans.PropertyEditorSupport
 import scala.collection.JavaConversions._
-import scala.collection.mutable.Builder
+import scala.collection.mutable
 
 /**
  * Property editor for Scala collections, converting any source collection to a given
@@ -30,7 +30,7 @@ import scala.collection.mutable.Builder
  * @param nullAsEmptyCollection whether to convert an incoming `null` value to an empty
  * collection (of the appropriate type). Defaults to `false`.
  */
-class ScalaCollectionEditor[T, U](val builderFunction: () => Builder[T, _],
+class ScalaCollectionEditor[T, U](val builderFunction: () => mutable.Builder[T, _],
                                   val nullAsEmptyCollection: Boolean = false)
 		extends PropertyEditorSupport {
 
@@ -52,10 +52,10 @@ class ScalaCollectionEditor[T, U](val builderFunction: () => Builder[T, _],
 				builder ++= source
 			}
 			case javaCollection: java.util.Collection[T] => {
-				builder ++= collectionAsScalaIterable(javaCollection);
+				builder ++= collectionAsScalaIterable(javaCollection)
 			}
 			case javaMap: java.util.Map[T, U] => {
-				val mapBuilder = builder.asInstanceOf[Builder[(T, U), _]]
+				val mapBuilder = builder.asInstanceOf[mutable.Builder[(T, U), _]]
 				mapBuilder ++= mapAsScalaMap(javaMap)
 			}
 			case el: T => {

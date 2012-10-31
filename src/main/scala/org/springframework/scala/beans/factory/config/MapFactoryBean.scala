@@ -17,8 +17,7 @@
 package org.springframework.scala.beans.factory.config
 
 import org.springframework.beans.factory.config.AbstractFactoryBean
-import scala.collection.mutable.Builder
-import scala.collection.Map
+import scala.collection.{mutable, Map}
 
 /**
  * Simple factory for shared [[scala.collection.Map]] instances. Allows for central setup
@@ -30,7 +29,7 @@ import scala.collection.Map
  * @param builderFunction function used to create a new map builder
  */
 class MapFactoryBean[T, U](val sourceMap: Map[T, U],
-                           val builderFunction: () => Builder[(T, U), Map[T, U]])
+                           val builderFunction: () => mutable.Builder[(T, U), Map[T, U]])
 		extends AbstractFactoryBean[scala.collection.Map[T, U]] {
 
 	def this(sourceMap: Map[T, U]) {

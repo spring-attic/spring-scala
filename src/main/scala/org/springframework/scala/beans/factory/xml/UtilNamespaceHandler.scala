@@ -7,6 +7,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.scala.beans.factory.config.{MapFactoryBean, SetFactoryBean, SeqFactoryBean}
 
 /**
+ * Namespace handler for the `scala-util` namespace.
+ *
  * @author Arjen Poutsma
  */
 class UtilNamespaceHandler extends NamespaceHandlerSupport {

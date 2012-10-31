@@ -1,7 +1,7 @@
 package org.springframework.scala.beans.factory.config
 
 import org.springframework.beans.factory.config.AbstractFactoryBean
-import collection.mutable.Builder
+import scala.collection.mutable
 
 /**
  * Simple factory for shared [[scala.collection.Set]] instances. Allows for central setup
@@ -13,7 +13,7 @@ import collection.mutable.Builder
  * @param builderFunction function used to create a new set builder
  */
 class SetFactoryBean[T](val sourceSet: scala.collection.Set[T],
-                        val builderFunction: () => Builder[T, Set[T]])
+                        val builderFunction: () => mutable.Builder[T, Set[T]])
 		extends AbstractFactoryBean[scala.collection.Set[T]] {
 
 	def this(sourceSet: scala.collection.Set[T]) {

@@ -28,8 +28,8 @@ import scala.collection.mutable.{Set, MultiMap, SynchronizedMap, HashMap}
  * alternative to Spring's [[org.springframework.beans.factory.InitializingBean]]
  * and [[org.springframework.beans.factory.DisposableBean]] callback interfaces.
  *
- * Initialization functions are defined as `(T) => T`, i.e. a function that takes the bean
- * as parameter, and returns either the original bean or a wrapped one.
+ * Initialization functions are defined as `(T) => Unit`, i.e. a function that takes the
+ * bean as parameter, but does not return anything.
  *
  * Destruction functions are defined as `(T) => Unit`, i.e. a function that takes the bean
  * as parameter, but does not return anything.
@@ -61,8 +61,8 @@ class InitDestroyFunctionBeanPostProcessor
 	 * @tparam T the bean type
 	 */
 	def registerInitFunction[T](beanName: String, initFunction: (T) => Unit) {
-		Assert.hasLength(beanName, "'beanName' must not be empty");
-		Assert.notNull(initFunction, "'initFunction' must not be null");
+		Assert.hasLength(beanName, "'beanName' must not be empty")
+		Assert.notNull(initFunction, "'initFunction' must not be null")
 
 		initFunctions.addBinding(beanName, initFunction.asInstanceOf[Function1[Any, Unit]])
 	}
@@ -78,8 +78,8 @@ class InitDestroyFunctionBeanPostProcessor
 	 * @tparam T the bean type
 	 */
 	def registerDestroyFunction[T](beanName: String, destroyFunction: (T) => Unit) {
-		Assert.hasLength(beanName, "'beanName' must not be empty");
-		Assert.notNull(destroyFunction, "'destroyFunction' must not be null");
+		Assert.hasLength(beanName, "'beanName' must not be empty")
+		Assert.notNull(destroyFunction, "'destroyFunction' must not be null")
 
 		destroyFunctions
 				.addBinding(beanName, destroyFunction.asInstanceOf[Function1[Any, Unit]])

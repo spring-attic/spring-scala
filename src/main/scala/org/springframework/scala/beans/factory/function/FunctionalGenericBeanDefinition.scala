@@ -19,9 +19,12 @@ package org.springframework.scala.beans.factory.function
 import org.springframework.beans.factory.support.GenericBeanDefinition
 
 /**
+ * Default implementation of
+ * [[org.springframework.scala.beans.factory.function.FunctionalBeanDefinition]].
+ *
  * @author Arjen Poutsma
  */
-class FunctionalGenericBeanDefinition[T](val beanFunction: () => T)
+class FunctionalGenericBeanDefinition[T](beanFunction: () => T)
 		extends GenericBeanDefinition with FunctionalBeanDefinition[T] {
 
 	setBeanClass(classOf[Function0Wrapper])
