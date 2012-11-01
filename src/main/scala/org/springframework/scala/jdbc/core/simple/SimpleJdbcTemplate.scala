@@ -19,10 +19,11 @@ package org.springframework.scala.jdbc.core.simple
 import scala.collection.Map
 import scala.collection.Seq
 import scala.collection.JavaConverters._
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations
 import javax.sql.DataSource
 import java.sql.ResultSet
+import org.springframework.jdbc.core.JdbcOperations
 import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations
 
 /**
  * Scala-based convenience wrapper for the Spring [[org.springframework.jdbc.core.simple.SimpleJdbcTemplate]], taking
@@ -36,7 +37,7 @@ import org.springframework.jdbc.core.RowMapper
  * @constructor Creates a `SimpleJdbcTemplate` that wraps the given Java template
  * @param javaTemplate the Java `SimpleJdbcTemplate` to wrap
  */
-class SimpleJdbcTemplate(val javaTemplate: SimpleJdbcOperations) {
+class SimpleJdbcTemplate(val javaTemplate: JdbcOperations, val namedParameterTemplate: NamedParameterJdbcOperations) {
 
 	/**
 	 * Construct a new `SimpleJdbcTemplate`, given a DataSource to obtain connections from.
@@ -44,7 +45,7 @@ class SimpleJdbcTemplate(val javaTemplate: SimpleJdbcOperations) {
 	 * @param dataSource the JDBC DataSource to obtain connections from
 	 */
 	def this(dataSource: DataSource) {
-		this (new org.springframework.jdbc.core.simple.SimpleJdbcTemplate(dataSource))
+		this (new org.springframework.jdbc.core.JdbcTemplate(dataSource), new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(dataSource))
 	}
 
 	/**
@@ -59,11 +60,11 @@ class SimpleJdbcTemplate(val javaTemplate: SimpleJdbcOperations) {
 	 * @param mapping the function to use for result mapping
 	 */
 	def queryForObject[T, U](sql: String, args: Map[String, U])(mapping: (ResultSet, Int) => T): T = {
-		javaTemplate.queryForObject(sql, new RowMapper[T] {
+	    namedParameterTemplate.queryForObject(sql, args.asJava, new RowMapper[T] {
 			def mapRow(rs: ResultSet, rowNum: Int) = {
 				mapping.apply(rs, rowNum)
 			}
-		}, args.asJava)
+		})
 	}
 
 	/**
@@ -97,11 +98,11 @@ class SimpleJdbcTemplate(val javaTemplate: SimpleJdbcOperations) {
 	 * @param mapping the function to use for result mapping
 	 */
 	def query[T, U](sql: String, args: Map[String, U])(mapping: (ResultSet, Int) => T): Seq[T] = {
-		javaTemplate.query(sql, new RowMapper[T] {
+	    namedParameterTemplate.query(sql, args.asJava, new RowMapper[T] {
 			def mapRow(rs: ResultSet, rowNum: Int) = {
 				mapping.apply(rs, rowNum)
 			}
-		}, args.asJava).asScala
+		}).asScala
 	}
 
 	/**
@@ -136,7 +137,7 @@ class SimpleJdbcTemplate(val javaTemplate: SimpleJdbcOperations) {
 	 * @param args the map containing the arguments for the query
 	 */
 	def queryForMap[T](sql: String, args: Map[String, T]): Map[String, Any] = {
-		asInstanceOfAny(javaTemplate.queryForMap(sql, args.asJava).asScala)
+		asInstanceOfAny(namedParameterTemplate.queryForMap(sql, args.asJava).asScala)
 	}
 
 	/**
@@ -167,7 +168,7 @@ class SimpleJdbcTemplate(val javaTemplate: SimpleJdbcOperations) {
 	 * @param args the map containing the arguments for the query
 	 */
 	def queryForSeq(sql: String, args: Map[String, _]): Seq[Map[String, Any]] = {
-		javaTemplate.queryForList(sql, args.asJava).asScala.map(_.asScala)
+		namedParameterTemplate.queryForList(sql, args.asJava).asScala.map(_.asScala)
 	}
 
 	/**
@@ -196,7 +197,7 @@ class SimpleJdbcTemplate(val javaTemplate: SimpleJdbcOperations) {
 	 * @return the numbers of rows affected by the update
 	 */
 	def update(sql: String, args: Map[String, _]): Int = {
-		javaTemplate.update(sql, args.asJava)
+		namedParameterTemplate.update(sql, args.asJava)
 	}
 
 	/**
