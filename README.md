@@ -29,7 +29,7 @@ You can find out more information about this project on the [wiki](https://githu
 
 ## Issue Tracking
 
-TBA
+Spring Scala uses [JIRA](https://jira.springsource.org/browse/SCALA) for issue tracking purposes
 
 ## License
 
