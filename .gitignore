@@ -1,4 +1,18 @@
-target
-*.iml
-.idea
 atlassian-ide-plugin.xml
+*.java.hsp
+*.sonarj
+*.sw*
+.DS_Store
+.settings
+.springBeans
+target
+.gradle
+build
+.classpath
+.project
+
+# IDEA metadata and output dirs
+*.iml
+*.ipr
+*.iws
+.idea
