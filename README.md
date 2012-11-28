@@ -14,14 +14,22 @@ For more information, please refer to the [documentation on the wiki](https://gi
 As of writing this, there are no binaries to download.
 We plan to release a first milestone soon.
 
-## Building
+## Building from Source
 
-Spring Scala is currently using Maven, but a Gradle build is being worked on.
-For the moment, you can build Spring Scala as follows:
+Spring Scala uses a [Gradle](http://gradle.org)-based build system.
+In the instructions below, [`./gradlew`](http://vimeo.com/34436402) is invoked from the root of the source tree and serves as a cross-platform, self-contained bootstrap mechanism for the build.
+The only prerequisites are [Git](http://help.github.com/set-up-git-redirect) and JDK 1.7+.
 
-    git clone git@github.com:SpringSource/spring-scala.git
-    cd spring-scala
-    mvn install
+### check out sources
+`git clone git://github.com/SpringSource/spring-scala.git`
+
+### compile and test, build all jars, distribution zips and docs
+`./gradlew build`
+
+### install all spring-\* jars into your local Maven cache
+`./gradlew install`
+
+... and discover more commands with `./gradlew tasks`. See also the [Gradle build and release FAQ](https://github.com/SpringSource/spring-framework/wiki/Gradle-build-and-release-FAQ).
 
 ## Documentation
 
