@@ -2,42 +2,41 @@ apply plugin: 'java'
 apply plugin: 'scala'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
-apply from: "${rootProject.projectDir}/publish-maven.gradle"
+apply from: "publish-maven.gradle"
 
 group 'org.springframework.scala'
 
 ext {
-  springVersion = '3.2.0.RC1'
+  springVersion = '3.2.0.RC2'
   scalaVersion = '2.9.2'
 }
 
 repositories {
-  mavenCentral()
-  maven { url "http://repo.springsource.org/repo" }
+  maven { url "http://repo.springsource.org/libs-snapshot" }
 }
 
 dependencies {
   // Spring
-  compile "org.springframework:spring-core:$springVersion"
-  compile "org.springframework:spring-beans:$springVersion"
-  compile "org.springframework:spring-context:$springVersion"
+  compile("org.springframework:spring-core:$springVersion")
+  compile("org.springframework:spring-beans:$springVersion")
+  compile("org.springframework:spring-context:$springVersion")
   compile("org.springframework:spring-jdbc:$springVersion", optional)
   compile("org.springframework:spring-jms:$springVersion", optional)
   compile("org.springframework:spring-web:$springVersion", optional)
 
   // Scala
-  scalaTools "org.scala-lang:scala-compiler:$scalaVersion"
-  compile "org.scala-lang:scala-library:$scalaVersion"
+  scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
+  compile("org.scala-lang:scala-library:$scalaVersion")
 
-  // JEE
+  // Java EE
   compile("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1", provided)
   compile("javax.servlet:servlet-api:2.5", provided)
 
   // Test
-  testCompile "org.scalatest:scalatest_$scalaVersion:1.6.1"
-  testCompile "junit:junit:4.10"
-  testRuntime "org.hsqldb:hsqldb-j5:2.2.4"
-  testRuntime "log4j:log4j:1.2.16"
+  testCompile("org.scalatest:scalatest_$scalaVersion:1.6.1")
+  testCompile("junit:junit:4.10")
+  testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
+  testRuntime("log4j:log4j:1.2.16")
 }
 
 tasks.withType(ScalaCompile) {
@@ -46,5 +45,5 @@ tasks.withType(ScalaCompile) {
 
 task wrapper(type: Wrapper) {
   description = 'Generates gradlew[.bat] scripts'
-  gradleVersion = '1.2'
+  gradleVersion = '1.3'
 }
