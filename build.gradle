@@ -2,7 +2,11 @@ apply plugin: 'java'
 apply plugin: 'scala'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
-apply from: "publish-maven.gradle"
+
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-maven'
+apply plugin: 'propdeps-idea'
+apply plugin: 'propdeps-eclipse'
 
 group 'org.springframework.scala'
 
@@ -20,17 +24,17 @@ dependencies {
   compile("org.springframework:spring-core:$springVersion")
   compile("org.springframework:spring-beans:$springVersion")
   compile("org.springframework:spring-context:$springVersion")
-  compile("org.springframework:spring-jdbc:$springVersion", optional)
-  compile("org.springframework:spring-jms:$springVersion", optional)
-  compile("org.springframework:spring-web:$springVersion", optional)
+  optional("org.springframework:spring-jdbc:$springVersion")
+  optional("org.springframework:spring-jms:$springVersion")
+  optional("org.springframework:spring-web:$springVersion")
 
   // Scala
   scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
   compile("org.scala-lang:scala-library:$scalaVersion")
 
   // Java EE
-  compile("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1", provided)
-  compile("javax.servlet:servlet-api:2.5", provided)
+  provided("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1")
+  provided("javax.servlet:servlet-api:2.5")
 
   // Test
   testCompile("org.scalatest:scalatest_$scalaVersion:1.6.1")
@@ -46,4 +50,13 @@ tasks.withType(ScalaCompile) {
 task wrapper(type: Wrapper) {
   description = 'Generates gradlew[.bat] scripts'
   gradleVersion = '1.3'
+}
+
+buildscript {
+    repositories {
+        maven { url 'http://repo.springsource.org/plugins-release' }
+    }
+    dependencies {
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.1'
+    }
 }
