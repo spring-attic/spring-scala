@@ -11,8 +11,22 @@ For more information, please refer to the [documentation on the wiki](https://gi
 
 ## Installation
 
-As of writing this, there are no binaries to download.
-We plan to release a first milestone soon.
+A first milestone of Spring Scala is available for download at our milestone repository, http://repo.springsource.org/libs-milestone.
+
+For Maven users:
+
+    <distributionManagement>
+        <repository>
+            <id>milestone.repo.springsource.org</id>
+            <name>repo.springsource.org-milestone</name>
+            <url>https://repo.springsource.org/libs-milestone</url>
+        </repository>
+    </distributionManagement>
+    <dependency>
+        <groupId>org.springframework.scala</groupId>
+        <artifactId>spring-scala</artifactId>
+        <version>1.0.0.M1</version>
+    </dependency>
 
 ## Building from Source
 
