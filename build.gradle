@@ -11,45 +11,46 @@ apply plugin: 'propdeps-eclipse'
 group 'org.springframework.scala'
 
 ext {
-  springVersion = '3.2.0.RC2'
-  scalaVersion = '2.9.2'
+    springVersion = '3.2.0.RC2'
+    scalaVersion = '2.9.2'
 }
 
 repositories {
-  maven { url "http://repo.springsource.org/libs-snapshot" }
+    maven { url "http://repo.springsource.org/libs-snapshot" }
 }
 
 dependencies {
-  // Spring
-  compile("org.springframework:spring-core:$springVersion")
-  compile("org.springframework:spring-beans:$springVersion")
-  compile("org.springframework:spring-context:$springVersion")
-  optional("org.springframework:spring-jdbc:$springVersion")
-  optional("org.springframework:spring-jms:$springVersion")
-  optional("org.springframework:spring-web:$springVersion")
+    // Spring
+    compile("org.springframework:spring-core:$springVersion")
+    compile("org.springframework:spring-beans:$springVersion")
+    compile("org.springframework:spring-context:$springVersion")
+    optional("org.springframework:spring-aop:$springVersion")
+    optional("org.springframework:spring-jdbc:$springVersion")
+    optional("org.springframework:spring-jms:$springVersion")
+    optional("org.springframework:spring-web:$springVersion")
 
-  // Scala
-  scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
-  compile("org.scala-lang:scala-library:$scalaVersion")
+    // Scala
+    scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
+    compile("org.scala-lang:scala-library:$scalaVersion")
 
-  // Java EE
-  provided("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1")
-  provided("javax.servlet:servlet-api:2.5")
+    // Java EE
+    provided("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1")
+    provided("javax.servlet:servlet-api:2.5")
 
-  // Test
-  testCompile("org.scalatest:scalatest_$scalaVersion:1.6.1")
-  testCompile("junit:junit:4.10")
-  testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
-  testRuntime("log4j:log4j:1.2.16")
+    // Test
+    testCompile("org.scalatest:scalatest_$scalaVersion:1.6.1")
+    testCompile("junit:junit:4.10")
+    testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
+    testRuntime("log4j:log4j:1.2.16")
 }
 
 tasks.withType(ScalaCompile) {
-  scalaCompileOptions.useAnt = false
+    scalaCompileOptions.useAnt = false
 }
 
 task wrapper(type: Wrapper) {
-  description = 'Generates gradlew[.bat] scripts'
-  gradleVersion = '1.3'
+    description = 'Generates gradlew[.bat] scripts'
+    gradleVersion = '1.3'
 }
 
 buildscript {
