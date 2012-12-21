@@ -24,9 +24,11 @@ dependencies {
   compile("org.springframework:spring-core:$springVersion")
   compile("org.springframework:spring-beans:$springVersion")
   compile("org.springframework:spring-context:$springVersion")
+  optional("org.springframework:spring-aop:$springVersion")
   optional("org.springframework:spring-jdbc:$springVersion")
   optional("org.springframework:spring-jms:$springVersion")
   optional("org.springframework:spring-web:$springVersion")
+  optional("org.springframework:spring-webmvc:$springVersion")
 
   // Scala
   scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
@@ -41,6 +43,7 @@ dependencies {
   testCompile("junit:junit:4.10")
   testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
   testRuntime("log4j:log4j:1.2.16")
+  testCompile("org.springframework:spring-test:$springVersion")
 }
 
 tasks.withType(ScalaCompile) {
