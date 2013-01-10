@@ -21,6 +21,7 @@ repositories {
 
 dependencies {
   // Spring
+  optional("org.springframework:spring-aop:$springVersion")
   compile("org.springframework:spring-core:$springVersion")
   compile("org.springframework:spring-beans:$springVersion")
   compile("org.springframework:spring-context:$springVersion")
