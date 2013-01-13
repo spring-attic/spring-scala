@@ -1,7 +1,5 @@
-package org.springframework.scala.transaction.support
-
 /*
- * Copyright 2002-2011 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,8 @@ package org.springframework.scala.transaction.support
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.springframework.scala.transaction.support
 
 import org.springframework.transaction.annotation.{Isolation, Propagation}
 import org.springframework.transaction.support.TransactionCallback
