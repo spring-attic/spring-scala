@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,18 @@ class FunctionalConfigurationTests extends FunSuite with BeforeAndAfterEach {
 
 	override protected def beforeEach() {
 		applicationContext = new GenericApplicationContext()
+	}
+
+	test("getBean()") {
+		val config = new FunctionalConfiguration {
+			bean("foo") {
+				"Foo"
+	    }
+		}
+		config.register(applicationContext, beanNameGenerator)
+
+		val foo = config.getBean[String]("foo")
+		assert("Foo" === foo)
 	}
 
 	test("bean() aliases") {
@@ -264,7 +276,7 @@ class FunctionalConfigurationTests extends FunSuite with BeforeAndAfterEach {
 				"classpath:/org/springframework/scala/context/function/imported.xml")
 
 			val john = bean() {
-				new Person(getBean("firstName"), getBean("lastName"))
+				new Person(getBean[String]("firstName"), getBean[String]("lastName"))
 			}
 		}
 		config.register(applicationContext, beanNameGenerator)
@@ -278,7 +290,7 @@ class FunctionalConfigurationTests extends FunSuite with BeforeAndAfterEach {
 			importClass(classOf[MyAnnotatedConfiguration])
 
 			val john = bean() {
-				new Person(getBean("firstName"), getBean("lastName"))
+				new Person(getBean[String]("firstName"), getBean[String]("lastName"))
 			}
 		}
 		config.register(applicationContext, beanNameGenerator)
