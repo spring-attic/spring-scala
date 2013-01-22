@@ -12,7 +12,7 @@ group 'org.springframework.scala'
 
 ext {
   springVersion = '3.2.0.RELEASE'
-  scalaVersion = '2.9.2'
+  scalaVersion = '2.10.0'
 }
 
 repositories {
@@ -32,13 +32,14 @@ dependencies {
   // Scala
   scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
   compile("org.scala-lang:scala-library:$scalaVersion")
+  compile("org.scala-lang:scala-reflect:$scalaVersion")
 
   // Java EE
   provided("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1")
   provided("javax.servlet:servlet-api:2.5")
 
   // Test
-  testCompile("org.scalatest:scalatest_$scalaVersion:1.6.1")
+  testCompile("org.scalatest:scalatest_$scalaVersion:1.8")
   testCompile("junit:junit:4.10")
   testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
   testRuntime("log4j:log4j:1.2.16")
