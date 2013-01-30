@@ -1,6 +1,6 @@
 package org.springframework.scala.transaction.support
 
-trait SynchronizationEvent
+sealed trait SynchronizationEvent
 
 case class SuspendEvent() extends SynchronizationEvent
 
