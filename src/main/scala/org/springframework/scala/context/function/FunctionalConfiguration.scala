@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import org.springframework.beans.factory.config.{BeanDefinition, BeanDefinitionH
 import scala.collection.mutable.ListBuffer
 import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
 import org.springframework.beans.factory.support.{RootBeanDefinition, BeanNameGenerator, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
+import scala.reflect.runtime.universe._
+import scala.reflect.runtime.currentMirror
 
 /**
  * Base trait used to declare one or more Spring Beans that may be processed by the Spring
@@ -94,16 +96,16 @@ trait FunctionalConfiguration extends DelayedInit {
 	 * Translates aliases back to the corresponding canonical bean name.
 	 * Will ask the parent factory if the bean cannot be found in this factory instance.
 	 * @param name the name of the bean to retrieve
-	 * @param manifest an implicit ``Manifest`` representing the type of the specified
-	 *                 type parameter.
+	 * @param tag an implicit ``TypeTag`` representing the type of the specified type
+	 *            parameter.
 	 * @return an instance of the bean
 	 * @throws NoSuchBeanDefinitionException if there's no such bean definition
 	 * @throws BeanNotOfRequiredTypeException if the bean is not of the required type
 	 * @throws BeansException if the bean could not be created
 	 */
-	def getBean[T](name: String)(implicit manifest: Manifest[T]): T = {
+	def getBean[T](name: String)(implicit tag: TypeTag[T]): T = {
 		state(beanFactory != null, "BeanFactory has not been register yet. ")
-		val beanType = manifest.erasure.asInstanceOf[Class[T]]
+		val beanType = currentMirror.runtimeClass(tag.tpe).asInstanceOf[Class[T]]
 		beanFactory.getBean(name, beanType)
 	}
 
@@ -137,7 +139,7 @@ trait FunctionalConfiguration extends DelayedInit {
 	                                             manifest: Manifest[T]): BeanLookupFunction[T] = {
 		state(beanRegistry != null, "BeanRegistry has not been registered yet.")
 
-		val beanType = manifest.erasure.asInstanceOf[Class[T]]
+		val beanType = manifest.runtimeClass.asInstanceOf[Class[T]]
 
 		val fbd = new FunctionalGenericBeanDefinition(beanFunction)
 		fbd.setScope(scope)
@@ -148,7 +150,7 @@ trait FunctionalConfiguration extends DelayedInit {
 		val definitionHolder = new
 						BeanDefinitionHolder(fbd, beanName, aliases.toArray)
 
-		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.beanRegistry);
+		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.beanRegistry)
 
 		new BeanLookupFunction[T] {
 			def apply() = beanFactory.getBean(beanName, beanType)

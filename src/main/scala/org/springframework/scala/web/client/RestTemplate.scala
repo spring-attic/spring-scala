@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -557,11 +557,11 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
   }
 
   private def asInstanceOfAnyRef(seq: Seq[Any]) = {
-    seq.map(_.asInstanceOf[AnyRef]);
+    seq.map(_.asInstanceOf[AnyRef])
   }
 
   private def responseType[T](manifest: Manifest[T]): Class[T] = {
-    manifest.erasure.asInstanceOf[Class[T]]
+    manifest.runtimeClass.asInstanceOf[Class[T]]
   }
 
   private def functionToRequestCallback(function: ClientHttpRequest => Unit): RequestCallback =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ class ScalaBeanInfo implements BeanInfo {
 						method.getName().startsWith("is"));
 	}
 
-	private static boolean isScalaSetter(Method method) {
+	public static boolean isScalaSetter(Method method) {
 		return method.getParameterTypes().length == 1 &&
 				method.getReturnType().equals(Void.TYPE) &&
 				method.getName().endsWith(SCALA_SETTER_SUFFIX);
