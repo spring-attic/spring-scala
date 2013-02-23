@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils
 import org.springframework.util.Assert.state
 import org.springframework.beans.factory.config.{BeanDefinition, BeanDefinitionHolder, ConfigurableBeanFactory}
 import scala.collection.mutable.ListBuffer
-import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
+import org.springframework.context.annotation.{AnnotationConfigUtils, AnnotatedBeanDefinitionReader}
 import org.springframework.beans.factory.support.{RootBeanDefinition, BeanNameGenerator, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
 import scala.reflect.runtime.universe._
 import scala.reflect.runtime.currentMirror
@@ -61,6 +61,8 @@ trait FunctionalConfiguration extends DelayedInit {
 	private var applicationContext: GenericApplicationContext = _
 
 	private var beanNameGenerator: BeanNameGenerator = _
+
+    protected var annotationConfig = false
 
 	private def initDestroyProcessor: InitDestroyFunctionBeanPostProcessor = {
 		assert(beanFactory.containsBean(INIT_DESTROY_FUNCTION_PROCESSOR_BEAN_NAME),
@@ -292,6 +294,10 @@ trait FunctionalConfiguration extends DelayedInit {
 		registerInitDestroyProcessor()
 
 		initCode.foreach(_())
+
+      if(annotationConfig) {
+        AnnotationConfigUtils.registerAnnotationConfigProcessors(applicationContext)
+      }
 	}
 
 	private def registerInitDestroyProcessor() {
