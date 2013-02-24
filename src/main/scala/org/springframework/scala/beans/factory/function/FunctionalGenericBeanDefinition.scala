@@ -17,6 +17,7 @@
 package org.springframework.scala.beans.factory.function
 
 import org.springframework.beans.factory.support.GenericBeanDefinition
+import org.springframework.beans.factory.config.BeanPostProcessor
 
 /**
  * Default implementation of
@@ -24,12 +25,14 @@ import org.springframework.beans.factory.support.GenericBeanDefinition
  *
  * @author Arjen Poutsma
  */
-class FunctionalGenericBeanDefinition[T](beanFunction: () => T)
+class FunctionalGenericBeanDefinition[T](beanFunction: () => T)(implicit manifest: Manifest[T])
 		extends GenericBeanDefinition with FunctionalBeanDefinition[T] {
 
 	setBeanClass(classOf[Function0Wrapper])
 	getConstructorArgumentValues.addIndexedArgumentValue(0, beanFunction)
-	setFactoryMethodName("apply")
+	val isBeanPostProcessor = classOf[BeanPostProcessor].isAssignableFrom(manifest.runtimeClass)
+	val factoryMethodName = if(isBeanPostProcessor) "applyAsBeanPostProcessor" else "apply"
+	setFactoryMethodName(factoryMethodName)
 
 	def beanCreationFunction = beanFunction
 }
