@@ -26,7 +26,7 @@ import org.springframework.util.Assert.state
 import org.springframework.beans.factory.config.{BeanDefinition, BeanDefinitionHolder, ConfigurableBeanFactory}
 import scala.collection.mutable.ListBuffer
 import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
-import org.springframework.beans.factory.support.{RootBeanDefinition, BeanNameGenerator, BeanDefinitionRegistry, BeanDefinitionReaderUtils}
+import org.springframework.beans.factory.support._
 import scala.reflect.runtime.universe._
 import scala.reflect.runtime.currentMirror
 
@@ -57,6 +57,9 @@ trait FunctionalConfiguration extends DelayedInit {
 		"org.springframework.scala.beans.factory.function.internalInitDestroyFunctionProcessor"
 
 	private val initCode = new ListBuffer[() => Unit]
+
+	private val registrationCode =
+		new ListBuffer[(GenericApplicationContext, BeanNameGenerator) => Unit]
 
 	private var applicationContext: GenericApplicationContext = _
 
@@ -280,6 +283,7 @@ trait FunctionalConfiguration extends DelayedInit {
 	 * Registers this functional configuration class with the given application context.
 	 *
 	 * @param applicationContext the application context
+	 * @param beanNameGenerator the bean name generator
 	 */
 	private[context] def register(applicationContext: GenericApplicationContext,
 	                              beanNameGenerator: BeanNameGenerator) {
@@ -289,9 +293,22 @@ trait FunctionalConfiguration extends DelayedInit {
 
 		this.applicationContext = applicationContext
 		this.beanNameGenerator = beanNameGenerator
+
 		registerInitDestroyProcessor()
 
 		initCode.foreach(_())
+
+		registrationCode.foreach(_(applicationContext, beanNameGenerator))
+	}
+
+	/**
+	 * Adds a function to be applied as part of the registration process. Used by sub-traits
+	 * to add configuration behavior.
+	 *
+	 * @param function the function to be added
+	 */
+	final def onRegister(function: (GenericApplicationContext, BeanNameGenerator) => Unit ) {
+		registrationCode += function
 	}
 
 	private def registerInitDestroyProcessor() {
