@@ -144,7 +144,7 @@ trait FunctionalConfiguration extends DelayedInit {
 
 		val beanType = manifest.runtimeClass.asInstanceOf[Class[T]]
 
-		val fbd = new FunctionalGenericBeanDefinition(beanFunction)
+		val fbd = new FunctionalGenericBeanDefinition(beanFunction)(manifest)
 		fbd.setScope(scope)
 		fbd.setLazyInit(lazyInit)
 

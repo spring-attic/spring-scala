@@ -16,6 +16,7 @@
 
 package org.springframework.scala.beans.factory.function;
 
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import scala.Function0;
 
 /**
@@ -36,5 +37,9 @@ public class Function0Wrapper {
 	public static <T> T apply(Function0<T> function) {
 		return function.apply();
 	}
+
+    public static BeanPostProcessor applyAsBeanPostProcessor(Function0<BeanPostProcessor> function) {
+        return function.apply();
+     }
 
 }
