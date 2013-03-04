@@ -16,10 +16,12 @@
 
 package org.springframework.scala.context.function
 
+import org.springframework.beans.factory.annotation.Autowired
+
 class Person(val firstName: String, val lastName: String) {
 	
-	var father: Person = null
-	var mother: Person = null
+	var father: Person = _
+	var mother: Person = _
 
 	override def toString = firstName + " " + lastName
 }
@@ -36,4 +38,12 @@ class InitializablePerson(firstName: String, lastName: String)
 	def destroy() {
 		initialised = false
 	}
+}
+
+class AutowirePerson(firstName: String, lastName: String)
+		extends Person(firstName, lastName) {
+
+	@Autowired
+	var friend: Person = _
+
 }

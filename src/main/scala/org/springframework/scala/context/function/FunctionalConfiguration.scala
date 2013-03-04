@@ -16,7 +16,7 @@
 
 package org.springframework.scala.context.function
 
-import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBeanPostProcessor, FunctionalGenericBeanDefinition}
+import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBeanPostProcessor, FunctionalRootBeanDefinition}
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 import org.springframework.context.support.GenericApplicationContext
@@ -144,7 +144,7 @@ trait FunctionalConfiguration extends DelayedInit {
 
 		val beanType = manifest.runtimeClass.asInstanceOf[Class[T]]
 
-		val fbd = new FunctionalGenericBeanDefinition(beanFunction)
+		val fbd = new FunctionalRootBeanDefinition(beanFunction, beanType)
 		fbd.setScope(scope)
 		fbd.setLazyInit(lazyInit)
 

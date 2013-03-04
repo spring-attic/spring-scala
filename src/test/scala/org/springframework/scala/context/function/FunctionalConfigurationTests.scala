@@ -22,6 +22,7 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import org.springframework.beans.factory.support.DefaultBeanNameGenerator
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
 
 /**
  * @author Arjen Poutsma
@@ -298,6 +299,30 @@ class FunctionalConfigurationTests extends FunSuite with BeforeAndAfterEach {
 
 		assert("John" == config.john().firstName)
 		assert("Doe" == config.john().lastName)
-	}
+ 	}
+
+	test("beanPostProcessor") {
+		val config = new FunctionalConfiguration {
+
+			bean("john") {
+				new AutowirePerson("John", "Doe")
+      }
+
+			bean("jane") {
+				new Person("Jane", "Roe")
+      }
+
+			bean() { new AutowiredAnnotationBeanPostProcessor}
+
+		}
+
+		config.register(applicationContext, beanNameGenerator)
+		applicationContext.refresh()
+
+		val jane= applicationContext.getBean("jane", classOf[Person])
+		val john = applicationContext.getBean("john", classOf[AutowirePerson])
+
+		assert(jane === john.friend)
+		}
 
 }

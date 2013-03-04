@@ -21,12 +21,12 @@ import scala.Function0;
 /**
  * Simple static wrapper for a Scala {@link Function0}.
  * <p/>
- * Used by the {@link FunctionalGenericBeanDefinition} as a provider of a static
+ * Used by the {@link FunctionalRootBeanDefinition} as a provider of a static
  * factory method. In Java, because the Spring bean factory natively does not handle Scala
  * Objects well.
  *
  * @author Arjen Poutsma
- * @see FunctionalGenericBeanDefinition
+ * @see FunctionalRootBeanDefinition
  */
 public class Function0Wrapper {
 

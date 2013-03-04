@@ -26,7 +26,7 @@ import org.scalatest.junit.JUnitRunner
  * @author Arjen Poutsma
  */
 @RunWith(classOf[JUnitRunner])
-class FunctionalGenericBeanDefinitionTests extends FunSuite with BeforeAndAfterEach {
+class FunctionalRootBeanDefinitionTests extends FunSuite with BeforeAndAfterEach {
 
 	val applicationContext = new StaticApplicationContext()
 
@@ -42,7 +42,7 @@ class FunctionalGenericBeanDefinitionTests extends FunSuite with BeforeAndAfterE
 	}
 
 	test("singleton") {
-		val bd = new FunctionalGenericBeanDefinition[Int](beanFunction)
+		val bd = new FunctionalRootBeanDefinition[Int](beanFunction, classOf[Int])
 		bd.setScope(BeanDefinition.SCOPE_SINGLETON)
 		applicationContext.registerBeanDefinition("function", bd)
 
@@ -55,7 +55,7 @@ class FunctionalGenericBeanDefinitionTests extends FunSuite with BeforeAndAfterE
 	}
 
 	test("prototype") {
-		val bd = new FunctionalGenericBeanDefinition[Int](beanFunction)
+		val bd = new FunctionalRootBeanDefinition[Int](beanFunction, classOf[Int])
 		bd.setScope(BeanDefinition.SCOPE_PROTOTYPE)
 		applicationContext.registerBeanDefinition("function", bd)
 
