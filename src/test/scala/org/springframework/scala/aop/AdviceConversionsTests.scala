@@ -25,7 +25,7 @@ import org.springframework.scala.context.function.FunctionalConfigApplicationCon
 @RunWith(classOf[JUnitRunner])
 class AdviceConversionsTests extends FunSuite {
 
-  val applicationContext: GenericApplicationContext = new FunctionalConfigApplicationContext(classOf[MethodAdviceConfiguration])
+  val applicationContext: GenericApplicationContext = FunctionalConfigApplicationContext[MethodAdviceConfiguration]
 
   test("MethodAdvice#interceptor") {
     val intercepted = applicationContext.getBean("intercepted")

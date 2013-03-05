@@ -42,15 +42,14 @@ class FunctionalConfigApplicationContext extends GenericApplicationContext {
 	var beanNameGenerator: BeanNameGenerator = new DefaultBeanNameGenerator
 
 	/**
-	 * Creates a new ``FunctionalConfigApplicationContext``, deriving bean
-	 * definitions from the given configuration classes and automatically
-	 * refreshing the context.
-	 * @param configurationClasses one or more functional configuration classes
+	 * Registers a single [[org.springframework.scala.context.function.FunctionalConfiguration]]
+	 * classes to be processed. Note that ``refresh()`` must be called in order for
+	 * the context to fully process the given configurations.
+	 * @tparam T the configuration class
 	 */
-	def this(configurationClasses: Class[_ <: FunctionalConfiguration]*) {
-		this()
-		registerClasses(configurationClasses: _*)
-		refresh()
+	def registerClass[T <: FunctionalConfiguration]()(implicit manifest: Manifest[T]) {
+		val configClass = manifest.runtimeClass.asInstanceOf[Class[T]]
+		registerClasses(configClass)
 	}
 
 	/**
@@ -80,3 +79,36 @@ class FunctionalConfigApplicationContext extends GenericApplicationContext {
 
 }
 
+/**
+ * Companion object to the ``FunctionalConfigApplicationContext`` class.
+ *
+ * @author Arjen Poutsma
+ */
+object FunctionalConfigApplicationContext {
+
+	/**
+	 * Creates a new ``FunctionalConfigApplicationContext``, deriving bean
+	 * definitions from the given configuration type parameter and automatically
+	 * refreshing the context.
+	 * @tparam T the configuration class
+	 */
+	def apply[T <: FunctionalConfiguration]()(implicit manifest: Manifest[T]): FunctionalConfigApplicationContext = {
+		val context = new FunctionalConfigApplicationContext()
+		context.registerClass()(manifest)
+		context.refresh()
+		context
+	}
+
+	/**
+	 * Creates a new ``FunctionalConfigApplicationContext``, deriving bean
+	 * definitions from the given configuration classes and automatically
+	 * refreshing the context.
+	 * @param configurationClasses one or more functional configuration classes
+	 */
+	def apply(configurationClasses: Class[_ <: FunctionalConfiguration]*): FunctionalConfigApplicationContext = {
+		val context = new FunctionalConfigApplicationContext()
+		context.registerClasses(configurationClasses: _*)
+		context.refresh()
+		context
+	}
+}

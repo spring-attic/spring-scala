@@ -26,9 +26,9 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class FunctionalConfigApplicationContextTests extends FunSuite {
 
-	test("classesConstructor") {
-		val appContext = new FunctionalConfigApplicationContext(
-			classOf[MyFunctionalConfiguration])
+	test("registerClass") {
+		val appContext = new FunctionalConfigApplicationContext()
+		appContext.registerClass[MyFunctionalConfiguration]
 		val foo = appContext.getBean("foo")
 		assert("Foo" == foo)
 	}
@@ -46,6 +46,19 @@ class FunctionalConfigApplicationContextTests extends FunSuite {
 		val foo = appContext.getBean("foo")
 		assert("Foo" == foo)
 	}
+
+	test("companion single class") {
+		val appContext = FunctionalConfigApplicationContext[MyFunctionalConfiguration]
+		val foo = appContext.getBean("foo")
+		assert("Foo" == foo)
+	}
+
+	test("companion multiple classes") {
+		val appContext = FunctionalConfigApplicationContext(classOf[MyFunctionalConfiguration])
+		val foo = appContext.getBean("foo")
+		assert("Foo" == foo)
+	}
+
 
 
 }
