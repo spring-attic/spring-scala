@@ -36,16 +36,6 @@ object BeanFactoryConversions {
 		new RichBeanFactory(beanFactory)
 
 	/**
-	 * Implicitly converts a [[org.springframework.scala.beans.factory.RichBeanFactory]] to
-	 * a [[org.springframework.beans.factory.BeanFactory]].
-	 *
-	 * @param beanFactory the bean factory to be converted
-	 * @return the bean factory
-	 */
-	implicit def toBeanFactory(beanFactory: RichBeanFactory) : BeanFactory =
-		beanFactory.beanFactory
-
-	/**
 	 * Implicitly converts a [[org.springframework.beans.factory.ListableBeanFactory]] to a
 	 * [[org.springframework.scala.beans.factory.RichListableBeanFactory]].
 	 *
@@ -54,16 +44,4 @@ object BeanFactoryConversions {
 	 */
 	implicit def toRichListableBeanFactory(beanFactory: ListableBeanFactory): RichListableBeanFactory =
 		new RichListableBeanFactory(beanFactory)
-
-	/**
-	 * Implicitly converts a [[org.springframework.scala.beans.factory.RichListableBeanFactory]]
-	 * to a [[org.springframework.beans.factory.ListableBeanFactory]].
-	 *
-	 * @param beanFactory the listable bean factory to be converted
-	 * @return the listable bean factory
-	 */
-	implicit def toListableBeanFactory(beanFactory: RichListableBeanFactory) : ListableBeanFactory =
-		beanFactory.beanFactory
-
-
 }
