@@ -7,19 +7,19 @@ object JdbcCallbackConversions {
 
   // Prepared Statement conversions
 
-  implicit def asPreparedStatementCreator(statementCreator: Connection => PreparedStatement) : PreparedStatementCreator = {
+  implicit def asPreparedStatementCreator(statementCreator: Connection => PreparedStatement): PreparedStatementCreator = {
     new PreparedStatementCreator {
       def createPreparedStatement(connection: Connection): PreparedStatement = statementCreator(connection)
     }
   }
 
-  implicit def asPreparedStatementCallback[T](statementCallback: PreparedStatement => T) : PreparedStatementCallback[T] = {
+  implicit def asPreparedStatementCallback[T](statementCallback: PreparedStatement => T): PreparedStatementCallback[T] = {
     new PreparedStatementCallback[T] {
       def doInPreparedStatement(statement: PreparedStatement): T = statementCallback(statement)
     }
   }
 
-  implicit def asPreparedStatementSetter(setterCallback: PreparedStatement => Unit) : PreparedStatementSetter = {
+  implicit def asPreparedStatementSetter(setterCallback: PreparedStatement => Unit): PreparedStatementSetter = {
     new PreparedStatementSetter() {
       def setValues(statement: PreparedStatement) {
         setterCallback(statement)
@@ -29,13 +29,13 @@ object JdbcCallbackConversions {
 
   // Callable Statement conversions
 
-  implicit def asCallableStatementCreator(statementCreator: Connection => CallableStatement) : CallableStatementCreator = {
+  implicit def asCallableStatementCreator(statementCreator: Connection => CallableStatement): CallableStatementCreator = {
     new CallableStatementCreator() {
       def createCallableStatement(connection: Connection): CallableStatement = statementCreator(connection)
     }
   }
 
-  implicit def asCallableStatementCallback[T](statementCallback: CallableStatement => T) : CallableStatementCallback[T] = {
+  implicit def asCallableStatementCallback[T](statementCallback: CallableStatement => T): CallableStatementCallback[T] = {
     new CallableStatementCallback[T] {
       def doInCallableStatement(statement: CallableStatement): T = statementCallback(statement)
     }

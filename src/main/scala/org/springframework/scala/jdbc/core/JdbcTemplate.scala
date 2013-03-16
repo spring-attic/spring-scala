@@ -39,6 +39,7 @@ import org.springframework.jdbc.support.KeyHolder
  * @param javaTemplate the Java `JdbcTemplate` to wrap
  */
 class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate) {
+
   /**
    * Construct a new `JdbcTemplate`, given a DataSource to obtain connections from.
    *
@@ -46,18 +47,6 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
    */
   def this(dataSource: DataSource) {
     this(new org.springframework.jdbc.core.JdbcTemplate(dataSource))
-  }
-
-  private def returnType[T](manifest: Manifest[T]): Class[T] = {
-    manifest.runtimeClass.asInstanceOf[Class[T]]
-  }
-
-  private def asInstanceOfAny(map: java.util.Map[String, AnyRef]): Map[String, Any] = {
-    map.asScala.toMap.mapValues(_.asInstanceOf[Any])
-  }
-
-  private def asInstanceOfAnyRef(seq: Seq[Any]): Seq[AnyRef] = {
-    seq.map(_.asInstanceOf[AnyRef])
   }
 
   //-------------------------------------------------------------------------
@@ -220,7 +209,7 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
     javaTemplate.queryForList(sql, returnType(manifest)).asScala
   }
 
-  def queryForColumnMaps(sql: String): Seq[Map[String, Any]] = {
+  def queryForMappedColumns(sql: String): Seq[Map[String, Any]] = {
     javaTemplate.queryForList(sql).asScala.map(mappedRow => asInstanceOfAny(mappedRow))
   }
 
@@ -292,40 +281,28 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
     javaTemplate.query(sql, setterCallback, rowMapper).asScala
   }
 
-  def queryAndMap[T](sql: String, args: Seq[Any], argTypes: Seq[Int], rowMapper: (ResultSet, Int) => T): Seq[T] = {
+  def queryAndMap[T](sql: String, args: Seq[Any], argTypes: Seq[Int])(rowMapper: (ResultSet, Int) => T): Seq[T] = {
     javaTemplate.query(sql, asInstanceOfAnyRef(args).toArray, argTypes.toArray, rowMapper).asScala
   }
 
-  def queryAndMap[T](sql: String, args: Seq[Any])(rowMapper: (ResultSet, Int) => T): Seq[T] = {
+  def queryAndMap[T](sql: String, args: Any*)(rowMapper: (ResultSet, Int) => T): Seq[T] = {
     javaTemplate.query(sql, asInstanceOfAnyRef(args).toArray, rowMapper).asScala
   }
 
-  def queryAndMap[T](sql: String, rowMapper: (ResultSet, Int) => T, args: Any*): Seq[T] = {
-    javaTemplate.query(sql, rowMapper, asInstanceOfAnyRef(args).toArray).asScala
-  }
-
-  def queryForObject[T](sql: String, args: Seq[Any], argTypes: Seq[Int], rowMapper: (ResultSet, Int) => T): Option[T] = {
+  def queryForObjectAndMap[T](sql: String, args: Seq[Any], argTypes: Seq[Int])(rowMapper: (ResultSet, Int) => T): Option[T] = {
     Option(javaTemplate.queryForObject(sql, asInstanceOfAnyRef(args).toArray, argTypes.toArray, rowMapper))
   }
 
-  def queryForObject[T](sql: String, args: Seq[Any], rowMapper: (ResultSet, Int) => T): Option[T] = {
+  def queryForObjectAndMap[T](sql: String, args: Any*)(rowMapper: (ResultSet, Int) => T): Option[T] = {
     Option(javaTemplate.queryForObject(sql, asInstanceOfAnyRef(args).toArray, rowMapper))
-  }
-
-  def queryForObject[T](sql: String, rowMapper: (ResultSet, Int) => T, args: Any*): Option[T] = {
-    Option(javaTemplate.queryForObject(sql, rowMapper, asInstanceOfAnyRef(args).toArray))
   }
 
   def queryForObject[T](sql: String, args: Seq[Any], argTypes: Seq[Int])(implicit manifest: Manifest[T]): Option[T] = {
     Option(javaTemplate.queryForObject(sql, asInstanceOfAnyRef(args).toArray, argTypes.toArray, returnType(manifest)))
   }
 
-//  def queryForObject[T](sql: String, args: Seq[Any])(implicit manifest: Manifest[T]): Option[T] = {
-//    Option(javaTemplate.queryForObject(sql, asInstanceOfAnyRef(args).toArray, returnType(manifest)))
-//  }
-
   def queryForObject[T](sql: String, args: Any*)(implicit manifest: Manifest[T]): Option[T] = {
-    Option(javaTemplate.queryForObject(sql, returnType(manifest), asInstanceOfAnyRef(args).toArray))
+    Option(javaTemplate.queryForObject(sql, asInstanceOfAnyRef(args).toArray, returnType(manifest)))
   }
 
   def queryForMap(sql: String, args: Seq[Any], argTypes: Seq[Int]): Map[String, Any] = {
@@ -333,7 +310,7 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
   }
 
   def queryForMap(sql: String, args: Any*): Map[String, Any] = {
-    asInstanceOfAny(javaTemplate.queryForMap(sql, asInstanceOfAnyRef(args).toArray))
+    asInstanceOfAny(javaTemplate.queryForMap(sql, asInstanceOfAnyRef(args): _*))
   }
 
   def queryForLong(sql: String, args: Seq[Any], argTypes: Seq[Int]): Long = {
@@ -341,7 +318,7 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
   }
 
   def queryForLong(sql: String, args: Any*): Long = {
-    javaTemplate.queryForLong(sql, asInstanceOfAnyRef(args).toArray)
+    javaTemplate.queryForLong(sql, asInstanceOfAnyRef(args): _ *)
   }
 
   def queryForInt(sql: String, args: Seq[Any], argTypes: Seq[Int]): Int = {
@@ -349,27 +326,23 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
   }
 
   def queryForInt(sql: String, args: Any*): Int = {
-    javaTemplate.queryForInt(sql, asInstanceOfAnyRef(args).toArray)
+    javaTemplate.queryForInt(sql, asInstanceOfAnyRef(args): _ *)
   }
 
   def queryForSeq[T](sql: String, args: Seq[Any], argTypes: Seq[Int])(implicit manifest: Manifest[T]): Seq[T] = {
     javaTemplate.queryForList(sql, asInstanceOfAnyRef(args).toArray, argTypes.toArray, returnType(manifest)).asScala
   }
 
-//  def queryForSeq[T](sql: String, args: Seq[Any])(implicit manifest: Manifest[T]): Seq[T] = {
-//    javaTemplate.queryForList(sql, asInstanceOfAnyRef(args).toArray, returnType(manifest)).asScala
-//  }
-
   def queryForSeq[T](sql: String, args: Any*)(implicit manifest: Manifest[T]): Seq[T] = {
-    javaTemplate.queryForList(sql, returnType(manifest), asInstanceOfAnyRef(args).toArray).asScala
+    javaTemplate.queryForList(sql, returnType(manifest), asInstanceOfAnyRef(args): _*).asScala
   }
 
-  def queryForSeq[T](sql: String, args: Seq[Any], argTypes: Seq[Int]): Seq[Map[String, Any]] = {
+  def queryForMappedColumns[T](sql: String, args: Seq[Any], argTypes: Seq[Int]): Seq[Map[String, Any]] = {
     javaTemplate.queryForList(sql, asInstanceOfAnyRef(args).toArray, argTypes.toArray).asScala.map(mappedRow => asInstanceOfAny(mappedRow))
   }
 
-  def queryForList(sql: String, args: Any*): Seq[Map[String, Any]] = {
-    javaTemplate.queryForList(sql, asInstanceOfAnyRef(args).toArray).asScala.map(mappedRow => asInstanceOfAny(mappedRow))
+  def queryForMappedColumns(sql: String, args: Any*): Seq[Map[String, Any]] = {
+    javaTemplate.queryForList(sql, asInstanceOfAnyRef(args): _*).asScala.map(mappedRow => asInstanceOfAny(mappedRow))
   }
 
   def queryForRowSet(sql: String, args: Seq[Any], argTypes: Seq[Int]): SqlRowSet = {
@@ -377,19 +350,19 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
   }
 
   def queryForRowSet(sql: String, args: Any*): SqlRowSet = {
-    javaTemplate.queryForRowSet(sql, asInstanceOfAnyRef(args).toArray)
+    javaTemplate.queryForRowSet(sql, asInstanceOfAnyRef(args): _*)
   }
 
   def update(statementCreator: Connection => PreparedStatement): Int = {
     javaTemplate.update(statementCreator)
   }
 
-  def update(statementCreator: Connection => PreparedStatement, generatedKeyHolder: KeyHolder): Int = {
+  def update(generatedKeyHolder: KeyHolder)(statementCreator: Connection => PreparedStatement): Int = {
     javaTemplate.update(statementCreator, generatedKeyHolder)
   }
 
-  def update(sql: String, statementCreator: Connection => PreparedStatement): Int = {
-    javaTemplate.update(sql, statementCreator)
+  def updateWithSetter(sql: String)(preparedStatementSetter: PreparedStatement => Unit): Int = {
+    javaTemplate.update(sql, asPreparedStatementSetter(preparedStatementSetter))
   }
 
   def update(sql: String, args: Seq[Any], argTypes: Seq[Int]): Int = {
@@ -397,7 +370,7 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
   }
 
   def update(sql: String, args: Any*): Int = {
-    javaTemplate.update(sql, asInstanceOfAnyRef(args).toArray)
+    javaTemplate.update(sql, asInstanceOfAnyRef(args): _*)
   }
 
   def batchUpdate(sql: String)(batchSize: => Int)(setterCallback: (PreparedStatement, Int) => Unit): Seq[Int] = {
@@ -410,22 +383,20 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
     })
   }
 
-  //  def batchUpdate(sql: String, batchArgs: Seq[Seq[Any]]) : Seq[Int] = {
-  //    val y : Seq[Array[Any]] = batchArgs.map(x => x.toArray)
-  //
-  //    javaTemplate.batchUpdate(sql, batchArgs.map(x => asInstanceOfAnyRef(x).toArray))
-  //  }
-  //
-  //  public int[] batchUpdate(String sql, List<Object[]> batchArgs, int[] argTypes) {
-  //    return BatchUpdateUtils.executeBatchUpdate(sql, batchArgs, argTypes, this);
-  //    }
+  def batchUpdate(sql: String, batchArgs: Seq[Seq[Any]]): Seq[Int] = {
+    javaTemplate.batchUpdate(sql, batchArgs.map(args => asInstanceOfAnyRef(args).toArray).asJava)
+  }
 
-  def batchUpdate[T](sql: String, batchArgs: Seq[T], batchSize: Int, setter: (PreparedStatement, T) => Unit): Seq[Seq[Int]] = {
+  def batchUpdate(sql: String, batchArgs: Seq[Seq[Any]], types: Seq[Int]): Seq[Int] = {
+    javaTemplate.batchUpdate(sql, batchArgs.map(args => asInstanceOfAnyRef(args).toArray).asJava, types.toArray)
+  }
+
+  def batchUpdate[T](sql: String, batchArgs: Seq[T], batchSize: Int)(setterCallback: (PreparedStatement, T) => Unit): Seq[Seq[Int]] = {
     javaTemplate.batchUpdate(sql, batchArgs.asJavaCollection, batchSize, new ParameterizedPreparedStatementSetter[T] {
       def setValues(ps: PreparedStatement, argument: T) {
-        setter(ps, argument)
+        setterCallback(ps, argument)
       }
-    }).map(x => x.toSeq)
+    }).map(_.toSeq)
   }
 
   //-------------------------------------------------------------------------
@@ -442,6 +413,22 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
 
   def call(statementCreator: Connection => CallableStatement)(declaredParameters: SqlParameter*): Map[String, Any] = {
     asInstanceOfAny(javaTemplate.call(statementCreator, declaredParameters.asJava))
+  }
+
+  //-------------------------------------------------------------------------
+  // Private helpers
+  //-------------------------------------------------------------------------
+
+  private def returnType[T](manifest: Manifest[T]): Class[T] = {
+    manifest.runtimeClass.asInstanceOf[Class[T]]
+  }
+
+  private def asInstanceOfAny(map: java.util.Map[String, AnyRef]): Map[String, Any] = {
+    map.asScala.toMap.mapValues(_.asInstanceOf[Any])
+  }
+
+  private def asInstanceOfAnyRef(seq: Seq[Any]): Seq[AnyRef] = {
+    seq.map(_.asInstanceOf[AnyRef])
   }
 
 }
