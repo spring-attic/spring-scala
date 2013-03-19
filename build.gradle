@@ -11,7 +11,7 @@ apply plugin: 'propdeps-eclipse'
 group 'org.springframework.scala'
 
 ext {
-  springVersion = '3.2.1.RELEASE'
+  springVersion = '3.2.2.RELEASE'
   scalaVersion = '2.10.0'
 }
 
