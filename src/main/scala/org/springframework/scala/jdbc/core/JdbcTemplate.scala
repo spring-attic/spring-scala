@@ -197,14 +197,6 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
     Option(javaTemplate.queryForObject(sql, returnType(manifest)))
   }
 
-  def queryForLong(sql: String): Long = {
-    javaTemplate.queryForLong(sql)
-  }
-
-  def queryForInt(sql: String): Int = {
-    javaTemplate.queryForInt(sql)
-  }
-
   def queryForSeq[T](sql: String)(implicit manifest: Manifest[T]): Seq[T] = {
     javaTemplate.queryForList(sql, returnType(manifest)).asScala
   }
@@ -311,22 +303,6 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
 
   def queryForMap(sql: String, args: Any*): Map[String, Any] = {
     asInstanceOfAny(javaTemplate.queryForMap(sql, asInstanceOfAnyRef(args): _*))
-  }
-
-  def queryForLong(sql: String, args: Seq[Any], argTypes: Seq[Int]): Long = {
-    javaTemplate.queryForLong(sql, asInstanceOfAnyRef(args).toArray, argTypes.toArray)
-  }
-
-  def queryForLong(sql: String, args: Any*): Long = {
-    javaTemplate.queryForLong(sql, asInstanceOfAnyRef(args): _ *)
-  }
-
-  def queryForInt(sql: String, args: Seq[Any], argTypes: Seq[Int]): Int = {
-    javaTemplate.queryForInt(sql, asInstanceOfAnyRef(args).toArray, argTypes.toArray)
-  }
-
-  def queryForInt(sql: String, args: Any*): Int = {
-    javaTemplate.queryForInt(sql, asInstanceOfAnyRef(args): _ *)
   }
 
   def queryForSeq[T](sql: String, args: Seq[Any], argTypes: Seq[Int])(implicit manifest: Manifest[T]): Seq[T] = {

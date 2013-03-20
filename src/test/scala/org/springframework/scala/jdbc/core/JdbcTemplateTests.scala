@@ -112,18 +112,6 @@ class JdbcTemplateTests extends FunSuite {
     }
   }
 
-  test("delegate to [long queryForLong(String sql)]") {
-    expect(1) {
-      template.queryForLong(SELECT_ID_QUERY)
-    }
-  }
-
-  test("delegate to [int queryForInt(String sql)]") {
-    expect(1) {
-      template.queryForInt(SELECT_ID_QUERY)
-    }
-  }
-
   test("delegate to [List<T> queryForList(String sql, Class<T> elementType)]") {
     expect(Seq("John")) {
       template.queryForSeq[String](SELECT_NAME_QUERY)
@@ -407,30 +395,6 @@ class JdbcTemplateTests extends FunSuite {
   test("delegate to [Map<String, Object> queryForMap(String sql, Object... args)]") {
     expect(Map("FIRST_NAME" -> "John")) {
       template.queryForMap(SELECT_NAME_QUERY_PARAMETRIZED, 1)
-    }
-  }
-
-  test("delegate to [long queryForLong(String sql, Object[] args, int[] argTypes)]") {
-    expect(1) {
-      template.queryForLong(SELECT_ID_QUERY_PARAMETRIZED, Seq(1), Seq(Types.INTEGER))
-    }
-  }
-
-  test("delegate to [long queryForLong(String sql, Object... args)]") {
-    expect(1) {
-      template.queryForLong(SELECT_ID_QUERY_PARAMETRIZED, 1)
-    }
-  }
-
-  test("delegate to [int queryForInt(String sql, Object[] args, int[] argTypes)]") {
-    expect(1) {
-      template.queryForInt(SELECT_ID_QUERY_PARAMETRIZED, Seq(1), Seq(Types.INTEGER))
-    }
-  }
-
-  test("delegate to [int queryForInt(String sql, Object... args)]") {
-    expect(1) {
-      template.queryForInt(SELECT_ID_QUERY_PARAMETRIZED, 1)
     }
   }
 
