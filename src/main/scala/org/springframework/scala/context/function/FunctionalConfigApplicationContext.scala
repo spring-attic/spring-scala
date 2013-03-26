@@ -22,6 +22,7 @@ import scala.collection.JavaConversions._
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.support.{DefaultBeanNameGenerator, BeanNameGenerator}
 import org.springframework.scala.context.RichApplicationContext
+import org.springframework.scala.util.ManifestUtils.manifestToClass
 
 /**
  * Standalone application context, accepting
@@ -52,8 +53,7 @@ class FunctionalConfigApplicationContext
 	 * @tparam T the configuration class
 	 */
 	def registerClass[T <: FunctionalConfiguration]()(implicit manifest: Manifest[T]) {
-		val configClass = manifest.runtimeClass.asInstanceOf[Class[T]]
-		registerClasses(configClass)
+		registerClasses(manifestToClass(manifest))
 	}
 
 	/**

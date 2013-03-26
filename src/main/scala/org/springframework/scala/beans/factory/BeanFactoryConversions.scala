@@ -18,6 +18,7 @@ package org.springframework.scala.beans.factory
 
 import org.springframework.beans.factory.{ListableBeanFactory, BeanFactory}
 import scala.collection.JavaConversions._
+import org.springframework.scala.util.ManifestUtils.manifestToClass
 
 /**
  * A collection of implicit conversions between bean factories and their rich counterpart.
@@ -57,10 +58,6 @@ private[springframework] class DefaultRichBeanFactory(val beanFactory: BeanFacto
 
 	def apply[T](name: String)(implicit manifest: Manifest[T]) = {
 		beanFactory.getBean(name, manifestToClass(manifest))
-	}
-
-	protected def manifestToClass[T](manifest: Manifest[T]): Class[T] = {
-		manifest.runtimeClass.asInstanceOf[Class[T]]
 	}
 
 }

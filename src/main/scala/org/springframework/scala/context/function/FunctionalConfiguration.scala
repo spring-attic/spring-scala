@@ -29,6 +29,7 @@ import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
 import org.springframework.beans.factory.support._
 import scala.reflect.runtime.universe._
 import scala.reflect.runtime.currentMirror
+import org.springframework.scala.util.ManifestUtils.manifestToClass
 
 /**
  * Base trait used to declare one or more Spring Beans that may be processed by the Spring
@@ -142,7 +143,7 @@ trait FunctionalConfiguration extends DelayedInit {
 	                                             manifest: Manifest[T]): BeanLookupFunction[T] = {
 		state(beanRegistry != null, "BeanRegistry has not been registered yet.")
 
-		val beanType = manifest.runtimeClass.asInstanceOf[Class[T]]
+		val beanType = manifestToClass(manifest)
 
 		val fbd = new FunctionalRootBeanDefinition(beanFunction, beanType)
 		fbd.setScope(scope)
