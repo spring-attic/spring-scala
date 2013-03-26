@@ -16,7 +16,7 @@
 
 package org.springframework.scala.beans.factory
 
-import org.springframework.beans.factory.{BeanNotOfRequiredTypeException, NoUniqueBeanDefinitionException, NoSuchBeanDefinitionException, BeanFactory}
+import org.springframework.beans.factory.{BeanNotOfRequiredTypeException, NoUniqueBeanDefinitionException, NoSuchBeanDefinitionException}
 import org.springframework.beans.BeansException
 
 /**
@@ -25,10 +25,28 @@ import org.springframework.beans.BeansException
  *
  * @author Arjen Poutsma
  */
-class RichBeanFactory(val beanFactory: BeanFactory) {
+trait RichBeanFactory {
 
 	/**
-	 * Return the bean instance that uniquely matches the given object type, if any.
+	 * Optionally returns the bean instance that uniquely matches the given object type, if any.
+	 *
+	 * @tparam T type the bean must match; can be an interface or superclass.
+	 * @return an option value containing the instance of the single bean matching the required type;
+	 *         or `None` if no such bean was found
+	 */
+	@throws(classOf[NoUniqueBeanDefinitionException])
+	def bean[T]()(implicit manifest: Manifest[T]): Option[T] = {
+		try {
+			Option(apply()(manifest))
+		}
+		catch {
+			case _: NoSuchBeanDefinitionException => None
+			case _: NoUniqueBeanDefinitionException => None
+		}
+	}
+
+	/**
+	 * Returns the bean instance that uniquely matches the given object type, if any.
 	 *
 	 * @tparam T type the bean must match; can be an interface or superclass.
 	 * @return an instance of the single bean matching the required type
@@ -37,8 +55,28 @@ class RichBeanFactory(val beanFactory: BeanFactory) {
 	 */
 	@throws(classOf[NoSuchBeanDefinitionException])
 	@throws(classOf[NoUniqueBeanDefinitionException])
-	def getBean[T]()(implicit manifest: Manifest[T]): T = {
-		beanFactory.getBean(manifestToClass(manifest))
+	def apply[T]()(implicit manifest: Manifest[T]): T
+
+	/**
+	 * Optionally returns an instance, which may be shared or independent, of the specified
+	 * bean.
+	 *
+	 * @param name the name of the bean to retrieve
+	 * @tparam T type the bean must match. Can be an interface or superclass
+	 *           of the actual class.
+	 * @return an option value containing the an instance of the bean; or `None` if no such
+	 *         bean was found
+	 * @throws BeansException if the bean could not be created
+	 */
+	@throws(classOf[BeansException])
+	def bean[T](name: String)(implicit manifest: Manifest[T]): Option[T] = {
+		try {
+			Option(apply(name)(manifest))
+		}
+		catch {
+			case _: NoSuchBeanDefinitionException => None
+			case _: BeanNotOfRequiredTypeException => None
+		}
 	}
 
 	/**
@@ -55,12 +93,6 @@ class RichBeanFactory(val beanFactory: BeanFactory) {
 	@throws(classOf[NoSuchBeanDefinitionException])
 	@throws(classOf[BeanNotOfRequiredTypeException])
 	@throws(classOf[BeansException])
-	def getBean[T](name: String)(implicit manifest: Manifest[T]): T = {
-		beanFactory.getBean(name, manifestToClass(manifest))
-	}
-
-	private def manifestToClass[T](manifest: Manifest[T]): Class[T] = {
-		manifest.runtimeClass.asInstanceOf[Class[T]]
-	}
+	def apply[T](name: String)(implicit manifest: Manifest[T]): T
 
 }

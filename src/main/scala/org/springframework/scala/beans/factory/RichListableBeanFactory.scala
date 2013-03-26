@@ -16,18 +16,13 @@
 
 package org.springframework.scala.beans.factory
 
-import org.springframework.beans.factory.ListableBeanFactory
-import scala.collection.JavaConversions._
-import java.lang.annotation.Annotation
-import org.springframework.beans.BeansException
-
 /**
  * Rich wrapper for [[org.springframework.beans.factory.ListableBeanFactory]], offering
  * Scala-specific methods.
  *
  * @author Arjen Poutsma
  */
-class RichListableBeanFactory(val beanFactory: ListableBeanFactory) {
+trait RichListableBeanFactory extends RichBeanFactory {
 
 	/**
 	 * Return the names of beans matching the given type (including subclasses),
@@ -60,13 +55,9 @@ class RichListableBeanFactory(val beanFactory: ListableBeanFactory) {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beanNamesForTypeIncludingAncestors(ListableBeanFactory, Class, boolean, boolean)
 	 */
-	def getBeanNamesForType[T](includeNonSingletons: Boolean = true,
-	                           allowEagerInit: Boolean = true)
-	                          (implicit manifest: Manifest[T]): Seq[String] = {
-		beanFactory.getBeanNamesForType(manifestToClass(manifest),
-		                                includeNonSingletons,
-		                                allowEagerInit)
-	}
+	def beanNamesForType[T](includeNonSingletons: Boolean = true,
+	                        allowEagerInit: Boolean = true)
+	                       (implicit manifest: Manifest[T]): Seq[String]
 
 	/**
 	 * Return the bean instances that match the given object type (including
@@ -104,43 +95,7 @@ class RichListableBeanFactory(val beanFactory: ListableBeanFactory) {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beansOfTypeIncludingAncestors(ListableBeanFactory, Class, boolean, boolean)
 	 */
-	def getBeansOfType[T](includeNonSingletons: Boolean = true,
-	                      allowEagerInit: Boolean = true)
-	                     (implicit manifest: Manifest[T]): Map[String, T] = {
-		beanFactory
-				.getBeansOfType(manifestToClass(manifest), includeNonSingletons, allowEagerInit)
-				.toMap
-	}
-
-	/**
-	 * Find all beans whose `Class` has the supplied [[java.lang.annotation.Annotation]] type.
-	 * @tparam T the type of annotation to look for
-	 * @return a Map with the matching beans, containing the bean names as
-	 * keys and the corresponding bean instances as values
-	 * @throws BeansException if a bean could not be created
-	 */
-	@throws(classOf[BeansException])
-	def getBeansWithAnnotation[T <: Annotation]()
-	                                           (implicit manifest: Manifest[T]): Map[String, Any] = {
-		beanFactory.getBeansWithAnnotation(manifestToClass(manifest)).toMap
-	}
-
-	/**
-	 * Find a [[java.lang.annotation.Annotation]] of the given type on the specified
-	 * bean, traversing its interfaces and super classes if no annotation can be
-	 * found on the given class itself.
-	 * @param beanName the name of the bean to look for annotations on
-	 * @tparam T the annotation class to look for
-	 * @return the annotation of the given type found, or none
-	 */
-	def findAnnotationOnBean[T <: Annotation](beanName: String)
-	                                         (implicit manifest: Manifest[T]): Option[T] = {
-		Option(beanFactory.findAnnotationOnBean(beanName, manifestToClass(manifest)))
-	}
-
-	private def manifestToClass[T](manifest: Manifest[T]): Class[T] = {
-		manifest.runtimeClass.asInstanceOf[Class[T]]
-	}
-
+	def beansOfType[T](includeNonSingletons: Boolean = true, allowEagerInit: Boolean = true)
+	                  (implicit manifest: Manifest[T]): Map[String, T]
 
 }

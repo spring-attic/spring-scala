@@ -28,15 +28,33 @@ class RichBeanFactoryTests extends FunSuite {
 	val beanFactory = new StaticListableBeanFactory()
 	beanFactory.addBean("foo", "Bar")
 
-	val richBeanFactory: RichBeanFactory = beanFactory
+	test("bean()") {
+		val result = beanFactory.bean[String]
+		assert("Bar" === result.get)
+  }
 
-	test("getBean[T]()") {
-		val result = richBeanFactory.getBean[String]
+	test("bean() not present") {
+		val result = beanFactory.bean[Boolean]
+		assert(None === result)
+  }
+
+	test("apply[T]()") {
+		val result = beanFactory[String]
 		assert("Bar" === result)
-	}
+  }
 
-	test("getBean[T](String)") {
-		val result = richBeanFactory.getBean[String]("foo")
+	test("bean[T](String)") {
+		val result = beanFactory.bean[String]("foo")
+    assert("Bar" === result.get)
+  }
+
+	test("bean[T](String) not present") {
+		val result = beanFactory.bean[String]("bar")
+    assert(None === result)
+  }
+
+	test("apply[T](String)") {
+		val result = beanFactory[String]("foo")
     assert("Bar" === result)
   }
 

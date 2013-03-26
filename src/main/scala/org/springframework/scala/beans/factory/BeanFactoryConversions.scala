@@ -17,9 +17,10 @@
 package org.springframework.scala.beans.factory
 
 import org.springframework.beans.factory.{ListableBeanFactory, BeanFactory}
+import scala.collection.JavaConversions._
 
 /**
- * A collection of implicit conversions between bean factories and their rich counterpart..
+ * A collection of implicit conversions between bean factories and their rich counterpart.
  *
  * @author Arjen Poutsma
  */
@@ -33,7 +34,7 @@ object BeanFactoryConversions {
 	 * @return the rich bean factory
 	 */
 	implicit def toRichBeanFactory(beanFactory: BeanFactory): RichBeanFactory =
-		new RichBeanFactory(beanFactory)
+		new DefaultRichBeanFactory(beanFactory)
 
 	/**
 	 * Implicitly converts a [[org.springframework.beans.factory.ListableBeanFactory]] to a
@@ -43,5 +44,44 @@ object BeanFactoryConversions {
 	 * @return the rich listable bean factory
 	 */
 	implicit def toRichListableBeanFactory(beanFactory: ListableBeanFactory): RichListableBeanFactory =
-		new RichListableBeanFactory(beanFactory)
+		new DefaultRichListableBeanFactory(beanFactory)
+
 }
+
+private[springframework] class DefaultRichBeanFactory(val beanFactory: BeanFactory)
+		extends RichBeanFactory {
+
+	def apply[T]()(implicit manifest: Manifest[T]) = {
+		beanFactory.getBean(manifestToClass(manifest))
+	}
+
+	def apply[T](name: String)(implicit manifest: Manifest[T]) = {
+		beanFactory.getBean(name, manifestToClass(manifest))
+	}
+
+	protected def manifestToClass[T](manifest: Manifest[T]): Class[T] = {
+		manifest.runtimeClass.asInstanceOf[Class[T]]
+	}
+
+}
+
+private[springframework] class DefaultRichListableBeanFactory(beanFactory: ListableBeanFactory)
+		extends DefaultRichBeanFactory(beanFactory) with RichListableBeanFactory {
+
+	def beanNamesForType[T](includeNonSingletons: Boolean = true,
+	                        allowEagerInit: Boolean = true)
+	                       (implicit manifest: Manifest[T]): Seq[String] = {
+		beanFactory.getBeanNamesForType(manifestToClass(manifest),
+		                                includeNonSingletons,
+		                                allowEagerInit)
+	}
+
+	def beansOfType[T](includeNonSingletons: Boolean = true, allowEagerInit: Boolean = true)
+	                  (implicit manifest: Manifest[T]): Map[String, T] = {
+		beanFactory
+				.getBeansOfType(manifestToClass(manifest), includeNonSingletons, allowEagerInit)
+				.toMap
+	}
+
+}
+

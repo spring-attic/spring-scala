@@ -14,36 +14,13 @@
  * limitations under the License.
  */
 
-package org.springframework.scala.beans.factory
+package org.springframework.scala.context
 
-import org.scalatest.FunSuite
-import org.springframework.beans.factory.support.StaticListableBeanFactory
-import BeanFactoryConversions._
+import org.springframework.scala.beans.factory.RichListableBeanFactory
 
 /**
  * @author Arjen Poutsma
  */
-class RichListableBeanFactoryTests extends FunSuite {
-
-	val bean = new MyBean
-
-	val beanFactory = new StaticListableBeanFactory
-	beanFactory.addBean("bean", bean)
-
-	test("getBeanNamesForType") {
-		val result = beanFactory.beanNamesForType[MyBean]()
-
-		assert(1 == result.size)
-		assert("bean" === result(0))
-  }
-
-	test("getBeansOfType") {
-		val result = beanFactory.beansOfType[MyBean]()
-
-		assert(1 == result.size)
-		assert(bean === result("bean"))
-  }
-
-	class MyBean
+trait RichApplicationContext extends RichListableBeanFactory {
 
 }

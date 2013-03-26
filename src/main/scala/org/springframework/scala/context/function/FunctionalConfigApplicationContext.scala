@@ -21,6 +21,7 @@ import org.springframework.util.CollectionUtils
 import scala.collection.JavaConversions._
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.support.{DefaultBeanNameGenerator, BeanNameGenerator}
+import org.springframework.scala.context.RichApplicationContext
 
 /**
  * Standalone application context, accepting
@@ -37,9 +38,12 @@ import org.springframework.beans.factory.support.{DefaultBeanNameGenerator, Bean
  * @author Arjen Poutsma
  * @see FunctionalConfiguration
  */
-class FunctionalConfigApplicationContext extends GenericApplicationContext {
+class FunctionalConfigApplicationContext
+		extends GenericApplicationContext with RichApplicationContext {
 
 	var beanNameGenerator: BeanNameGenerator = new DefaultBeanNameGenerator
+
+	private val richApplicationContext: RichApplicationContext = this
 
 	/**
 	 * Registers a single [[org.springframework.scala.context.function.FunctionalConfiguration]]
@@ -60,7 +64,7 @@ class FunctionalConfigApplicationContext extends GenericApplicationContext {
 	 */
 	def registerClasses(configurationClasses: Class[_ <: FunctionalConfiguration]*) {
 		require(!CollectionUtils.isEmpty(configurationClasses),
-			"At least one functional configuration class must be specified")
+		        "At least one functional configuration class must be specified")
 		val configurations = configurationClasses.map(BeanUtils.instantiate(_))
 		registerConfigurations(configurations: _*)
 	}
@@ -73,10 +77,23 @@ class FunctionalConfigApplicationContext extends GenericApplicationContext {
 	 */
 	def registerConfigurations(configurations: FunctionalConfiguration*) {
 		require(!CollectionUtils.isEmpty(configurations),
-			"At least one configuration must be specified")
+		        "At least one configuration must be specified")
 		configurations.foreach(_.register(this, beanNameGenerator))
 	}
 
+	def apply[T]()(implicit manifest: Manifest[T]) = richApplicationContext
+			.apply()(manifest)
+
+	def apply[T](name: String)(implicit manifest: Manifest[T]) = richApplicationContext
+			.apply(name)(manifest)
+
+	def beanNamesForType[T](includeNonSingletons: Boolean, allowEagerInit: Boolean)
+	                       (implicit manifest: Manifest[T]) = richApplicationContext
+			.beanNamesForType(includeNonSingletons, allowEagerInit)(manifest)
+
+	def beansOfType[T](includeNonSingletons: Boolean, allowEagerInit: Boolean)
+	                  (implicit manifest: Manifest[T]) = richApplicationContext
+			.beansOfType(includeNonSingletons, allowEagerInit)(manifest)
 }
 
 /**
@@ -92,7 +109,8 @@ object FunctionalConfigApplicationContext {
 	 * refreshing the context.
 	 * @tparam T the configuration class
 	 */
-	def apply[T <: FunctionalConfiguration]()(implicit manifest: Manifest[T]): FunctionalConfigApplicationContext = {
+	def apply[T <: FunctionalConfiguration]()
+	                                       (implicit manifest: Manifest[T]): FunctionalConfigApplicationContext = {
 		val context = new FunctionalConfigApplicationContext()
 		context.registerClass()(manifest)
 		context.refresh()
