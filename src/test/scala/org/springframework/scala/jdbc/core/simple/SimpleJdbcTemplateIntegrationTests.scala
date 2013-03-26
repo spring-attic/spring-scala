@@ -29,7 +29,7 @@ class SimpleJdbcTemplateIntegrationTests extends FunSuite with BeforeAndAfter {
 	private val template = new SimpleJdbcTemplate(db)
 
 	test("queryForObject with Map") {
-		expect("John") {
+		expectResult("John") {
 			template.queryForObject("SELECT * FROM USERS WHERE ID = :id", Map("id" -> 1)) {
 				(set, i) => {
 					set.getString("FIRST_NAME")
@@ -39,7 +39,7 @@ class SimpleJdbcTemplateIntegrationTests extends FunSuite with BeforeAndAfter {
 	}
 
 	test("queryForObject with var args") {
-		expect("John") {
+		expectResult("John") {
 			template.queryForObject("SELECT * FROM USERS WHERE ID = ?", 1) {
 				(set, i) => {
 					set.getString("FIRST_NAME")
@@ -49,7 +49,7 @@ class SimpleJdbcTemplateIntegrationTests extends FunSuite with BeforeAndAfter {
 	}
 
 	test("query with Map") {
-		expect(Seq("John", "Jane")) {
+		expectResult(Seq("John", "Jane")) {
 			template.query("SELECT * FROM USERS WHERE LAST_NAME = :last_name", Map("last_name" -> "Doe")) {
 				(set, i) => {
 					set.getString("FIRST_NAME")
@@ -59,7 +59,7 @@ class SimpleJdbcTemplateIntegrationTests extends FunSuite with BeforeAndAfter {
 	}
 
 	test("query with var args") {
-		expect(Seq("John", "Jane")) {
+		expectResult(Seq("John", "Jane")) {
 			template.query("SELECT * FROM USERS WHERE LAST_NAME = ?", "Doe") {
 				(set, i) => {
 					set.getString("FIRST_NAME")
@@ -69,40 +69,40 @@ class SimpleJdbcTemplateIntegrationTests extends FunSuite with BeforeAndAfter {
 	}
 
 	test("queryForMap with Map") {
-		expect(Map("ID" -> 1, "FIRST_NAME" -> "John", "LAST_NAME" -> "Doe")) {
+		expectResult(Map("ID" -> 1, "FIRST_NAME" -> "John", "LAST_NAME" -> "Doe")) {
 			template.queryForMap("SELECT * FROM USERS WHERE ID = :id", Map("id" -> 1))
 		}
 	}
 
 	test("queryForMap with var args") {
-		expect(Map("ID" -> 1, "FIRST_NAME" -> "John", "LAST_NAME" -> "Doe")) {
+		expectResult(Map("ID" -> 1, "FIRST_NAME" -> "John", "LAST_NAME" -> "Doe")) {
 			template.queryForMap("SELECT * FROM USERS WHERE ID = ?", 1)
 		}
 	}
 
 	test("queryForList with Map") {
-		expect(Seq(Map("ID" -> 1, "FIRST_NAME" -> "John", "LAST_NAME" -> "Doe"),
+		expectResult(Seq(Map("ID" -> 1, "FIRST_NAME" -> "John", "LAST_NAME" -> "Doe"),
 			Map("ID" -> 2, "FIRST_NAME" -> "Jane", "LAST_NAME" -> "Doe"))) {
 			template.queryForSeq("SELECT * FROM USERS WHERE LAST_NAME = :last_name", Map("last_name" -> "Doe"))
 		}
 	}
 
 	test("queryForList with var args") {
-		expect(Seq(Map("ID" -> 1, "FIRST_NAME" -> "John", "LAST_NAME" -> "Doe"),
+		expectResult(Seq(Map("ID" -> 1, "FIRST_NAME" -> "John", "LAST_NAME" -> "Doe"),
 			Map("ID" -> 2, "FIRST_NAME" -> "Jane", "LAST_NAME" -> "Doe"))) {
 			template.queryForSeq("SELECT * FROM USERS WHERE LAST_NAME = ?", "Doe")
 		}
 	}
 
 	test("update with Map") {
-		expect(1) {
+		expectResult(1) {
 			template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)",
 				Map("id" -> 3, "first_name" -> "John", "last_name" -> "Johnson"))
 		}
 	}
 
 	test("update with var args") {
-		expect(1) {
+		expectResult(1) {
 			template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (?, ?, ?)", 4, "John", "Johnson")
 		}
 	}

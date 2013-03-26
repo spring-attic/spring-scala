@@ -42,7 +42,7 @@ class TransactionManagementTests extends FunSuite with TransactionManagement {
         template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", args)
       }
     }
-    expect(1) {
+    expectResult(1) {
       template.queryForInt("SELECT COUNT(ID) FROM USERS WHERE ID = 3")
     }
   }
@@ -54,7 +54,7 @@ class TransactionManagementTests extends FunSuite with TransactionManagement {
         template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", args)
       }
     }
-    expect(1) {
+    expectResult(1) {
       template.queryForInt("SELECT COUNT(ID) FROM USERS WHERE ID = 4")
     }
 
