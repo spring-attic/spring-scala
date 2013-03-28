@@ -16,46 +16,42 @@ package org.springframework.scala.transaction.support
  * limitations under the License.
  */
 
-import scala.collection.immutable.Map
-import scala.collection.JavaConverters._
 import org.springframework.transaction.annotation.{Isolation, Propagation}
 import org.scalatest.FunSuite
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import org.springframework.jdbc.core.JdbcTemplate
 
 @RunWith(classOf[JUnitRunner])
 class TransactionManagementTests extends FunSuite with TransactionManagement {
 
   private val db = new EmbeddedDatabaseBuilder().addDefaultScripts().build()
 
-  private val template = new SimpleJdbcTemplate(db)
+  private val template = new JdbcTemplate(db)
 
   val transactionManager = new DataSourceTransactionManager(db)
 
   test("default") {
     transactional() {
       status => {
-        val args = Map("id" -> 3, "first_name" -> "John", "last_name" -> "Johnson").asJava
-        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", args)
+        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", 3.asInstanceOf[Integer], "John", "Johnson")
       }
     }
     expectResult(1) {
-      template.queryForInt("SELECT COUNT(ID) FROM USERS WHERE ID = 3")
+      template.queryForObject("SELECT COUNT(ID) FROM USERS WHERE ID = 3", classOf[Integer])
     }
   }
 
   test("custom parameters") {
     transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ) {
       status => {
-        val args = Map("id" -> 4, "first_name" -> "John", "last_name" -> "Johnson").asJava
-        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", args)
+        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", 4.asInstanceOf[Integer], "John", "Johnson")
       }
     }
     expectResult(1) {
-      template.queryForInt("SELECT COUNT(ID) FROM USERS WHERE ID = 4")
+      template.queryForObject("SELECT COUNT(ID) FROM USERS WHERE ID = 4", classOf[Integer])
     }
 
   }
