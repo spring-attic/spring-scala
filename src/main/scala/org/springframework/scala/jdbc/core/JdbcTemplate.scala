@@ -37,6 +37,7 @@ import scala.throws
  * Use the `javaTemplate` accessor to get access to the Java `JdbcTemplate`.
  *
  * @author Arjen Poutsma
+ * @author Henryk Konsek
  * @since 1.0
  * @constructor Creates a `JdbcTemplate` that wraps the given Java template
  * @param javaTemplate the Java `JdbcTemplate` to wrap
