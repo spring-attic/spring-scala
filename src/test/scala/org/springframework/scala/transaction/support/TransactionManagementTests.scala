@@ -22,7 +22,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.scala.jdbc.core.JdbcTemplate
 
 @RunWith(classOf[JUnitRunner])
 class TransactionManagementTests extends FunSuite with TransactionManagement {
@@ -36,22 +36,22 @@ class TransactionManagementTests extends FunSuite with TransactionManagement {
   test("default") {
     transactional() {
       status => {
-        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", 3.asInstanceOf[Integer], "John", "Johnson")
+        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", 3, "John", "Johnson")
       }
     }
-    expectResult(1) {
-      template.queryForObject("SELECT COUNT(ID) FROM USERS WHERE ID = 3", classOf[Integer])
+    expectResult(Some(1)) {
+      template.queryForObject[Integer]("SELECT COUNT(ID) FROM USERS WHERE ID = 3")
     }
   }
 
   test("custom parameters") {
     transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ) {
       status => {
-        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", 4.asInstanceOf[Integer], "John", "Johnson")
+        template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", 4, "John", "Johnson")
       }
     }
-    expectResult(1) {
-      template.queryForObject("SELECT COUNT(ID) FROM USERS WHERE ID = 4", classOf[Integer])
+    expectResult(Some(1)) {
+      template.queryForObject[Integer]("SELECT COUNT(ID) FROM USERS WHERE ID = 4")
     }
 
   }
