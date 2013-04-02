@@ -46,6 +46,7 @@ dependencies {
 }
 
 tasks.withType(ScalaCompile) {
+  scalaCompileOptions.additionalParameters = ["-feature", "-language:implicitConversions", "-language:reflectiveCalls"]
   scalaCompileOptions.useAnt = false
 }
 
