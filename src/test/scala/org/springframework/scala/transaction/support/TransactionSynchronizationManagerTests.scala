@@ -51,7 +51,7 @@ class TransactionSynchronizationManagerTests extends FunSuite with ShouldMatcher
       status => {
         TransactionSynchronizationManager.registerSynchronization {
           case e: BeforeCommitEvent => beforeEvent = e
-          case e@AfterCommitEvent => afterEvent = e
+          case AfterCommitEvent => afterEvent = AfterCommitEvent
         }
       }
     }
