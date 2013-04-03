@@ -44,15 +44,15 @@ object TransactionSynchronizationManager {
 
     DelegateSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
       def suspend() {
-        propagateEvent(SuspendEvent())
+        propagateEvent(SuspendEvent)
       }
 
       def resume() {
-        propagateEvent(ResumeEvent())
+        propagateEvent(ResumeEvent)
       }
 
       def flush() {
-        propagateEvent(FlushEvent())
+        propagateEvent(FlushEvent)
       }
 
       def beforeCommit(readOnly: Boolean) {
@@ -60,11 +60,11 @@ object TransactionSynchronizationManager {
       }
 
       def beforeCompletion() {
-        propagateEvent(BeforeCompletionEvent())
+        propagateEvent(BeforeCompletionEvent)
       }
 
       def afterCommit() {
-        propagateEvent(AfterCommitEvent())
+        propagateEvent(AfterCommitEvent)
       }
 
       def afterCompletion(status: Int) {

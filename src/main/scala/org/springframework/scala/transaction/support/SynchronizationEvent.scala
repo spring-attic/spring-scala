@@ -32,7 +32,7 @@ sealed trait SynchronizationEvent
  * @author Henryk Konsek
  * @since 1.0
  */
-case class SuspendEvent() extends SynchronizationEvent
+case object SuspendEvent extends SynchronizationEvent
 
 /**
  * Event generated when the `resume` method of the
@@ -41,7 +41,7 @@ case class SuspendEvent() extends SynchronizationEvent
  * @author Henryk Konsek
  * @since 1.0
  */
-case class ResumeEvent() extends SynchronizationEvent
+case object ResumeEvent extends SynchronizationEvent
 
 /**
  * Event generated when the `flush` method of the
@@ -50,7 +50,7 @@ case class ResumeEvent() extends SynchronizationEvent
  * @author Henryk Konsek
  * @since 1.0
  */
-case class FlushEvent() extends SynchronizationEvent
+case object FlushEvent extends SynchronizationEvent
 
 /**
  * Event generated when the `beforeCommit` method of the
@@ -69,7 +69,7 @@ case class BeforeCommitEvent(readOnly: Boolean) extends SynchronizationEvent
  * @author Henryk Konsek
  * @since 1.0
  */
-case class BeforeCompletionEvent() extends SynchronizationEvent
+case object BeforeCompletionEvent extends SynchronizationEvent
 
 /**
  * Event generated when the `afterCommit` method of the
@@ -78,7 +78,7 @@ case class BeforeCompletionEvent() extends SynchronizationEvent
  * @author Henryk Konsek
  * @since 1.0
  */
-case class AfterCommitEvent() extends SynchronizationEvent
+case object AfterCommitEvent extends SynchronizationEvent
 
 /**
  * Event generated when the `afterCompletion` method of the
