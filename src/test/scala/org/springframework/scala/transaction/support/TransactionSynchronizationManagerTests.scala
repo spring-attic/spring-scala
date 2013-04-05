@@ -45,18 +45,18 @@ class TransactionSynchronizationManagerTests extends FunSuite with ShouldMatcher
   }
 
   test("Should match multiple events.") {
-    var beforeEvent: BeforeCommitEvent = null
-    var afterEvent: AfterCommitEvent = null
+    var beforeEventReceived: Boolean = false
+    var afterEventReceived: Boolean = false
     transactional() {
       status => {
         TransactionSynchronizationManager.registerSynchronization {
-          case e: BeforeCommitEvent => beforeEvent = e
-          case e: AfterCommitEvent => afterEvent = e
+          case _: BeforeCommitEvent => beforeEventReceived = true
+          case AfterCommitEvent => afterEventReceived = true
         }
       }
     }
-    beforeEvent should not be (null)
-    afterEvent should not be (null)
+    beforeEventReceived should be (true)
+    afterEventReceived should be (true)
   }
 
   test("Should match all succeeded callbacks.") {
@@ -68,8 +68,10 @@ class TransactionSynchronizationManagerTests extends FunSuite with ShouldMatcher
         }
       }
     }
-    assert(events.map(_.getClass) ===
-      List(classOf[BeforeCommitEvent], classOf[BeforeCompletionEvent], classOf[AfterCommitEvent], classOf[AfterCompletionEvent]))
+    assert(events(0) === BeforeCommitEvent(readOnly = false))
+    assert(events(1) === BeforeCompletionEvent)
+    assert(events(2) === AfterCommitEvent)
+    assert(events(3) === AfterCompletionEvent(TransactionSynchronization.STATUS_COMMITTED))
   }
 
   test("Should match all rollback callbacks.") {
@@ -82,8 +84,8 @@ class TransactionSynchronizationManagerTests extends FunSuite with ShouldMatcher
         status.setRollbackOnly()
       }
     }
-    assert(events.map(_.getClass) ===
-      List(classOf[BeforeCompletionEvent], classOf[AfterCompletionEvent]))
+    assert(events(0) === BeforeCompletionEvent)
+    assert(events(1) === AfterCompletionEvent(TransactionSynchronization.STATUS_ROLLED_BACK))
   }
 
 }
