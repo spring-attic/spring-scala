@@ -18,7 +18,8 @@ package org.springframework.scala.context.function
 
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.beans.factory.support.BeanNameGenerator
-import org.springframework.context.annotation.AnnotationConfigUtils
+import org.springframework.context.annotation.{ScopedProxyMode, ScopeMetadataResolver, ClassPathBeanDefinitionScanner, AnnotationConfigUtils}
+import org.springframework.core.`type`.filter.TypeFilter
 
 /**
  * Defines the configuration elements for the Spring Framework's application context
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.AnnotationConfigUtils
  * Spring ApplicationContext.
  *
  * @author Arjen Poutsma
+ * @author Henryk Konsek
  */
 trait ContextSupport {
 	self: FunctionalConfiguration =>
@@ -53,5 +55,47 @@ trait ContextSupport {
 			AnnotationConfigUtils.registerAnnotationConfigProcessors(applicationContext)
 		})
 	}
+
+  def componentScan(basePackages: Seq[String],
+                    useDefaultFilters: Boolean = true, resourcePattern : String = null,
+                    beanNameGenerator: BeanNameGenerator = null,
+                    scopeResolver: ScopeMetadataResolver = null, scopedProxy: ScopedProxyMode = null,
+                    includeFilters: Seq[TypeFilter] = Seq.empty, excludeFilters: Seq[TypeFilter] = Seq.empty) {
+    if(scopeResolver != null && scopedProxy != null) {
+      throw new IllegalArgumentException("Cannot define both 'scopeResolver' and 'scopedProxy' on 'componentScan' option")
+    }
+
+    onRegister((applicationContext: GenericApplicationContext, defaultBeanNameGenerator: BeanNameGenerator) => {
+      val scanner = new ClassPathBeanDefinitionScanner(beanRegistry, useDefaultFilters)
+      scanner.setResourceLoader(applicationContext)
+      scanner.setEnvironment(environment)
+      includeFilters.foreach(scanner.addIncludeFilter(_))
+      excludeFilters.foreach(scanner.addExcludeFilter(_))
+
+      if(resourcePattern != null) {
+        scanner.setResourcePattern(resourcePattern)
+      }
+
+      if (beanNameGenerator != null) {
+        scanner.setBeanNameGenerator(beanNameGenerator)
+      } else {
+        scanner.setBeanNameGenerator(defaultBeanNameGenerator)
+      }
+
+      if(scopeResolver != null) {
+        scanner.setScopeMetadataResolver(scopeResolver)
+      }
+
+      if(scopedProxy != null) {
+        scanner.setScopedProxyMode(scopedProxy)
+      }
+
+      scanner.scan(basePackages :_*)
+    })
+  }
+
+  def componentScan(basePackages: String*) {
+    componentScan(basePackages = basePackages)
+  }
 
 }
