@@ -81,11 +81,13 @@ class FunctionalConfigApplicationContext
 		configurations.foreach(_.register(this, beanNameGenerator))
 	}
 
-	def apply[T]()(implicit manifest: Manifest[T]) = richApplicationContext
-			.apply()(manifest)
+	def apply[T]()(implicit manifest: Manifest[T]) = {
+		getBean(manifestToClass(manifest))
+	}
 
-	def apply[T](name: String)(implicit manifest: Manifest[T]) = richApplicationContext
-			.apply(name)(manifest)
+	def apply[T](name: String)(implicit manifest: Manifest[T]) = {
+		getBean(name, manifestToClass(manifest))
+	}
 
 	def beanNamesForType[T](includeNonSingletons: Boolean, allowEagerInit: Boolean)
 	                       (implicit manifest: Manifest[T]) = richApplicationContext
