@@ -22,7 +22,8 @@ import scala.collection.JavaConversions._
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.support.{DefaultBeanNameGenerator, BeanNameGenerator}
 import org.springframework.scala.context.RichApplicationContext
-import org.springframework.scala.util.ManifestUtils.manifestToClass
+import org.springframework.scala.util.TypeTagUtils.typeToClass
+import scala.reflect.ClassTag
 
 /**
  * Standalone application context, accepting
@@ -52,8 +53,8 @@ class FunctionalConfigApplicationContext
 	 * the context to fully process the given configurations.
 	 * @tparam T the configuration class
 	 */
-	def registerClass[T <: FunctionalConfiguration]()(implicit manifest: Manifest[T]) {
-		registerClasses(manifestToClass(manifest))
+	def registerClass[T <: FunctionalConfiguration : ClassTag]() {
+		registerClasses(typeToClass[T])
 	}
 
 	/**
@@ -81,19 +82,17 @@ class FunctionalConfigApplicationContext
 		configurations.foreach(_.register(this, beanNameGenerator))
 	}
 
-	def apply[T]()(implicit manifest: Manifest[T]) = richApplicationContext
-			.apply()(manifest)
+	def apply[T : ClassTag]() =
+		richApplicationContext.apply[T]()
 
-	def apply[T](name: String)(implicit manifest: Manifest[T]) = richApplicationContext
-			.apply(name)(manifest)
+	def apply[T : ClassTag](name: String) =
+		richApplicationContext.apply[T](name)
 
-	def beanNamesForType[T](includeNonSingletons: Boolean, allowEagerInit: Boolean)
-	                       (implicit manifest: Manifest[T]) = richApplicationContext
-			.beanNamesForType(includeNonSingletons, allowEagerInit)(manifest)
+	def beanNamesForType[T : ClassTag](includeNonSingletons: Boolean, allowEagerInit: Boolean) =
+		richApplicationContext.beanNamesForType[T](includeNonSingletons, allowEagerInit)
 
-	def beansOfType[T](includeNonSingletons: Boolean, allowEagerInit: Boolean)
-	                  (implicit manifest: Manifest[T]) = richApplicationContext
-			.beansOfType(includeNonSingletons, allowEagerInit)(manifest)
+	def beansOfType[T : ClassTag](includeNonSingletons: Boolean, allowEagerInit: Boolean) =
+		richApplicationContext.beansOfType(includeNonSingletons, allowEagerInit)(reflect.classTag[T])
 }
 
 /**
@@ -109,10 +108,9 @@ object FunctionalConfigApplicationContext {
 	 * refreshing the context.
 	 * @tparam T the configuration class
 	 */
-	def apply[T <: FunctionalConfiguration]()
-	                                       (implicit manifest: Manifest[T]): FunctionalConfigApplicationContext = {
+	def apply[T <: FunctionalConfiguration : ClassTag](): FunctionalConfigApplicationContext = {
 		val context = new FunctionalConfigApplicationContext()
-		context.registerClass()(manifest)
+		context.registerClass[T]()
 		context.refresh()
 		context
 	}
