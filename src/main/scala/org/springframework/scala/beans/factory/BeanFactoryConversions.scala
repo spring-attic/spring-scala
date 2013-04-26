@@ -18,7 +18,8 @@ package org.springframework.scala.beans.factory
 
 import org.springframework.beans.factory.{ListableBeanFactory, BeanFactory}
 import scala.collection.JavaConversions._
-import org.springframework.scala.util.ManifestUtils.manifestToClass
+import org.springframework.scala.util.TypeTagUtils.typeToClass
+import scala.reflect.ClassTag
 
 /**
  * A collection of implicit conversions between bean factories and their rich counterpart.
@@ -52,12 +53,12 @@ object BeanFactoryConversions {
 private[springframework] class DefaultRichBeanFactory(val beanFactory: BeanFactory)
 		extends RichBeanFactory {
 
-	def apply[T]()(implicit manifest: Manifest[T]) = {
-		beanFactory.getBean(manifestToClass(manifest))
+	def apply[T : ClassTag]() = {
+		beanFactory.getBean(typeToClass[T])
 	}
 
-	def apply[T](name: String)(implicit manifest: Manifest[T]) = {
-		beanFactory.getBean(name, manifestToClass(manifest))
+	def apply[T : ClassTag](name: String) = {
+		beanFactory.getBean(name, typeToClass[T])
 	}
 
 }
@@ -65,18 +66,17 @@ private[springframework] class DefaultRichBeanFactory(val beanFactory: BeanFacto
 private[springframework] class DefaultRichListableBeanFactory(beanFactory: ListableBeanFactory)
 		extends DefaultRichBeanFactory(beanFactory) with RichListableBeanFactory {
 
-	def beanNamesForType[T](includeNonSingletons: Boolean = true,
-	                        allowEagerInit: Boolean = true)
-	                       (implicit manifest: Manifest[T]): Seq[String] = {
-		beanFactory.getBeanNamesForType(manifestToClass(manifest),
+	def beanNamesForType[T : ClassTag](includeNonSingletons: Boolean = true,
+	                        allowEagerInit: Boolean = true): Seq[String] = {
+		beanFactory.getBeanNamesForType(typeToClass[T],
 		                                includeNonSingletons,
 		                                allowEagerInit)
 	}
 
-	def beansOfType[T](includeNonSingletons: Boolean = true, allowEagerInit: Boolean = true)
-	                  (implicit manifest: Manifest[T]): Map[String, T] = {
+	def beansOfType[T : ClassTag](includeNonSingletons: Boolean = true,
+                                allowEagerInit: Boolean = true): Map[String, T] = {
 		beanFactory
-				.getBeansOfType(manifestToClass(manifest), includeNonSingletons, allowEagerInit)
+				.getBeansOfType(typeToClass[T], includeNonSingletons, allowEagerInit)
 				.toMap
 	}
 

@@ -16,6 +16,8 @@
 
 package org.springframework.scala.beans.factory
 
+import scala.reflect.ClassTag
+
 /**
  * Rich wrapper for [[org.springframework.beans.factory.ListableBeanFactory]], offering
  * Scala-specific methods.
@@ -55,9 +57,7 @@ trait RichListableBeanFactory extends RichBeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beanNamesForTypeIncludingAncestors(ListableBeanFactory, Class, boolean, boolean)
 	 */
-	def beanNamesForType[T](includeNonSingletons: Boolean = true,
-	                        allowEagerInit: Boolean = true)
-	                       (implicit manifest: Manifest[T]): Seq[String]
+	def beanNamesForType[T : ClassTag](includeNonSingletons: Boolean = true, allowEagerInit: Boolean = true): Seq[String]
 
 	/**
 	 * Return the bean instances that match the given object type (including
@@ -125,7 +125,6 @@ trait RichListableBeanFactory extends RichBeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beansOfTypeIncludingAncestors(ListableBeanFactory, Class, boolean, boolean)
 	 */
-	def beansOfType[T](includeNonSingletons: Boolean = true, allowEagerInit: Boolean = true)
-	                  (implicit manifest: Manifest[T]): Map[String, T]
+	def beansOfType[T : ClassTag](includeNonSingletons: Boolean = true, allowEagerInit: Boolean = true) : Map[String, T]
 
 }

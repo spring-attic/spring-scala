@@ -25,8 +25,9 @@ import org.springframework.jdbc.support.rowset.SqlRowSet
 import JdbcCallbackConversions._
 import org.springframework.jdbc.support.KeyHolder
 import org.springframework.dao.DataAccessException
-import org.springframework.scala.util.ManifestUtils._
+import org.springframework.scala.util.TypeTagUtils.typeToClass
 import scala.throws
+import scala.reflect.ClassTag
 
 /**
  * Scala-based convenience wrapper for the Spring
@@ -188,8 +189,8 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
 	 * @throws DataAccessException if there is any problem executing the query
 	 */
 	@throws(classOf[DataAccessException])
-	def queryForObject[T](sql: String)(implicit manifest: Manifest[T]): Option[T] = {
-		Option(javaTemplate.queryForObject(sql, manifestToClass(manifest)))
+	def queryForObject[T: ClassTag](sql: String): Option[T] = {
+		Option(javaTemplate.queryForObject(sql, typeToClass[T]))
 	}
 
 	/**
@@ -204,8 +205,8 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
 	 * @throws DataAccessException if there is any problem executing the query
 	 */
 	@throws(classOf[DataAccessException])
-	def queryForSeq[T](sql: String)(implicit manifest: Manifest[T]): Seq[T] = {
-		javaTemplate.queryForList(sql, manifestToClass(manifest)).asScala
+	def queryForSeq[T: ClassTag](sql: String): Seq[T] = {
+		javaTemplate.queryForList(sql, typeToClass[T]).asScala
 	}
 
 	/**
@@ -585,12 +586,11 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
 	 * @throws DataAccessException if the query fails
 	 */
 	@throws(classOf[DataAccessException])
-	def queryForObject[T](sql: String, args: Seq[Any], argTypes: Seq[Int])
-	                     (implicit manifest: Manifest[T]): Option[T] = {
+	def queryForObject[T: ClassTag](sql: String, args: Seq[Any], argTypes: Seq[Int]): Option[T] = {
 		Option(javaTemplate.queryForObject(sql,
 		                                   asInstanceOfAnyRef(args).toArray,
 		                                   argTypes.toArray,
-		                                   manifestToClass(manifest)))
+		                                   typeToClass[T]))
 	}
 
 	/**
@@ -611,11 +611,10 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
 	 * @throws DataAccessException if the query fails
 	 */
 	@throws(classOf[DataAccessException])
-	def queryForObject[T](sql: String, args: Any*)
-	                     (implicit manifest: Manifest[T]): Option[T] = {
+	def queryForObject[T: ClassTag](sql: String, args: Any*): Option[T] = {
 		Option(javaTemplate.queryForObject(sql,
 		                                   asInstanceOfAnyRef(args).toArray,
-		                                   manifestToClass(manifest)))
+		                                   typeToClass[T]))
 	}
 
 	/**
@@ -676,12 +675,11 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
 	 * @throws DataAccessException if the query fails
 	 */
 	@throws(classOf[DataAccessException])
-	def queryForSeq[T](sql: String, args: Seq[Any], argTypes: Seq[Int])
-	                  (implicit manifest: Manifest[T]): Seq[T] = {
+	def queryForSeq[T: ClassTag](sql: String, args: Seq[Any], argTypes: Seq[Int]): Seq[T] = {
 		javaTemplate.queryForList(sql,
 		                          asInstanceOfAnyRef(args).toArray,
 		                          argTypes.toArray,
-		                          manifestToClass(manifest)).asScala
+															typeToClass[T]).asScala
 	}
 
 	/**
@@ -698,9 +696,9 @@ class JdbcTemplate(val javaTemplate: org.springframework.jdbc.core.JdbcTemplate)
 	 * @throws DataAccessException if the query fails
 	 */
 	@throws(classOf[DataAccessException])
-	def queryForSeq[T](sql: String, args: Any*)(implicit manifest: Manifest[T]): Seq[T] = {
+	def queryForSeq[T: ClassTag](sql: String, args: Any*): Seq[T] = {
 		javaTemplate
-				.queryForList(sql, manifestToClass(manifest), asInstanceOfAnyRef(args): _*)
+				.queryForList(sql, typeToClass[T], asInstanceOfAnyRef(args): _*)
 				.asScala
 	}
 
