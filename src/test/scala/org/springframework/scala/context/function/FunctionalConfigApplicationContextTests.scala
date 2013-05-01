@@ -59,6 +59,16 @@ class FunctionalConfigApplicationContextTests extends FunSuite {
 		assert("Foo" == foo)
 	}
 
+  test("context[Class]") {
+    val appContext = FunctionalConfigApplicationContext(classOf[MyFunctionalConfiguration])
+    val foo = appContext[String]
+    assert("Foo" == foo)
+  }
 
+  test("context[Class]('beanName')") {
+    val appContext = FunctionalConfigApplicationContext(classOf[MyFunctionalConfiguration])
+    val foo = appContext[String]("foo")
+    assert("Foo" == foo)
+  }
 
 }
