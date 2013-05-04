@@ -2,7 +2,7 @@ package org.springframework.scala.context.function
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.{GivenWhenThen, BeforeAndAfter, FunSuite}
+import org.scalatest.{GivenWhenThen, FunSuite}
 import org.scalatest.matchers.ShouldMatchers
 import org.springframework.stereotype.Component
 import org.springframework.context.annotation.{AnnotationScopeMetadataResolver, ScopedProxyMode}
@@ -88,7 +88,7 @@ class VarArgComponentScanConfig extends FunctionalConfiguration with ContextSupp
 class ScopeConflictComponentScanConfig extends FunctionalConfiguration with ContextSupport {
 
   componentScan(basePackages = Seq("org.springframework.scala.context.function"),
-    scopedProxy = ScopedProxyMode.TARGET_CLASS, scopeResolver = new AnnotationScopeMetadataResolver)
+    scopedProxy = Some(ScopedProxyMode.TARGET_CLASS), scopeResolver = Some(new AnnotationScopeMetadataResolver))
 
 }
 

@@ -56,12 +56,36 @@ trait ContextSupport {
 		})
 	}
 
+  /**
+   * Activates automatic detection of stereotyped classes. Classes eligible for such autodetection will be registered in
+   * the [[org.springframework.context.ApplicationContext]]. This method is an equivalent of the
+   * `context:component-scan` element of the Spring Schema configuration.
+   *
+   * @param basePackages the packages to check for annotated classes
+   * @param useDefaultFilters useDefaultFilters whether to include the default filters for the
+   *                          [[org.springframework.stereotype.Component]],
+   *                          [[org.springframework.stereotype.Repository]],
+   *                          [[org.springframework.stereotype.Service]], and
+   *                          [[org.springframework.stereotype.Controller]] stereotype
+   * @param resourcePattern the resource pattern to use when scanning the classpath. This value will be appended to
+   *                        each base package name.
+   * @param beanNameGenerator the [[org.springframework.beans.factory.support.BeanNameGenerator]] to use for detected
+   *                          bean classes. Default name generator is inherited from the
+   *                          [[org.springframework.scala.context.function.FunctionalConfiguration]].
+   * @param scopeResolver the [[org.springframework.context.annotation.ScopeMetadataResolver]] to use for detected
+   *                      bean classes. Note that this will override any custom `scopedProxyMode` setting. The default
+   *                      is an [[org.springframework.context.annotation.AnnotationScopeMetadataResolver]].
+   * @param scopedProxy the proxy behavior for non-singleton scoped beans. Note that this will override any custom
+   *                    `scopeMetadataResolver` setting. The default is `ScopedProxyMode#NO`.
+   * @param includeFilters include filters to the resulting classes to find candidates.
+   * @param excludeFilters exclude filters to the resulting classes to find candidates.
+   */
   def componentScan(basePackages: Seq[String],
-                    useDefaultFilters: Boolean = true, resourcePattern : String = null,
-                    beanNameGenerator: BeanNameGenerator = null,
-                    scopeResolver: ScopeMetadataResolver = null, scopedProxy: ScopedProxyMode = null,
+                    useDefaultFilters: Boolean = true, resourcePattern : Option[String] = None,
+                    beanNameGenerator: Option[BeanNameGenerator] = None,
+                    scopeResolver: Option[ScopeMetadataResolver] = None, scopedProxy: Option[ScopedProxyMode] = None,
                     includeFilters: Seq[TypeFilter] = Seq.empty, excludeFilters: Seq[TypeFilter] = Seq.empty) {
-    if(scopeResolver != null && scopedProxy != null) {
+    if(scopeResolver.isDefined && scopedProxy.isDefined) {
       throw new IllegalArgumentException("Cannot define both 'scopeResolver' and 'scopedProxy' on 'componentScan' option")
     }
 
@@ -71,29 +95,19 @@ trait ContextSupport {
       scanner.setEnvironment(environment)
       includeFilters.foreach(scanner.addIncludeFilter(_))
       excludeFilters.foreach(scanner.addExcludeFilter(_))
-
-      if(resourcePattern != null) {
-        scanner.setResourcePattern(resourcePattern)
-      }
-
-      if (beanNameGenerator != null) {
-        scanner.setBeanNameGenerator(beanNameGenerator)
-      } else {
-        scanner.setBeanNameGenerator(defaultBeanNameGenerator)
-      }
-
-      if(scopeResolver != null) {
-        scanner.setScopeMetadataResolver(scopeResolver)
-      }
-
-      if(scopedProxy != null) {
-        scanner.setScopedProxyMode(scopedProxy)
-      }
-
+      resourcePattern.foreach(scanner.setResourcePattern(_))
+      scanner.setBeanNameGenerator(beanNameGenerator.getOrElse(defaultBeanNameGenerator))
+      scopeResolver.foreach(scanner.setScopeMetadataResolver(_))
+      scopedProxy.foreach(scanner.setScopedProxyMode(_))
       scanner.scan(basePackages :_*)
     })
   }
 
+  /**
+   * Convenience method used to invoke component scanning with default parameters and varargs list of the base packages.
+   *
+   * @param basePackages the packages to check for annotated classes
+   */
   def componentScan(basePackages: String*) {
     componentScan(basePackages = basePackages)
   }
