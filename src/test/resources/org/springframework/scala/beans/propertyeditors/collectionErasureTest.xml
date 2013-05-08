@@ -31,4 +31,13 @@
         </constructor-arg>
     </bean>
 
+    <bean id="wrongMap" class="org.springframework.scala.beans.propertyeditors.WrongMapBean">
+    <constructor-arg name="data">
+        <map>
+            <entry key="1" value="bar"/>
+            <entry key="2" value="bar"/>
+        </map>
+    </constructor-arg>
+</bean>
+
 </beans>

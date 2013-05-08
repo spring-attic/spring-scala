@@ -10,3 +10,5 @@ package org.springframework.scala.beans.propertyeditors
 case class ErasedMapBean(data:Map[JavaEnum,String]) {
 
 }
+
+case class WrongMapBean(data:Map[Double, Int])

@@ -55,6 +55,10 @@ class ScalaCollectionEditor[T, U](val builderFunction: () => mutable.Builder[T, 
 				builder ++= collectionAsScalaIterable(javaCollection)
 			}
 			case javaMap: java.util.Map[T, U] => {
+        // TODO: this might not work properly, since T and U will be erased, you can put any map inside and get out the map of a different type
+        // Very dangerous because this will give you a map of T,U while in fact it could be a map of something else and your code will fail silently at runtime
+        // with a class cast exception . It would be much better to have a failure when the context is loaded. Same is valid for javacollection conversion
+        // look to the ScalaCollectionEditorTest
 				val mapBuilder = builder.asInstanceOf[mutable.Builder[(T, U), _]]
 				mapBuilder ++= mapAsScalaMap(javaMap)
 			}
@@ -65,3 +69,5 @@ class ScalaCollectionEditor[T, U](val builderFunction: () => mutable.Builder[T, 
 		super.setValue(builder.result())
 	}
 }
+
+

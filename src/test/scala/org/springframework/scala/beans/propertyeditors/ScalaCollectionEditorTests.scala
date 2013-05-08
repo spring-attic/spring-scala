@@ -53,5 +53,12 @@ class ScalaCollectionEditorTests extends FunSuite with ShouldMatchers {
 
   }
 
+  test("you should not be able to inject in a scala class a wrong typed map"){
+    val applicationContext = new ClassPathXmlApplicationContext("collectionErasureTest.xml",getClass)
+    val map = applicationContext.getBean(classOf[WrongMapBean])
+    map should be (null)
+
+   }
+
 
 }
