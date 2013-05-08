@@ -19,9 +19,11 @@ package org.springframework.scala.beans.propertyeditors
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import org.springframework.context.support.ClassPathXmlApplicationContext
+import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class ScalaCollectionEditorTests extends FunSuite {
+class ScalaCollectionEditorTests extends FunSuite with ShouldMatchers {
 
 	test("null as empty collection") {
 		val editor = new ScalaCollectionEditor(Seq.newBuilder[String] _, true)
@@ -36,6 +38,20 @@ class ScalaCollectionEditorTests extends FunSuite {
 		val result = editor.getValue
 		assert(result == null)
 	}
+
+  test("the returned map when not forcing the right key type will fail"){
+     val applicationContext = new ClassPathXmlApplicationContext("collectionErasureTest.xml",getClass)
+      val map = applicationContext.getBean("erasedMapBean1").asInstanceOf[ErasedMapBean]
+       map.data should contain key (JavaEnum.FIRST)
+
+  }
+
+  test("the returned map when forcing the key type should have the right keys"){
+       val applicationContext = new ClassPathXmlApplicationContext("collectionErasureTest.xml",getClass)
+       val map = applicationContext.getBean("erasedMapBean2").asInstanceOf[ErasedMapBean]
+       map.data should contain key (JavaEnum.FIRST)
+
+  }
 
 
 }
