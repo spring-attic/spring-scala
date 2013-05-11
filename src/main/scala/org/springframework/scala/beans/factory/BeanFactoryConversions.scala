@@ -80,5 +80,8 @@ private[springframework] class DefaultRichListableBeanFactory(beanFactory: Lista
 				.toMap
 	}
 
+  def beansOfType[T](implicit manifest: Manifest[T]): Map[String, T] =
+    beansOfType[T]()
+
 }
 

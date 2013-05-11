@@ -59,6 +59,10 @@ class FunctionalConfigApplicationContextTests extends FunSuite {
 		assert("Foo" == foo)
 	}
 
-
+	test("context.beansOfType[String] call without empty parameter list") {
+		val appContext = FunctionalConfigApplicationContext(classOf[MyFunctionalConfiguration])
+		val foos : Map[String,String] = appContext.beansOfType[String]
+		assert(1 === foos.size)
+	}
 
 }

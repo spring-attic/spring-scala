@@ -98,4 +98,6 @@ trait RichListableBeanFactory extends RichBeanFactory {
 	def beansOfType[T](includeNonSingletons: Boolean = true, allowEagerInit: Boolean = true)
 	                  (implicit manifest: Manifest[T]): Map[String, T]
 
+	def beansOfType[T](implicit manifest: Manifest[T]): Map[String, T]
+
 }

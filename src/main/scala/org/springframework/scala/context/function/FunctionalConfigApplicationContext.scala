@@ -21,7 +21,7 @@ import org.springframework.util.CollectionUtils
 import scala.collection.JavaConversions._
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.support.{DefaultBeanNameGenerator, BeanNameGenerator}
-import org.springframework.scala.context.RichApplicationContext
+import org.springframework.scala.context.{DefaultRichApplicationContext, RichApplicationContext}
 import org.springframework.scala.util.ManifestUtils.manifestToClass
 
 /**
@@ -94,6 +94,9 @@ class FunctionalConfigApplicationContext
 	def beansOfType[T](includeNonSingletons: Boolean, allowEagerInit: Boolean)
 	                  (implicit manifest: Manifest[T]) = richApplicationContext
 			.beansOfType(includeNonSingletons, allowEagerInit)(manifest)
+
+	def beansOfType[T](implicit manifest: Manifest[T]): Map[String, T] =
+		beansOfType[T]()
 }
 
 /**
