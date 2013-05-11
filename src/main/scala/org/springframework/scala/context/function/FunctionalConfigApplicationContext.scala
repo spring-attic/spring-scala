@@ -21,7 +21,7 @@ import org.springframework.util.CollectionUtils
 import scala.collection.JavaConversions._
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.support.{DefaultBeanNameGenerator, BeanNameGenerator}
-import org.springframework.scala.context.RichApplicationContext
+import org.springframework.scala.context.{DefaultRichApplicationContext, RichApplicationContext}
 import org.springframework.scala.util.ManifestUtils.manifestToClass
 
 /**
@@ -44,7 +44,7 @@ class FunctionalConfigApplicationContext
 
 	var beanNameGenerator: BeanNameGenerator = new DefaultBeanNameGenerator
 
-	private val richApplicationContext: RichApplicationContext = this
+	private val richApplicationContext: RichApplicationContext = new DefaultRichApplicationContext(this)
 
 	/**
 	 * Registers a single [[org.springframework.scala.context.function.FunctionalConfiguration]]

@@ -59,6 +59,10 @@ class FunctionalConfigApplicationContextTests extends FunSuite {
 		assert("Foo" == foo)
 	}
 
-
+  test("rich ctx[Type]") {
+    val appContext = FunctionalConfigApplicationContext(classOf[MyFunctionalConfiguration])
+    val foo = appContext[String]
+    assert("Foo" === foo)
+  }
 
 }
