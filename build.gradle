@@ -8,6 +8,8 @@ apply plugin: 'propdeps-maven'
 apply plugin: 'propdeps-idea'
 apply plugin: 'propdeps-eclipse'
 
+apply from: 'cobertura.gradle'
+
 group 'org.springframework.scala'
 
 ext {
@@ -17,6 +19,7 @@ ext {
 
 repositories {
   maven { url "http://repo.springsource.org/libs-snapshot" }
+  mavenCentral()
 }
 
 dependencies {
