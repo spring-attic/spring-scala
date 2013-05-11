@@ -57,4 +57,7 @@ private[springframework] class DefaultRichApplicationContext(val appContext: App
 	def beansOfType[T](includeNonSingletons: Boolean, allowEagerInit: Boolean)
 	                  (implicit manifest: Manifest[T]) = beanFactory
 			.beansOfType(includeNonSingletons, allowEagerInit)(manifest)
+
+
+
 }
