@@ -11,21 +11,38 @@ For more information, please refer to the [documentation on the wiki](https://gi
 
 ## Installation
 
-A first milestone of Spring Scala is available for download at our milestone repository, http://repo.springsource.org/libs-milestone.
+Milestones of Spring Scala are available for download at our milestone repository, http://repo.springsource.org/milestone.
 
 For Maven users:
 
-    <distributionManagement>
-        <repository>
-            <id>milestone.repo.springsource.org</id>
-            <name>repo.springsource.org-milestone</name>
-            <url>https://repo.springsource.org/libs-milestone</url>
-        </repository>
-    </distributionManagement>
+    <repository>
+        <id>repository.springsource.milestone</id>
+        <name>SpringSource Milestone Repository</name>
+        <url>http://repo.springsource.org/milestone</url>
+    </repository>
+    ...
     <dependency>
         <groupId>org.springframework.scala</groupId>
         <artifactId>spring-scala</artifactId>
-        <version>1.0.0.M1</version>
+        <version>1.0.0.M2</version>
+    </dependency>
+    
+## Snapshots
+
+Nightly snapshots of Spring Scala are available for download at our snapshot repository, http://repo.springsource.org/snapshot.
+
+For Maven users:
+
+    <repository>
+        <id>repository.springsource.snapshot</id>
+        <name>SpringSource Snapshot Repository</name>
+        <url>http://repo.springsource.org/snapshot</url>
+    </repository>
+    ...
+    <dependency>
+        <groupId>org.springframework.scala</groupId>
+        <artifactId>spring-scala</artifactId>
+        <version>1.0.0.BUILD-SNAPSHOT</version>
     </dependency>
 
 ## Building from Source
