@@ -30,7 +30,7 @@ dependencies {
   optional("org.springframework:spring-web:$springVersion")
 
   // Scala
-  scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
+//  scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
   compile("org.scala-lang:scala-library:$scalaVersion")
   compile("org.scala-lang:scala-reflect:$scalaVersion")
 
@@ -52,7 +52,7 @@ tasks.withType(ScalaCompile) {
 
 task wrapper(type: Wrapper) {
   description = 'Generates gradlew[.bat] scripts'
-  gradleVersion = '1.5'
+  gradleVersion = '1.6'
 }
 
 buildscript {
