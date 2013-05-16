@@ -18,6 +18,7 @@ package org.springframework.scala.beans.factory
 
 import org.springframework.beans.factory.{BeanNotOfRequiredTypeException, NoUniqueBeanDefinitionException, NoSuchBeanDefinitionException}
 import org.springframework.beans.BeansException
+import scala.reflect.ClassTag
 
 /**
  * Rich wrapper for [[org.springframework.beans.factory.BeanFactory]], offering
@@ -35,9 +36,9 @@ trait RichBeanFactory {
 	 *         or `None` if no such bean was found
 	 */
 	@throws(classOf[NoUniqueBeanDefinitionException])
-	def bean[T]()(implicit manifest: Manifest[T]): Option[T] = {
+	def bean[T : ClassTag](): Option[T] = {
 		try {
-			Option(apply()(manifest))
+			Option(apply[T]())
 		}
 		catch {
 			case _: NoSuchBeanDefinitionException => None
@@ -55,7 +56,7 @@ trait RichBeanFactory {
 	 */
 	@throws(classOf[NoSuchBeanDefinitionException])
 	@throws(classOf[NoUniqueBeanDefinitionException])
-	def apply[T]()(implicit manifest: Manifest[T]): T
+	def apply[T : ClassTag](): T
 
 	/**
 	 * Optionally returns an instance, which may be shared or independent, of the specified
@@ -69,9 +70,9 @@ trait RichBeanFactory {
 	 * @throws BeansException if the bean could not be created
 	 */
 	@throws(classOf[BeansException])
-	def bean[T](name: String)(implicit manifest: Manifest[T]): Option[T] = {
+	def bean[T : ClassTag](name: String): Option[T] = {
 		try {
-			Option(apply(name)(manifest))
+			Option(apply[T](name))
 		}
 		catch {
 			case _: NoSuchBeanDefinitionException => None
@@ -93,6 +94,6 @@ trait RichBeanFactory {
 	@throws(classOf[NoSuchBeanDefinitionException])
 	@throws(classOf[BeanNotOfRequiredTypeException])
 	@throws(classOf[BeansException])
-	def apply[T](name: String)(implicit manifest: Manifest[T]): T
+	def apply[T : ClassTag](name: String): T
 
 }

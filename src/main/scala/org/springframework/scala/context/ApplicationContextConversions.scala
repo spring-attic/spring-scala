@@ -19,6 +19,7 @@ package org.springframework.scala.context
 import org.springframework.context.ApplicationContext
 import org.springframework.scala.beans.factory.RichListableBeanFactory
 import org.springframework.scala.beans.factory.BeanFactoryConversions._
+import scala.reflect.ClassTag
 
 /**
  * A collection of implicit conversions between application contexts and their rich
@@ -45,19 +46,14 @@ private[springframework] class DefaultRichApplicationContext(val appContext: App
 
 	private val beanFactory: RichListableBeanFactory = appContext
 
-	def apply[T]()(implicit manifest: Manifest[T]) = beanFactory.apply()(manifest)
+	def apply[T : ClassTag]() = beanFactory.apply[T]()
 
-	def apply[T](name: String)(implicit manifest: Manifest[T]) = beanFactory
-			.apply(name)(manifest)
+	def apply[T : ClassTag](name: String) = beanFactory.apply[T](name)
 
-	def beanNamesForType[T](includeNonSingletons: Boolean, allowEagerInit: Boolean)
-	                       (implicit manifest: Manifest[T]) = beanFactory
-			.beanNamesForType(includeNonSingletons, allowEagerInit)(manifest)
+	def beanNamesForType[T : ClassTag](includeNonSingletons: Boolean, allowEagerInit: Boolean) =
+		beanFactory.beanNamesForType[T](includeNonSingletons, allowEagerInit)
 
-	def beansOfType[T](includeNonSingletons: Boolean, allowEagerInit: Boolean)
-	                  (implicit manifest: Manifest[T]) = beanFactory
-			.beansOfType(includeNonSingletons, allowEagerInit)(manifest)
-
-
+	def beansOfType[T : ClassTag](includeNonSingletons: Boolean, allowEagerInit: Boolean) =
+		beanFactory.beansOfType[T](includeNonSingletons, allowEagerInit)
 
 }

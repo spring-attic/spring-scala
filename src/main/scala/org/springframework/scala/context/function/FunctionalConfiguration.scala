@@ -29,7 +29,8 @@ import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
 import org.springframework.beans.factory.support._
 import scala.reflect.runtime.universe._
 import scala.reflect.runtime.currentMirror
-import org.springframework.scala.util.ManifestUtils.manifestToClass
+import org.springframework.scala.util.TypeTagUtils.typeToClass
+import scala.reflect.ClassTag
 
 /**
  * Base trait used to declare one or more Spring Beans that may be processed by the Spring
@@ -125,25 +126,22 @@ trait FunctionalConfiguration extends DelayedInit {
 	 * @return a function that returns the registered bean
 	 * @tparam T the bean type
 	 */
-	protected def bean[T](name: String = "",
-	                      aliases: Seq[String] = Seq(),
-	                      scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
-	                      lazyInit: Boolean = false)
-	                     (beanFunction: => T)
-	                     (implicit manifest: Manifest[T]): BeanLookupFunction[T] = {
+	protected def bean[T: ClassTag](name: String = "",
+	                                aliases: Seq[String] = Seq(),
+	                                scope: String = ConfigurableBeanFactory.SCOPE_SINGLETON,
+	                                lazyInit: Boolean = false)
+	                               (beanFunction: => T): BeanLookupFunction[T] = {
 
-		registerBean(name, aliases, scope, lazyInit, beanFunction _, manifest)
+		registerBean(name, typeToClass[T], aliases, scope, lazyInit, beanFunction _)
 	}
 
 	private[springframework] def registerBean[T](name: String,
+																							 beanType: Class[T],
 	                                             aliases: Seq[String],
 	                                             scope: String,
 	                                             lazyInit: Boolean,
-	                                             beanFunction: () => T,
-	                                             manifest: Manifest[T]): BeanLookupFunction[T] = {
+	                                             beanFunction: () => T): BeanLookupFunction[T] = {
 		state(beanRegistry != null, "BeanRegistry has not been registered yet.")
-
-		val beanType = manifestToClass(manifest)
 
 		val fbd = new FunctionalRootBeanDefinition(beanFunction, beanType)
 		fbd.setScope(scope)
@@ -190,18 +188,17 @@ trait FunctionalConfiguration extends DelayedInit {
 	 * @return the singleton instance of the registered bean
 	 * @tparam T the bean type
 	 */
-	protected def singleton[T](name: String = "",
-	                           aliases: Seq[String] = Seq(),
-	                           lazyInit: Boolean = false)
-	                          (beanFunction: => T)
-	                          (implicit manifest: Manifest[T]): T = {
+	protected def singleton[T: ClassTag](name: String = "",
+	                                     aliases: Seq[String] = Seq(),
+	                                     lazyInit: Boolean = false)
+	                                    (beanFunction: => T): T = {
 
 		registerBean(name,
+		             typeToClass[T],
 		             aliases,
 		             ConfigurableBeanFactory.SCOPE_SINGLETON,
 		             lazyInit,
-		             beanFunction _,
-		             manifest).apply()
+		             beanFunction _).apply()
 	}
 
 	/**
@@ -215,17 +212,16 @@ trait FunctionalConfiguration extends DelayedInit {
 	 * @return a function that returns the registered bean
 	 * @tparam T the bean type
 	 */
-	protected def prototype[T](name: String = "",
+	protected def prototype[T: ClassTag](name: String = "",
 	                           aliases: Seq[String] = Seq(),
 	                           lazyInit: Boolean = false)
-	                          (beanFunction: => T)
-	                          (implicit manifest: Manifest[T]): BeanLookupFunction[T] = {
+	                          (beanFunction: => T): BeanLookupFunction[T] = {
 		registerBean(name,
+								 typeToClass[T],
 		             aliases,
 		             ConfigurableBeanFactory.SCOPE_PROTOTYPE,
 		             lazyInit,
-		             beanFunction _,
-		             manifest)
+		             beanFunction _)
 	}
 
 	/**

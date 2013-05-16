@@ -22,7 +22,8 @@ import scala.collection.JavaConverters._
 import org.springframework.web.client.{RequestCallback, ResponseExtractor}
 import org.springframework.http.client.{ClientHttpRequest, ClientHttpRequestFactory, ClientHttpResponse}
 import org.springframework.http.{HttpHeaders, HttpEntity, ResponseEntity, HttpMethod}
-import org.springframework.scala.util.ManifestUtils.manifestToClass
+import org.springframework.scala.util.TypeTagUtils.typeToClass
+import scala.reflect.ClassTag
 
 /**
  * Scala-based convenience wrapper for the Spring [[org.springframework.web.client.RestTemplate]], taking
@@ -56,8 +57,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @param uriVariables the variables to expand the template
    * @return the converted object
    */
-  def getForAny[T](url: String, uriVariables: Any*)(implicit manifest: Manifest[T]): Option[T] = {
-    Option(javaTemplate.getForObject(url, manifestToClass(manifest), asInstanceOfAnyRef(uriVariables): _*))
+  def getForAny[T: ClassTag](url: String, uriVariables: Any*): Option[T] = {
+    Option(javaTemplate.getForObject(url, typeToClass[T], asInstanceOfAnyRef(uriVariables): _*))
   }
 
   /**
@@ -70,8 +71,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @param uriVariables the map containing variables for the URI template
    * @return the converted object
    */
-  def getForAny[T](url: String, uriVariables: Map[String, _])(implicit manifest: Manifest[T]): Option[T] = {
-    Option(javaTemplate.getForObject(url, manifestToClass(manifest), uriVariables.asJava))
+  def getForAny[T: ClassTag](url: String, uriVariables: Map[String, _]): Option[T] = {
+    Option(javaTemplate.getForObject(url, typeToClass[T], uriVariables.asJava))
   }
 
   /**
@@ -81,8 +82,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @param url the URL
    * @return the converted object
    */
-  def getForAny[T](url: URI)(implicit manifest: Manifest[T]): Option[T] = {
-    Option(javaTemplate.getForObject(url, manifestToClass(manifest)))
+  def getForAny[T: ClassTag](url: URI): Option[T] = {
+    Option(javaTemplate.getForObject(url, typeToClass[T]))
   }
 
   /**
@@ -94,8 +95,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @param uriVariables the variables to expand the template
    * @return the entity
    */
-  def getForEntity[T](url: String, uriVariables: Any*)(implicit manifest: Manifest[T]): ResponseEntity[T] = {
-    javaTemplate.getForEntity(url, manifestToClass(manifest), asInstanceOfAnyRef(uriVariables): _*)
+  def getForEntity[T: ClassTag](url: String, uriVariables: Any*): ResponseEntity[T] = {
+    javaTemplate.getForEntity(url, typeToClass[T], asInstanceOfAnyRef(uriVariables): _*)
   }
 
   /**
@@ -107,8 +108,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @param uriVariables the map containing variables for the URI template
    * @return the converted object
    */
-  def getForEntity[T](url: String, uriVariables: Map[String, _])(implicit manifest: Manifest[T]): ResponseEntity[T] = {
-    javaTemplate.getForEntity(url, manifestToClass(manifest), uriVariables.asJava)
+  def getForEntity[T: ClassTag](url: String, uriVariables: Map[String, _]): ResponseEntity[T] = {
+    javaTemplate.getForEntity(url, typeToClass[T], uriVariables.asJava)
   }
 
   /**
@@ -117,8 +118,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @param url the URL
    * @return the converted object
    */
-  def getForEntity[T](url: URI)(implicit manifest: Manifest[T]): ResponseEntity[T] = {
-    javaTemplate.getForEntity(url, manifestToClass(manifest))
+  def getForEntity[T: ClassTag](url: URI): ResponseEntity[T] = {
+    javaTemplate.getForEntity(url, typeToClass[T])
   }
 
   // HEAD
@@ -229,9 +230,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @return the converted object
    * @see HttpEntity
    */
-  def postForObject[T](url: String, request: Option[Any], uriVariables: Any*)
-                      (implicit manifest: Manifest[T]): Option[T] = {
-    Option(javaTemplate.postForObject(url, request.orNull, manifestToClass(manifest), asInstanceOfAnyRef(uriVariables)))
+  def postForObject[T: ClassTag](url: String, request: Option[Any], uriVariables: Any*): Option[T] = {
+    Option(javaTemplate.postForObject(url, request.orNull, typeToClass[T], asInstanceOfAnyRef(uriVariables)))
   }
 
   /**
@@ -249,9 +249,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @return the converted object
    * @see HttpEntity
    */
-  def postForObject[T](url: String, request: Option[Any], uriVariables: Map[String, _])
-                      (implicit manifest: Manifest[T]): Option[T] = {
-    Option(javaTemplate.postForObject(url, request.orNull, manifestToClass(manifest), uriVariables.asJava))
+  def postForObject[T: ClassTag](url: String, request: Option[Any], uriVariables: Map[String, _]): Option[T] = {
+    Option(javaTemplate.postForObject(url, request.orNull, typeToClass[T], uriVariables.asJava))
   }
 
   /**
@@ -266,8 +265,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @return the converted object
    * @see HttpEntity
    */
-  def postForObject[T](url: URI, request: Option[Any])(implicit manifest: Manifest[T]): Option[T] = {
-    Option(javaTemplate.postForObject(url, request.orNull, manifestToClass(manifest)))
+  def postForObject[T: ClassTag](url: URI, request: Option[Any]): Option[T] = {
+    Option(javaTemplate.postForObject(url, request.orNull, typeToClass[T]))
   }
 
   /**
@@ -285,9 +284,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @return the converted object
    * @see HttpEntity
    */
-  def postForEntity[T](url: String, request: Option[Any], uriVariables: Any*)
-                      (implicit manifest: Manifest[T]): ResponseEntity[T] = {
-    javaTemplate.postForEntity(url, request.orNull, manifestToClass(manifest), asInstanceOfAnyRef(uriVariables))
+  def postForEntity[T: ClassTag](url: String, request: Option[Any], uriVariables: Any*): ResponseEntity[T] = {
+    javaTemplate.postForEntity(url, request.orNull, typeToClass[T], asInstanceOfAnyRef(uriVariables))
   }
 
   /**
@@ -305,9 +303,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @return the converted object
    * @see HttpEntity
    */
-  def postForEntity[T](url: String, request: Option[Any], uriVariables: Map[String, _])
-                      (implicit manifest: Manifest[T]): ResponseEntity[T] = {
-    javaTemplate.postForEntity(url, request.orNull, manifestToClass(manifest), uriVariables.asJava)
+  def postForEntity[T: ClassTag](url: String, request: Option[Any], uriVariables: Map[String, _]): ResponseEntity[T] = {
+    javaTemplate.postForEntity(url, request.orNull, typeToClass[T], uriVariables.asJava)
   }
 
   /**
@@ -323,8 +320,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @see HttpEntity
    * @since 3.0.2
    */
-  def postForEntity[T](url: URI, request: Option[Any])(implicit manifest: Manifest[T]): ResponseEntity[T] = {
-    javaTemplate.postForEntity(url, request.orNull, manifestToClass(manifest))
+  def postForEntity[T: ClassTag](url: URI, request: Option[Any]): ResponseEntity[T] = {
+    javaTemplate.postForEntity(url, request.orNull, typeToClass[T])
   }
 
   // PUT
@@ -458,10 +455,9 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @param uriVariables the variables to expand in the template
    * @return the response as entity
    */
-  def exchange[T](url: String, method: HttpMethod, requestEntity: Option[HttpEntity[_]], uriVariables: Any*)
-                 (implicit manifest: Manifest[T]): ResponseEntity[T] = {
+  def exchange[T: ClassTag](url: String, method: HttpMethod, requestEntity: Option[HttpEntity[_]], uriVariables: Any*): ResponseEntity[T] = {
     javaTemplate
-        .exchange(url, method, requestEntity.orNull, manifestToClass(manifest), asInstanceOfAnyRef(uriVariables): _*)
+        .exchange(url, method, requestEntity.orNull, typeToClass[T], asInstanceOfAnyRef(uriVariables): _*)
   }
 
   /**
@@ -477,9 +473,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @return the response as entity
    * @since 3.0.2
    */
-  def exchange[T](url: String, method: HttpMethod, requestEntity: Option[HttpEntity[_]], uriVariables: Map[String, _])
-                 (implicit manifest: Manifest[T]): ResponseEntity[T] = {
-    javaTemplate.exchange(url, method, requestEntity.orNull, manifestToClass(manifest), uriVariables.asJava)
+  def exchange[T: ClassTag](url: String, method: HttpMethod, requestEntity: Option[HttpEntity[_]], uriVariables: Map[String, _]): ResponseEntity[T] = {
+    javaTemplate.exchange(url, method, requestEntity.orNull, typeToClass[T], uriVariables.asJava)
   }
 
   /**
@@ -491,9 +486,8 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    * @param requestEntity the entity (headers and/or body) to write to the request
    * @return the response as entity
    */
-  def exchange[T](url: URI, method: HttpMethod, requestEntity: Option[HttpEntity[_]])
-                 (implicit manifest: Manifest[T]): ResponseEntity[T] = {
-    javaTemplate.exchange(url, method, requestEntity.orNull, manifestToClass(manifest))
+  def exchange[T: ClassTag](url: URI, method: HttpMethod, requestEntity: Option[HttpEntity[_]]): ResponseEntity[T] = {
+    javaTemplate.exchange(url, method, requestEntity.orNull, typeToClass[T])
   }
 
   // general execution
