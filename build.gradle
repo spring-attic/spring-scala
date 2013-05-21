@@ -28,6 +28,7 @@ dependencies {
   optional("org.springframework:spring-jdbc:$springVersion")
   optional("org.springframework:spring-jms:$springVersion")
   optional("org.springframework:spring-web:$springVersion")
+  optional("org.springframework:spring-test:$springVersion")
 
   // Scala
 //  scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
