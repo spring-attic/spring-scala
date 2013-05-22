@@ -19,7 +19,8 @@ package org.springframework.scala.test.context
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigUtils.registerAnnotationConfigProcessors
 import org.springframework.scala.context.function.{FunctionalConfiguration, FunctionalConfigApplicationContext}
-import org.springframework.test.context.{SmartContextLoader, ContextConfigurationAttributes, MergedContextConfiguration}
+import org.springframework.test.context.{ContextConfigurationAttributes, MergedContextConfiguration}
+import org.springframework.test.context.support.AbstractContextLoader
 
 import scala.UnsupportedOperationException
 
@@ -32,7 +33,7 @@ import scala.UnsupportedOperationException
  *
  * @author Henryk Konsek
  */
-class FunctionalConfigContextLoader extends SmartContextLoader {
+class FunctionalConfigContextLoader extends AbstractContextLoader {
 
   private var configClasses: Seq[Class[_ <: FunctionalConfiguration]] = _
 
@@ -42,18 +43,19 @@ class FunctionalConfigContextLoader extends SmartContextLoader {
 
   override def loadContext(mergedConfig: MergedContextConfiguration): ApplicationContext = {
     val context = new FunctionalConfigApplicationContext()
+    prepareContext(context, mergedConfig)
     context.registerClasses(configClasses: _*)
     registerAnnotationConfigProcessors(context)
     context.refresh()
     context
   }
 
-  override def processLocations(clazz: Class[_], locations: String*): Array[String] = {
+  override def loadContext(locations: String*): ApplicationContext = {
     throw new UnsupportedOperationException("FunctionalConfigContextLoader supports only SmartContextLoader API.")
   }
 
-  override def loadContext(locations: String*): ApplicationContext = {
-    throw new UnsupportedOperationException("FunctionalConfigContextLoader supports only SmartContextLoader API.")
+  override def getResourceSuffix: String = {
+    throw new UnsupportedOperationException("FunctionalConfigContextLoader does not support the getResourceSuffix() method")
   }
 
 }
