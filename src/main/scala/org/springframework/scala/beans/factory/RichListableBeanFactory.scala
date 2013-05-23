@@ -86,7 +86,7 @@ trait RichListableBeanFactory extends RichBeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beansOfTypeIncludingAncestors(ListableBeanFactory, Class, boolean, boolean)
 	 */
-	def beansOfType[T](implicit manifest: Manifest[T]): Map[String, T] =
+	def beansOfType[T : ClassTag]: Map[String, T] =
 		beansOfType[T]()
 
 	/**
