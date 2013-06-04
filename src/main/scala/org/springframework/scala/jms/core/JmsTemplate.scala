@@ -16,6 +16,7 @@
 
 package org.springframework.scala.jms.core
 
+import org.springframework.jms.core.{BrowserCallback, MessagePostProcessor, MessageCreator, JmsOperations}
 import javax.jms.{Queue, QueueBrowser, Destination, Message, Session, ConnectionFactory}
 
 /**
