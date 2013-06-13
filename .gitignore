@@ -10,6 +10,8 @@ target
 build
 .classpath
 .project
+.cache
+bin/
 
 # IDEA metadata and output dirs
 *.iml
