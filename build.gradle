@@ -17,6 +17,7 @@ ext {
 
 repositories {
   maven { url "http://repo.springsource.org/libs-snapshot" }
+  mavenCentral()
 }
 
 dependencies {
@@ -25,6 +26,7 @@ dependencies {
   compile("org.springframework:spring-core:$springVersion")
   compile("org.springframework:spring-beans:$springVersion")
   compile("org.springframework:spring-context:$springVersion")
+  optional("org.springframework.data:spring-data-mongodb:1.2.1.RELEASE")
   optional("org.springframework:spring-jdbc:$springVersion")
   optional("org.springframework:spring-jms:$springVersion")
   optional("org.springframework:spring-web:$springVersion")
@@ -44,6 +46,11 @@ dependencies {
   testCompile("junit:junit:4.10")
   testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
   testRuntime("log4j:log4j:1.2.16")
+
+  // MongoDB test
+  testCompile("de.flapdoodle.embed:de.flapdoodle.embed.mongo:1.33")
+  testCompile("com.google.guava:guava:14.0.1")
+  testCompile("org.slf4j:slf4j-api:1.7.5")
 }
 
 tasks.withType(ScalaCompile) {
