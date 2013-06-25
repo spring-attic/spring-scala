@@ -18,6 +18,7 @@ package org.springframework.scala.jms.core
 
 import org.springframework.jms.core.{BrowserCallback, MessagePostProcessor, MessageCreator, JmsOperations}
 import javax.jms.{Queue, QueueBrowser, Destination, Message, Session, ConnectionFactory}
+import org.springframework.jms.core.{BrowserCallback, MessagePostProcessor, MessageCreator, JmsOperations}
 
 /**
  * Scala-based convenience wrapper for the Spring [[org.springframework.jms.core.JmsTemplate]], taking
