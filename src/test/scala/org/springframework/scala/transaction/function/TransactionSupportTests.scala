@@ -1,4 +1,4 @@
-package org.springframework.scala.context.function
+package org.springframework.scala.transaction.function
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -11,32 +11,31 @@ import org.springframework.transaction.TransactionDefinition
 import org.springframework.aop.config.AopConfigUtils
 import org.springframework.aop.framework.autoproxy.InfrastructureAdvisorAutoProxyCreator
 import org.springframework.transaction.config.TransactionManagementConfigUtils
+import org.springframework.scala.context.function.{MyFunctionalConfiguration, FunctionalConfigApplicationContext, FunctionalConfiguration}
 
 /**
- * User: Maciej Zientarski
+ * @author Maciej Zientarski
  */
 @RunWith(classOf[JUnitRunner])
-class TxSupportTests extends FunSuite with BeforeAndAfterEach {
-  var applicationContext: GenericApplicationContext = _
-
-  val beanNameGenerator = new DefaultBeanNameGenerator()
+class TransactionSupportTests extends FunSuite with BeforeAndAfterEach {
+  var applicationContext: FunctionalConfigApplicationContext = _
 
   override protected def beforeEach() {
-    applicationContext = new GenericApplicationContext()
+    applicationContext = new FunctionalConfigApplicationContext()
   }
 
   test("enableTransactionManagement() default values") {
     //given
-    val config = new FunctionalConfiguration with TxSupport {
+    val config = new FunctionalConfiguration with TransactionSupport {
 
       enableTransactionManagement()
 
-      bean(TxSupport.DEFAULT_TRANSACTION_MANAGER_NAME) {
+      bean(TransactionSupport.DEFAULT_TRANSACTION_MANAGER_NAME) {
         new DummyTransactionManager
       }
     }
-    config.register(applicationContext, beanNameGenerator)
-    applicationContext.refresh()
+
+    applicationContext.registerConfigurations(config)
 
     //then
     val infrastructureAdvisorAutoProxyCreator = applicationContext.getBean(
@@ -51,19 +50,20 @@ class TxSupportTests extends FunSuite with BeforeAndAfterEach {
 
   test("enableTransactionManagement() makes @Transactional methods run in transaction") {
     //given
-    val config = new FunctionalConfiguration with TxSupport {
+    val config = new FunctionalConfiguration with TransactionSupport {
 
       enableTransactionManagement()
 
       bean("frog") {
         new Frog
       }
-      bean(TxSupport.DEFAULT_TRANSACTION_MANAGER_NAME) {
+      bean(TransactionSupport.DEFAULT_TRANSACTION_MANAGER_NAME) {
         new DummyTransactionManager
       }
     }
-    config.register(applicationContext, beanNameGenerator)
-    applicationContext.refresh()
+
+    applicationContext.registerConfigurations(config)
+    applicationContext.refresh();
 
     //when
     val frog = applicationContext.getBean("frog", classOf[Frog])
@@ -73,7 +73,7 @@ class TxSupportTests extends FunSuite with BeforeAndAfterEach {
   }
 
   test("enableTransactionManagement() with custom transaction manager name") {
-    val config = new FunctionalConfiguration with TxSupport {
+    val config = new FunctionalConfiguration with TransactionSupport {
       val transactionManagerName = "myCustomTransactionManagerName"
 
       enableTransactionManagement(transactionManagerName = transactionManagerName)
@@ -86,24 +86,24 @@ class TxSupportTests extends FunSuite with BeforeAndAfterEach {
       }
     }
 
-    config.register(applicationContext, beanNameGenerator)
-
-    applicationContext.refresh()
+    applicationContext.registerConfigurations(config)
+    applicationContext.refresh();
 
     val frog = applicationContext.getBean("frog", classOf[Frog])
     assert(frog.hasTransaction === true)
   }
 
   test("enableTransactionManagement() CGLIB proxy") {
-    val config = new FunctionalConfiguration with TxSupport {
+    val config = new FunctionalConfiguration with TransactionSupport {
 
       enableTransactionManagement(ProxyTransactionMode(proxyTargetClass = true))
 
-      bean(TxSupport.DEFAULT_TRANSACTION_MANAGER_NAME) {
+      bean(TransactionSupport.DEFAULT_TRANSACTION_MANAGER_NAME) {
         new DummyTransactionManager
       }
     }
-    config.register(applicationContext, beanNameGenerator)
+
+    applicationContext.registerConfigurations(config)
     applicationContext.refresh()
 
     val infrastructureAdvisorAutoProxyCreator = applicationContext.getBean(
@@ -114,15 +114,16 @@ class TxSupportTests extends FunSuite with BeforeAndAfterEach {
   }
 
   test("enableTransactionManagement() AspectJ mode") {
-    val config = new FunctionalConfiguration with TxSupport {
+    val config = new FunctionalConfiguration with TransactionSupport {
 
       enableTransactionManagement(AspectJTransactionMode())
 
-      bean(TxSupport.DEFAULT_TRANSACTION_MANAGER_NAME) {
+      bean(TransactionSupport.DEFAULT_TRANSACTION_MANAGER_NAME) {
         new DummyTransactionManager
       }
     }
-    config.register(applicationContext, beanNameGenerator)
+
+    applicationContext.registerConfigurations(config)
     applicationContext.refresh()
 
     assert(applicationContext.containsBean(

@@ -1,59 +1,14 @@
-package org.springframework.scala.context.function
+package org.springframework.scala.transaction.function
 
-import org.springframework.beans.factory.support.{BeanDefinitionReaderUtils, RootBeanDefinition, BeanNameGenerator}
-import org.springframework.context.support.GenericApplicationContext
-import org.springframework.aop.config.AopConfigUtils
+import org.springframework.scala.context.function.FunctionalConfiguration
 import org.springframework.transaction.config.TransactionManagementConfigUtils
-import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource
-import org.springframework.beans.factory.config.{RuntimeBeanReference, BeanDefinition}
-import org.springframework.transaction.interceptor.{BeanFactoryTransactionAttributeSourceAdvisor, TransactionInterceptor}
-import scala.Predef.String
+import org.springframework.beans.factory.support.{BeanNameGenerator, BeanDefinitionReaderUtils, RootBeanDefinition}
 import org.springframework.beans.factory.parsing.BeanComponentDefinition
-
-
-/**
- * Base class for annotation-driven transaction manager modes:
- * [[org.springframework.scala.context.function.AspectJTransactionMode]]
- * and
- * [[org.springframework.scala.context.function.ProxyTransactionMode]]
- *
- * @author Maciej Zientarski
- * @since 1.0.0.M2
- */
-abstract class TransactionMode
-
-/**
- * AspectJ annotation-driven transaction manager mode. To be used as parameter of
- * `org.springframework.scala.context.function.TxSupport.enableTransactionManagement()`
- *
- * @author Maciej Zientarski
- * @since 1.0.0.M2
- */
-case class AspectJTransactionMode() extends TransactionMode
-
-
-/**
- * Spring's AOP framework proxy transaction mode. To be used as
- * parameter of [[org.springframework.scala.context.function.TxSupport.enableTransactionManagement()]]
- * Equivalent to `mode="proxy"` attribute of `<tx:annotation-driven/>`.
- *
- * @param proxyTargetClass equivalent to `proxy-target-class="true|false"` attribute of
- * `<tx:annotation-driven/>`. If set to true, then class based proxies are used.
- * False means that standard JDK interface-based proxies should be created.
- * @author Maciej Zientarski
- * @since 1.0.0.M2
- */
-case class ProxyTransactionMode(proxyTargetClass: Boolean = false) extends TransactionMode
-
-/**
- * Used to store default transaction manager name.
- *
- * @author Maciej Zientarski
- * @since 1.0.0.M2
- */
-object TxSupport {
-  val DEFAULT_TRANSACTION_MANAGER_NAME = "transactionManager"
-}
+import org.springframework.beans.factory.config.{RuntimeBeanReference, BeanDefinition}
+import org.springframework.aop.config.AopConfigUtils
+import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource
+import org.springframework.transaction.interceptor.{BeanFactoryTransactionAttributeSourceAdvisor, TransactionInterceptor}
+import org.springframework.context.support.GenericApplicationContext
 
 /**
  * Defines additional FunctionalConfiguration elements for transaction support .
@@ -62,7 +17,7 @@ object TxSupport {
  * @since 1.0.0.M2
  * @see FunctionalConfiguration
  */
-trait TxSupport {
+trait TransactionSupport {
   self: FunctionalConfiguration =>
 
   /**
@@ -71,33 +26,33 @@ trait TxSupport {
    * Adds transactions around calls to methods annotated with @Transactional.
    * Should be used as follows:
    * {{{
-   * class Config extends FunctionalConfiguration with TxSupport {
+   * class Config extends FunctionalConfiguration with TransactionSupport {
    *   enableTransactionManagement()
    * }
    * }}}
    * which is equivalent to
    * {{{
    * <beans>
-   *   <tx:annotation-driven/>
+   * <tx:annotation-driven/>
    * </beans>
    * }}}
    * and
    * {{{
    * @Configuration
    * @EnableTransactionManagement
-   *   public class Config {}
+   * public class Config {}
    * }}}
    *
    * @param transactionMode one of [[org.springframework.scala.context.function.AspectJTransactionMode]]
    * or [[org.springframework.scala.context.function.ProxyTransactionMode]]. Defaults to
    * `ProxyTransactionMode`
    * @param transactionManagerName transaction manager bean name.
-   * Defaults to `TxSupport.DEFAULT_TRANSACTION_MANAGER_NAME`
+   * Defaults to `TransactionSupport.DEFAULT_TRANSACTION_MANAGER_NAME`
    * @param order order of transaction advice applied to `@Transactional` methods
    */
   def enableTransactionManagement(
                                    transactionMode: TransactionMode = ProxyTransactionMode(),
-                                   transactionManagerName: String = TxSupport.DEFAULT_TRANSACTION_MANAGER_NAME,
+                                   transactionManagerName: String = TransactionSupport.DEFAULT_TRANSACTION_MANAGER_NAME,
                                    order: Int = org.springframework.core.Ordered.LOWEST_PRECEDENCE
                                    ) {
 
@@ -169,4 +124,14 @@ trait TxSupport {
           setupAspectJTransactions
       })
   }
+}
+
+/**
+ * Used to store default transaction manager name.
+ *
+ * @author Maciej Zientarski
+ * @since 1.0.0.M2
+ */
+object TransactionSupport {
+  val DEFAULT_TRANSACTION_MANAGER_NAME = "transactionManager"
 }
