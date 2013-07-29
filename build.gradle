@@ -44,6 +44,7 @@ dependencies {
   testCompile("junit:junit:4.10")
   testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
   testRuntime("log4j:log4j:1.2.16")
+  testCompile("org.springframework:spring-aspects:$springVersion")
 }
 
 tasks.withType(ScalaCompile) {
