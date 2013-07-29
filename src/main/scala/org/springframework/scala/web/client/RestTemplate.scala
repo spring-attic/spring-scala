@@ -30,7 +30,6 @@ import scala.reflect.ClassTag
  * advantage of functions and Scala types.
  *
  * @author Arjen Poutsma
- * @author Ramnivas Laddad
  * @since 1.0
  * @constructor Creates a `RestTemplate` that wraps the given Java template, defaulting to the standard `RestTemplate`
  * @param javaTemplate the Java `RestTemplate` to wrap
@@ -77,6 +76,17 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
   }
 
   /**
+   * Retrieve a representation by doing a GET on the URL.
+   * The response (if any) is converted and returned.
+   *
+   * @param url the URL
+   * @return the converted object
+   */
+  def getForAny[T: ClassTag](url: URI): Option[T] = {
+    Option(javaTemplate.getForObject(url, typeToClass[T]))
+  }
+
+  /**
    * Retrieve an entity by doing a GET on the specified URL.
    * The response is converted and stored in an `ResponseEntity`.
    *
@@ -102,6 +112,15 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
     javaTemplate.getForEntity(url, typeToClass[T], uriVariables.asJava)
   }
 
+  /**
+   * Retrieve a representation by doing a GET on the URL .
+   * The response is converted and stored in an [[org.springframework.http.ResponseEntity]]}.
+   * @param url the URL
+   * @return the converted object
+   */
+  def getForEntity[T: ClassTag](url: URI): ResponseEntity[T] = {
+    javaTemplate.getForEntity(url, typeToClass[T])
+  }
 
   // HEAD
   /**
@@ -130,6 +149,14 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
     javaTemplate.headForHeaders(url, uriVariables.asJava)
   }
 
+  /**
+   * Retrieve all headers of the resource specified by the URL.
+   * @param url the URL
+   * @return all HTTP headers of that resource
+   */
+  def headForHeaders(url: URI): HttpHeaders = {
+    javaTemplate.headForHeaders(url)
+  }
 
   // POST
   /**
@@ -173,6 +200,22 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
   }
 
   /**
+   * Create a new resource by POSTing the given object to the URL, and returns the value of the `Location` header.
+   * This header typically indicates where the new resource is stored.
+   *
+   * The `request` parameter can be a [[org.springframework.http.HttpEntity]] in order to add additional HTTP headers
+   * to the request.
+   *
+   * @param url the URL
+   * @param request the Object to be POSTed
+   * @return the value for the `Location` header
+   * @see HttpEntity
+   */
+  def postForLocation(url: URI, request: Option[Any]): URI = {
+    javaTemplate.postForLocation(url, request.orNull)
+  }
+
+  /**
    * Create a new resource by POSTing the given object to the URI template, and returns the representation found in
    * the response.
    *
@@ -208,6 +251,22 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    */
   def postForObject[T: ClassTag](url: String, request: Option[Any], uriVariables: Map[String, _]): Option[T] = {
     Option(javaTemplate.postForObject(url, request.orNull, typeToClass[T], uriVariables.asJava))
+  }
+
+  /**
+   * Create a new resource by POSTing the given object to the URL, and returns the representation found in the
+   * response.
+   *
+   * The `request` parameter can be a [[org.springframework.http.HttpEntity]] in order to add additional HTTP headers
+   * to the request.
+   *
+   * @param url the URL
+   * @param request the Object to be POSTed
+   * @return the converted object
+   * @see HttpEntity
+   */
+  def postForObject[T: ClassTag](url: URI, request: Option[Any]): Option[T] = {
+    Option(javaTemplate.postForObject(url, request.orNull, typeToClass[T]))
   }
 
   /**
@@ -248,6 +307,23 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
     javaTemplate.postForEntity(url, request.orNull, typeToClass[T], uriVariables.asJava)
   }
 
+  /**
+   * Create a new resource by POSTing the given object to the URL, and returns the response as
+   * [[org.springframework.http.ResponseEntity]].
+   *
+   * The `request` parameter can be a [[org.springframework.http.HttpEntity]] in order to add additional HTTP headers
+   * to the request.
+   *
+   * @param url the URL
+   * @param request the Object to be POSTed, may be `null`
+   * @return the converted object
+   * @see HttpEntity
+   * @since 3.0.2
+   */
+  def postForEntity[T: ClassTag](url: URI, request: Option[Any]): ResponseEntity[T] = {
+    javaTemplate.postForEntity(url, request.orNull, typeToClass[T])
+  }
+
   // PUT
   /**
    * Create or update a resource by PUTting the given object to the URI.
@@ -283,6 +359,19 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
     javaTemplate.put(url, request.orNull, uriVariables.asJava)
   }
 
+  /**
+   * Creates a new resource by PUTting the given object to URL.
+   *
+   * The `request` parameter can be a [[org.springframework.http.HttpEntity]] in order to add additional HTTP headers
+   * to the request.
+   *
+   * @param url the URL
+   * @param request the Object to be PUT
+   * @see HttpEntity
+   */
+  def put(url: URI, request: Option[Any]) {
+    javaTemplate.put(url, request.orNull)
+  }
 
   // DELETE
   /**
@@ -308,6 +397,14 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
     javaTemplate.delete(url, uriVariables.asJava)
   }
 
+  /**
+   * Delete the resources at the specified URL.
+   *
+   * @param url the URL
+   */
+  def delete(url: URI) {
+    javaTemplate.delete(url)
+  }
 
   // OPTIONS
   /**
@@ -334,6 +431,16 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
    */
   def optionsForAllow(url: String, uriVariables: Map[String, _]): Set[HttpMethod] = {
     javaTemplate.optionsForAllow(url, uriVariables.asJava).asScala
+  }
+
+  /**
+   * Return the value of the Allow header for the given URL.
+   *
+   * @param url the URL
+   * @return the value of the allow header
+   */
+  def optionsForAllow(url: URI): Set[HttpMethod] = {
+    javaTemplate.optionsForAllow(url).asScala
   }
 
   // exchange
@@ -370,6 +477,18 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
     javaTemplate.exchange(url, method, requestEntity.orNull, typeToClass[T], uriVariables.asJava)
   }
 
+  /**
+   * Execute the HTTP method to the given URI template, writing the given request entity to the request, and
+   * returns the response as `ResponseEntity`.
+   *
+   * @param url the URL
+   * @param method the HTTP method (GET, POST, etc)
+   * @param requestEntity the entity (headers and/or body) to write to the request
+   * @return the response as entity
+   */
+  def exchange[T: ClassTag](url: URI, method: HttpMethod, requestEntity: Option[HttpEntity[_]]): ResponseEntity[T] = {
+    javaTemplate.exchange(url, method, requestEntity.orNull, typeToClass[T])
+  }
 
   // general execution
   /**
@@ -412,6 +531,24 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
     Option(javaTemplate
         .execute(url, method, functionToRequestCallback(requestFunction), functionToResponseExtractor(responseFunction),
       uriVariables.asJava))
+  }
+
+  /**
+   * Execute the HTTP method to the given URL, preparing the request with the given function, and reading the response
+   * with a function.
+   *
+   * @param url the URL
+   * @param method the HTTP method (GET, POST, etc)
+   * @param requestFunction function that prepares the request
+   * @param responseFunction function that extracts the return value from the response
+   * @return an arbitrary object, as returned by the response object
+   */
+  def execute[T](url: URI, method: HttpMethod)
+                (requestFunction: ClientHttpRequest => Unit)
+                (responseFunction: ClientHttpResponse => T): Option[T] = {
+    Option(javaTemplate.execute(url, method, functionToRequestCallback(requestFunction),
+      functionToResponseExtractor(responseFunction)))
+
   }
 
   private def asInstanceOfAnyRef(seq: Seq[Any]) = {
