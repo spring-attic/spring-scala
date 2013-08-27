@@ -9,6 +9,7 @@ apply plugin: 'propdeps-idea'
 apply plugin: 'propdeps-eclipse'
 
 group 'org.springframework.scala'
+archivesBaseName = "spring-scala_2.10"
 
 ext {
   springVersion = '3.2.4.RELEASE'
