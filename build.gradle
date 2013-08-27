@@ -11,7 +11,7 @@ apply plugin: 'propdeps-eclipse'
 group 'org.springframework.scala'
 
 ext {
-  springVersion = '3.2.2.RELEASE'
+  springVersion = '3.2.4.RELEASE'
   scalaVersion = '2.10.2'
 }
 
@@ -31,7 +31,6 @@ dependencies {
   optional("org.springframework:spring-test:$springVersion")
 
   // Scala
-//  scalaTools("org.scala-lang:scala-compiler:$scalaVersion")
   compile("org.scala-lang:scala-library:$scalaVersion")
   compile("org.scala-lang:scala-reflect:$scalaVersion")
 
@@ -54,7 +53,7 @@ tasks.withType(ScalaCompile) {
 
 task wrapper(type: Wrapper) {
   description = 'Generates gradlew[.bat] scripts'
-  gradleVersion = '1.6'
+  gradleVersion = '1.7'
 }
 
 buildscript {
