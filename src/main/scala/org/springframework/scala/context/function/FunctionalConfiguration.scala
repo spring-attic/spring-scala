@@ -185,20 +185,20 @@ trait FunctionalConfiguration extends DelayedInit {
 	 * @param aliases aliases for the bean, if any
 	 * @param lazyInit whether the bean is to be lazily initialized. Defaults to ``false``.
 	 * @param beanFunction the bean creation function
-	 * @return the singleton instance of the registered bean
+	 * @return a function that returns the registered bean
 	 * @tparam T the bean type
 	 */
 	protected def singleton[T: ClassTag](name: String = "",
 	                                     aliases: Seq[String] = Seq(),
 	                                     lazyInit: Boolean = false)
-	                                    (beanFunction: => T): T = {
+	                                    (beanFunction: => T): BeanLookupFunction[T] = {
 
 		registerBean(name,
 		             typeToClass[T],
 		             aliases,
 		             ConfigurableBeanFactory.SCOPE_SINGLETON,
 		             lazyInit,
-		             beanFunction _).apply()
+		             beanFunction _)
 	}
 
 	/**

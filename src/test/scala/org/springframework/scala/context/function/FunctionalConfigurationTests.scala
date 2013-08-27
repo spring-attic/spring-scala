@@ -78,7 +78,7 @@ class FunctionalConfigurationTests extends FunSuite with BeforeAndAfterEach {
 
 		config.register(applicationContext, beanNameGenerator)
 
-		val beanFromConfig: Person = config.foo
+		val beanFromConfig: Person = config.foo()
 		val beanFromBeanFactory = applicationContext.getBean("foo", classOf[Person])
 		assert(beanFromConfig eq beanFromBeanFactory)
 		assert(1 == count)
