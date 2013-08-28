@@ -37,16 +37,20 @@ import scala.reflect.ClassTag
  * container.
  * For example:
  * {{{
- *   class PersonConfiguration extends FunctionalConfiguration {
- *     bean() {
- *       new Person("John", "Doe")
- *     }
+ * class PersonConfiguration extends FunctionalConfiguration {
+ *   bean() {
+ *     new Person("John", "Doe")
+ *   }
  * }
  * }}}
  *
  * Besides the `bean` method, the `FunctionalConfiguration` trait also offers methods to
  * register singletons, prototypes, importing XML or `@Configuration` classes, bean
  * profiles and more.
+ *
+ * @note Extending this trait in a sub-trait can give initialization issues, due to the
+ *       nature of the [[scala.DelayedInit]] trait used. Therefore, make sure to '''extend
+ *       this trait in a class'''.
  *
  * @author Arjen Poutsma
  */
