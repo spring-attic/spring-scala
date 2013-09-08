@@ -14,9 +14,11 @@ archivesBaseName = "spring-scala_2.10"
 ext {
   springVersion = '3.2.4.RELEASE'
   scalaVersion = '2.10.2'
+  jacksonModuleScalaVersion = '2.1.2'
 }
 
 repositories {
+  mavenCentral()
   maven { url "http://repo.springsource.org/libs-snapshot" }
 }
 
@@ -34,6 +36,9 @@ dependencies {
   // Scala
   compile("org.scala-lang:scala-library:$scalaVersion")
   compile("org.scala-lang:scala-reflect:$scalaVersion")
+
+  // Jackson
+  optional("com.fasterxml.jackson.module:jackson-module-scala:$jacksonModuleScalaVersion")
 
   // Java EE
   provided("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1")

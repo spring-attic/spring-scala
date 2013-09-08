@@ -24,6 +24,9 @@ import org.springframework.http.client.{ClientHttpRequest, ClientHttpRequestFact
 import org.springframework.http.{HttpHeaders, HttpEntity, ResponseEntity, HttpMethod}
 import org.springframework.scala.util.TypeTagUtils.typeToClass
 import scala.reflect.ClassTag
+import org.springframework.util.ClassUtils
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
 /**
  * Scala-based convenience wrapper for the Spring [[org.springframework.web.client.RestTemplate]], taking
@@ -37,6 +40,13 @@ import scala.reflect.ClassTag
 class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperations =
                    new org.springframework.web.client.RestTemplate) {
 
+  if (RestTemplate.jackson2Present && RestTemplate.jacksonScalaModulePresent) {
+    import scala.collection.JavaConversions._
+
+    val messageCoverters = javaTemplate.asInstanceOf[org.springframework.web.client.RestTemplate].getMessageConverters()
+    val converterOption = messageCoverters.collectFirst { case c:MappingJackson2HttpMessageConverter => c }
+    converterOption.foreach(_.getObjectMapper().registerModule(DefaultScalaModule))
+  }
   /**
    * Create a new instance of the `RestTemplate` given the ClientHttpRequestFactory to obtain requests from
    *
@@ -568,4 +578,13 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
     }
 
 
+}
+
+object RestTemplate {
+  private val jacksonScalaModulePresent =
+    ClassUtils.isPresent("com.fasterxml.jackson.module.scala.DefaultScalaModule", classOf[RestTemplate].getClassLoader());
+
+  private val jackson2Present =
+    ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", classOf[RestTemplate].getClassLoader()) &&
+	  ClassUtils.isPresent("com.fasterxml.jackson.core.JsonGenerator", classOf[RestTemplate].getClassLoader());
 }
