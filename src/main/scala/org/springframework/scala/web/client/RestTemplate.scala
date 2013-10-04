@@ -24,6 +24,7 @@ import org.springframework.http.{HttpHeaders, HttpEntity, ResponseEntity, HttpMe
 import org.springframework.scala.util.TypeTagUtils.typeToClass
 import org.springframework.util.ClassUtils
 import org.springframework.web.client.{RequestCallback, ResponseExtractor}
+import scala.collection.JavaConverters._
 import scala.collection.{Map, Set}
 import scala.reflect.ClassTag
 
