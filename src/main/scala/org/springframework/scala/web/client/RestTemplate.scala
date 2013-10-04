@@ -16,13 +16,15 @@
 
 package org.springframework.scala.web.client
 
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import java.net.URI
-import scala.collection.{Map, Set}
-import scala.collection.JavaConverters._
-import org.springframework.web.client.{RequestCallback, ResponseExtractor}
 import org.springframework.http.client.{ClientHttpRequest, ClientHttpRequestFactory, ClientHttpResponse}
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.http.{HttpHeaders, HttpEntity, ResponseEntity, HttpMethod}
 import org.springframework.scala.util.TypeTagUtils.typeToClass
+import org.springframework.util.ClassUtils
+import org.springframework.web.client.{RequestCallback, ResponseExtractor}
+import scala.collection.{Map, Set}
 import scala.reflect.ClassTag
 
 /**
@@ -36,6 +38,14 @@ import scala.reflect.ClassTag
  */
 class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperations =
                    new org.springframework.web.client.RestTemplate) {
+
+	if (RestTemplate.jackson2Present && RestTemplate.jacksonScalaModulePresent) {
+		val messageConverters = javaTemplate
+				.asInstanceOf[org.springframework.web.client.RestTemplate].getMessageConverters.asScala
+	    val converterOption = messageConverters.collectFirst { case c:MappingJackson2HttpMessageConverter => c }
+	    converterOption.foreach(_.getObjectMapper.registerModule(DefaultScalaModule))
+	}
+
 
   /**
    * Create a new instance of the `RestTemplate` given the ClientHttpRequestFactory to obtain requests from
@@ -567,5 +577,17 @@ class RestTemplate(val javaTemplate: org.springframework.web.client.RestOperatio
       def extractData(response: ClientHttpResponse): T = function(response)
     }
 
+}
 
+object RestTemplate {
+
+	private val jacksonScalaModulePresent =
+		ClassUtils.isPresent("com.fasterxml.jackson.module.scala.DefaultScalaModule",
+		                     classOf[RestTemplate].getClassLoader)
+
+	private val jackson2Present =
+		ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper",
+		                     classOf[RestTemplate].getClassLoader) &&
+				ClassUtils.isPresent("com.fasterxml.jackson.core.JsonGenerator",
+				                     classOf[RestTemplate].getClassLoader);
 }

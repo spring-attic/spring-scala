@@ -14,6 +14,7 @@ archivesBaseName = "spring-scala_2.10"
 ext {
   springVersion = '3.2.4.RELEASE'
   scalaVersion = '2.10.2'
+  scalaLibVersion = '2.10'
 }
 
 repositories {
@@ -35,12 +36,15 @@ dependencies {
   compile("org.scala-lang:scala-library:$scalaVersion")
   compile("org.scala-lang:scala-reflect:$scalaVersion")
 
+  // Jackson
+  optional("com.fasterxml.jackson.module:jackson-module-scala_$scalaLibVersion:2.2.3")
+
   // Java EE
   provided("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1")
   provided("javax.servlet:servlet-api:2.5")
 
   // Test
-  testCompile("org.scalatest:scalatest_2.10:1.9.1")
+  testCompile("org.scalatest:scalatest_$scalaLibVersion:1.9.1")
   testCompile("junit:junit:4.10")
   testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
   testRuntime("log4j:log4j:1.2.16")
