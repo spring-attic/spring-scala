@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import scala.collection.mutable.{ListBuffer, SynchronizedMap, HashMap}
 import scala.Predef._
 import scala.AnyRef
 import scala.Some
+import scala.collection.mutable
 
 /**
  * [[org.springframework.beans.factory.config.BeanPostProcessor]] implementation
@@ -42,11 +43,11 @@ import scala.Some
 class InitDestroyFunctionBeanPostProcessor
 		extends DestructionAwareBeanPostProcessor with PriorityOrdered {
 
-	val initFunctions = new HashMap[String, ListBuffer[Function1[Any, Unit]]]
-			with SynchronizedMap[String, ListBuffer[Function1[Any, Unit]]]
+	val initFunctions = new mutable.HashMap[String, ListBuffer[Function1[Any, Unit]]]
+			with mutable.SynchronizedMap[String, ListBuffer[Function1[Any, Unit]]]
 
-	val destroyFunctions = new HashMap[String, ListBuffer[Function1[Any, Unit]]]
-			with SynchronizedMap[String, ListBuffer[Function1[Any, Unit]]]
+	val destroyFunctions = new mutable.HashMap[String, ListBuffer[Function1[Any, Unit]]]
+			with mutable.SynchronizedMap[String, ListBuffer[Function1[Any, Unit]]]
 
 	@BeanProperty
 	var order: Int = org.springframework.core.Ordered.LOWEST_PRECEDENCE

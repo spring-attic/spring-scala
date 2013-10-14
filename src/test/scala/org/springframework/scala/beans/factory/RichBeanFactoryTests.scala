@@ -19,10 +19,13 @@ package org.springframework.scala.beans.factory
 import org.springframework.beans.factory.support.StaticListableBeanFactory
 import org.scalatest.FunSuite
 import BeanFactoryConversions._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
 /**
  * @author Arjen Poutsma
  */
+@RunWith(classOf[JUnitRunner])
 class RichBeanFactoryTests extends FunSuite {
 
 	val beanFactory = new StaticListableBeanFactory()
