@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.scala.beans.factory.annotation
+package org.springframework.scala.context.annotation
 
 import java.lang.reflect.Constructor
 import org.springframework.beans.factory.annotation.{AutowiredAnnotationBeanPostProcessor, Autowired}

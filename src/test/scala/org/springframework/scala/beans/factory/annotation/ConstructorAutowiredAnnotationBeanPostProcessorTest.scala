@@ -20,6 +20,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scala.context.annotation.ConstructorAutowiredAnnotationBeanPostProcessor
 
 /** @author Stephen Samuel */
 @RunWith(classOf[JUnitRunner])
