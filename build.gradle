@@ -42,6 +42,7 @@ dependencies {
   // Java EE
   provided("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1")
   provided("javax.servlet:servlet-api:2.5")
+  provided("javax.inject:javax.inject:1")
 
   // Test
   testCompile("org.scalatest:scalatest_$scalaLibVersion:1.9.1")
