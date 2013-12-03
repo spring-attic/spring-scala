@@ -16,11 +16,13 @@
 
 package org.springframework.scala.beans;
 
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.lang.reflect.Method;
 
 import org.springframework.beans.BeanInfoFactory;
+import org.springframework.core.Ordered;
 
 /**
  * Implementation of the {@code BeanInfoFactory} interface for Scala beans.
@@ -32,7 +34,7 @@ import org.springframework.beans.BeanInfoFactory;
  *
  * @author Arjen Poutsma
  */
-public class ScalaBeanInfoFactory implements BeanInfoFactory {
+public class ScalaBeanInfoFactory implements Ordered, BeanInfoFactory {
 
 	@Override
 	public BeanInfo getBeanInfo(Class<?> beanClass) throws IntrospectionException {
@@ -49,4 +51,8 @@ public class ScalaBeanInfoFactory implements BeanInfoFactory {
 		return false;
 	}
 
+	@Override
+	public int getOrder() {
+		return Ordered.LOWEST_PRECEDENCE - 1000;
+	}
 }
