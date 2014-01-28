@@ -301,6 +301,22 @@ class FunctionalConfigurationTests extends FunSuite with BeforeAndAfterEach {
 		assert("Doe" == config.john().lastName)
  	}
 
+	test("importClass via tag") {
+		val config = new FunctionalConfiguration() {
+
+			importClass[MyAnnotatedConfiguration]()
+
+			val john = bean() {
+				new Person(getBean[String]("firstName"), getBean[String]("lastName"))
+			}
+		}
+		config.register(applicationContext, beanNameGenerator)
+		applicationContext.refresh()
+
+		assert("John" == config.john().firstName)
+		assert("Doe" == config.john().lastName)
+	}
+
 	test("beanPostProcessor") {
 		val config = new FunctionalConfiguration {
 
