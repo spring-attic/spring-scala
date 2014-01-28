@@ -281,6 +281,16 @@ trait FunctionalConfiguration extends DelayedInit {
 	}
 
 	/**
+	* Convenience version of the ``importClass(annotatedClasses: Class[_]*)`` method using class tag instead of class
+	* literal.
+	*
+	* @tparam T configuration class to import
+ 	*/
+	protected def importClass[T : ClassTag]() {
+		importClass(typeToClass[T])
+	}
+
+	/**
 	 * Registers this functional configuration class with the given application context.
 	 *
 	 * @param applicationContext the application context
