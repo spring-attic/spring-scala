@@ -281,6 +281,16 @@ trait FunctionalConfiguration extends DelayedInit {
 	}
 
 	/**
+	 * Imports one ``@Configuration`` class containing ``@Bean`` definitions using a
+	 * class tag.
+
+	 * @tparam T ``@Configuration`` class to import
+	 */
+	protected def importClass[T: ClassTag]() {
+		importClass(typeToClass[T])
+	}
+
+	/**
 	 * Registers this functional configuration class with the given application context.
 	 *
 	 * @param applicationContext the application context
