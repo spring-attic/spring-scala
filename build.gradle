@@ -59,7 +59,7 @@ tasks.withType(ScalaCompile) {
 
 task wrapper(type: Wrapper) {
   description = 'Generates gradlew[.bat] scripts'
-  gradleVersion = '1.7'
+  gradleVersion = '1.10'
 }
 
 buildscript {
