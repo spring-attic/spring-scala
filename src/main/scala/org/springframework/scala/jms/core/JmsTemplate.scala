@@ -16,9 +16,8 @@
 
 package org.springframework.scala.jms.core
 
-import org.springframework.jms.core.{BrowserCallback, MessagePostProcessor, MessageCreator, JmsOperations}
-import javax.jms.{Queue, QueueBrowser, Destination, Message, Session, ConnectionFactory}
-import org.springframework.jms.core.{BrowserCallback, MessagePostProcessor, MessageCreator, JmsOperations}
+import javax.jms.{Queue, QueueBrowser, Destination, Message, Session, ConnectionFactory, MessageProducer}
+import org.springframework.jms.core.{BrowserCallback, MessageCreator, MessagePostProcessor, JmsOperations, SessionCallback, ProducerCallback}
 
 /**
  * Scala-based convenience wrapper for the Spring [[org.springframework.jms.core.JmsTemplate]], taking
@@ -405,9 +404,39 @@ class JmsTemplate(val javaTemplate: JmsOperations) {
 		javaTemplate.browse(queueName, functionToBrowserCallback(function))
 	}
 
+	/**
+	 * Execute the action specified by the given action object within a JMS Session.
+	 *
+	 * @param function function that exposes the session
+	 * @return the result object from working with the session
+	 * @throws JmsException if there is any problem
+	 */
+	def execute[T](function: Session => T): T = {
+		javaTemplate.execute(new SessionCallback[T] {
+			override def doInJms(session: Session): T = function(session)
+		})
+	}
+
+	/**
+	 * Send messages to the default JMS destination (or one specified
+	 * for each send operation). The callback gives access to the JMS Session
+	 * and MessageProducer in order to perform complex send operations.
+	 *
+	 * @param function function that exposes the session/producer pair
+	 * @return the result object from working with the session
+	 * @throws JmsException checked JMSException converted to unchecked
+	 */
+	def execute[T](function: (Session, MessageProducer) => T): T = {
+		javaTemplate.execute(new ProducerCallback[T] {
+			override def doInJms(session: Session, producer: MessageProducer): T =
+				function(session, producer)
+		})
+	}
+
 	private def functionToBrowserCallback[T](function: (Session, QueueBrowser) => T): BrowserCallback[T] =
 		new BrowserCallback[T] {
-			def doInJms(session: Session, browser: QueueBrowser) = function(session, browser)
+			def doInJms(session: Session, browser: QueueBrowser) = function(session,
+			                                                                browser)
 		}
 
 }
