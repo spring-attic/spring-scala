@@ -13,7 +13,7 @@ archivesBaseName = "spring-scala_2.10"
 
 ext {
   springVersion = '3.2.4.RELEASE'
-  scalaVersion = '2.10.3'
+  scalaVersion = '2.10.4'
   scalaLibVersion = '2.10'
 }
 
@@ -59,7 +59,7 @@ tasks.withType(ScalaCompile) {
 
 task wrapper(type: Wrapper) {
   description = 'Generates gradlew[.bat] scripts'
-  gradleVersion = '1.10'
+  gradleVersion = '1.11'
 }
 
 buildscript {
