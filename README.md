@@ -23,8 +23,8 @@ For Maven users:
     ...
     <dependency>
         <groupId>org.springframework.scala</groupId>
-        <artifactId>spring-scala</artifactId>
-        <version>1.0.0.M2</version>
+        <artifactId>spring-scala_2.10</artifactId>
+        <version>1.0.0.RC1</version>
     </dependency>
     
 ## Snapshots
@@ -41,7 +41,7 @@ For Maven users:
     ...
     <dependency>
         <groupId>org.springframework.scala</groupId>
-        <artifactId>spring-scala</artifactId>
+        <artifactId>spring-scala_2.10</artifactId>
         <version>1.0.0.BUILD-SNAPSHOT</version>
     </dependency>
 
