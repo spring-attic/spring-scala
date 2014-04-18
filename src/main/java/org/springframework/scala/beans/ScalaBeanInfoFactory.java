@@ -21,18 +21,19 @@ import java.beans.IntrospectionException;
 import java.lang.reflect.Method;
 
 import org.springframework.beans.BeanInfoFactory;
+import org.springframework.core.Ordered;
 
 /**
  * Implementation of the {@code BeanInfoFactory} interface for Scala beans.
- * <p>
- * The {@link BeanInfo} returned from {@link #getBeanInfo(Class)} includes {@linkplain
+ *
+ * <p>The {@link BeanInfo} returned from {@link #getBeanInfo(Class)} includes {@linkplain
  * java.beans.BeanInfo#getPropertyDescriptors() property descriptors} for "normal"
  * JavaBean properties as well as Scala properties (i.e. setter methods that end with
  * {@code _$eq}).
  *
  * @author Arjen Poutsma
  */
-public class ScalaBeanInfoFactory implements BeanInfoFactory {
+public class ScalaBeanInfoFactory implements BeanInfoFactory, Ordered {
 
 	@Override
 	public BeanInfo getBeanInfo(Class<?> beanClass) throws IntrospectionException {
@@ -49,4 +50,8 @@ public class ScalaBeanInfoFactory implements BeanInfoFactory {
 		return false;
 	}
 
+	@Override
+	public int getOrder() {
+		return Ordered.LOWEST_PRECEDENCE - 1000;
+	}
 }
