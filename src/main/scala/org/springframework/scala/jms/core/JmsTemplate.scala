@@ -16,8 +16,9 @@
 
 package org.springframework.scala.jms.core
 
-import javax.jms.{Queue, QueueBrowser, Destination, Message, Session, ConnectionFactory, MessageProducer}
-import org.springframework.jms.core.{BrowserCallback, MessageCreator, MessagePostProcessor, JmsOperations, SessionCallback, ProducerCallback}
+import javax.jms.{ConnectionFactory, Destination, Message, MessageProducer, Queue, QueueBrowser, Session}
+
+import org.springframework.jms.core.{BrowserCallback, JmsOperations, MessageCreator, MessagePostProcessor, ProducerCallback, SessionCallback}
 
 /**
  * Scala-based convenience wrapper for the Spring [[org.springframework.jms.core.JmsTemplate]], taking
@@ -129,7 +130,7 @@ class JmsTemplate(val javaTemplate: JmsOperations) {
 	 * @throws JmsException checked JMSException converted to unchecked
 	 * @note This will only work with a default destination specified!
 	 */
-	def convertAndSend(message: Any)(function: Message => Message) {
+	def convertModifyAndSend(message: Any)(function: Message => Message) {
 		javaTemplate.convertAndSend(message, functionToMessagePostProcessor(function))
 	}
 
@@ -143,7 +144,7 @@ class JmsTemplate(val javaTemplate: JmsOperations) {
 	 * @param function the function to modify the message
 	 * @throws JmsException checked JMSException converted to unchecked
 	 */
-	def convertAndSend(destination: Destination, message: Any)(function: Message => Message) {
+	def convertModifyAndSend(destination: Destination, message: Any)(function: Message => Message) {
 		javaTemplate.convertAndSend(message, functionToMessagePostProcessor(function))
 	}
 
@@ -158,7 +159,7 @@ class JmsTemplate(val javaTemplate: JmsOperations) {
 	 * @param function the function to modify the message
 	 * @throws JmsException checked JMSException converted to unchecked
 	 */
-	def convertAndSend(destinationName: String, message: Any)(function: Message => Message) {
+	def convertModifyAndSend(destinationName: String, message: Any)(function: Message => Message) {
 		javaTemplate.convertAndSend(destinationName, message,
 		                            functionToMessagePostProcessor(function))
 	}
