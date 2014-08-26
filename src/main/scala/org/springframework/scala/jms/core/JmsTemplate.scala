@@ -18,7 +18,8 @@ package org.springframework.scala.jms.core
 
 import javax.jms.{ConnectionFactory, Destination, Message, MessageProducer, Queue, QueueBrowser, Session}
 
-import org.springframework.jms.core.{BrowserCallback, JmsOperations, MessageCreator, MessagePostProcessor, ProducerCallback, SessionCallback}
+import org.springframework.jms.JmsException
+import org.springframework.jms.core.{JmsTemplate => JavaTemplate, _}
 
 /**
  * Scala-based convenience wrapper for the Spring [[org.springframework.jms.core.JmsTemplate]], taking
@@ -29,7 +30,7 @@ import org.springframework.jms.core.{BrowserCallback, JmsOperations, MessageCrea
  * @constructor Creates a `JmsTemplate` that wraps the given Java template
  * @param javaTemplate the Java `JmsTemplate` to wrap
  */
-class JmsTemplate(val javaTemplate: JmsOperations) {
+class JmsTemplate(val javaTemplate: JavaTemplate) {
 
 	/**
 	 * Create a new JmsTemplate, given a ConnectionFactory.
