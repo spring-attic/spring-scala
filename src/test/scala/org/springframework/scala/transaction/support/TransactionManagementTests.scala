@@ -39,7 +39,7 @@ class TransactionManagementTests extends FunSuite with TransactionManagement {
         template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", 3.asInstanceOf[Integer], "John", "Johnson")
       }
     }
-    expectResult(1) {
+    assertResult(1) {
       template.queryForObject("SELECT COUNT(ID) FROM USERS WHERE ID = 3", classOf[Integer])
     }
   }
@@ -50,7 +50,7 @@ class TransactionManagementTests extends FunSuite with TransactionManagement {
         template.update("INSERT INTO USERS(ID, FIRST_NAME, LAST_NAME) VALUES (:id, :first_name, :last_name)", 4.asInstanceOf[Integer], "John", "Johnson")
       }
     }
-    expectResult(1) {
+    assertResult(1) {
       template.queryForObject("SELECT COUNT(ID) FROM USERS WHERE ID = 4", classOf[Integer])
     }
 

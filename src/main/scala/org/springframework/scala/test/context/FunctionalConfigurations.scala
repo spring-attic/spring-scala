@@ -21,7 +21,7 @@ import org.springframework.util.ClassUtils.{getDefaultClassLoader => defaultClas
 import scala.annotation.StaticAnnotation
 import scala.reflect.runtime.universe.typeOf
 import scala.reflect.runtime.universe.Constant
-import scala.reflect.runtime.universe.nme
+import scala.reflect.runtime.universe.termNames
 import scala.reflect.runtime.universe.runtimeMirror
 import scala.reflect.runtime.universe.TypeRef
 
@@ -61,13 +61,13 @@ object FunctionalConfigurations {
     val configurationsAnnotationType = typeOf[FunctionalConfigurations]
     val testClassSymbol = mirror.classSymbol(testClass)
 
-    testClassSymbol.annotations.find(_.tpe == configurationsAnnotationType) match {
+    testClassSymbol.annotations.find(_.tree.tpe == configurationsAnnotationType) match {
       case Some(annotation) => {
-        val configurationsAnnotationArgs = annotation.scalaArgs.map {
+        val configurationsAnnotationArgs = annotation.tree.children.tail.map {
           arg => mirror.runtimeClass(arg.productElement(0).asInstanceOf[Constant].value.asInstanceOf[TypeRef])
         }
         val annotationMirror = mirror.reflectClass(configurationsAnnotationType.typeSymbol.asClass)
-        val constructorSymbol = configurationsAnnotationType.declaration(nme.CONSTRUCTOR).asMethod
+        val constructorSymbol = configurationsAnnotationType.decl(termNames.CONSTRUCTOR).asMethod
         val constructorMirror = annotationMirror.reflectConstructor(constructorSymbol)
         constructorMirror(configurationsAnnotationArgs.seq).asInstanceOf[FunctionalConfigurations].classes
       }

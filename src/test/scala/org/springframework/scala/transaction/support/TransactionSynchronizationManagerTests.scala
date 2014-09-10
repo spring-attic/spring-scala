@@ -16,7 +16,7 @@
 
 package org.springframework.scala.transaction.support
 
-import org.scalatest.FunSuite
+import org.scalatest.{Matchers, FunSuite}
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ import org.scalatest.matchers.ShouldMatchers
 import org.springframework.transaction.support.TransactionSynchronization
 
 @RunWith(classOf[JUnitRunner])
-class TransactionSynchronizationManagerTests extends FunSuite with ShouldMatchers with TransactionManagement {
+class TransactionSynchronizationManagerTests extends FunSuite with Matchers with TransactionManagement {
 
   private val db = new EmbeddedDatabaseBuilder().addDefaultScripts().build()
 

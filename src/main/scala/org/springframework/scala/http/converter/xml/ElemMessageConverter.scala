@@ -18,7 +18,7 @@ package org.springframework.scala.http.converter.xml
 
 import org.springframework.http.converter.AbstractHttpMessageConverter
 import org.springframework.http.{MediaType, HttpInputMessage, HttpOutputMessage}
-import xml.{XML, Elem}
+import scala.xml.{XML, Elem}
 import java.nio.charset.Charset
 import java.io.OutputStreamWriter
 
