@@ -16,7 +16,7 @@
 
 package org.springframework.scala.beans.propertyeditors
 
-import scala.reflect.BeanProperty
+import scala.beans.BeanProperty
 
 class CollectionsBean {
 

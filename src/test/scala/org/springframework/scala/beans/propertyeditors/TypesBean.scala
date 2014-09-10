@@ -16,8 +16,8 @@
 
 package org.springframework.scala.beans.propertyeditors
 
-import reflect.BeanProperty
-import util.matching.Regex
+import scala.beans.BeanProperty
+import scala.util.matching.Regex
 
 /**
  * @author Arjen Poutsma

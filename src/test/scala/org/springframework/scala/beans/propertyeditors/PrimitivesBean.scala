@@ -16,7 +16,7 @@ package org.springframework.scala.beans.propertyeditors
  * limitations under the License.
  */
 
-import reflect.BeanProperty
+import scala.beans.BeanProperty
 
 /**
  * @author Arjen Poutsma

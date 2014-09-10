@@ -16,7 +16,7 @@
 
 package org.springframework.scala.beans
 
-import scala.reflect.BeanProperty
+import scala.beans.BeanProperty
 
 class ScalaBean {
 
