@@ -18,7 +18,7 @@ package org.springframework.scala.beans.factory.function
 
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
 import org.springframework.core.PriorityOrdered
-import scala.reflect.BeanProperty
+import scala.beans.BeanProperty
 import org.springframework.util.{StringUtils, Assert}
 import scala.collection.mutable.{ListBuffer, SynchronizedMap, HashMap}
 import scala.Predef._
