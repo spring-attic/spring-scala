@@ -9,12 +9,12 @@ apply plugin: 'propdeps-idea'
 apply plugin: 'propdeps-eclipse'
 
 group 'org.springframework.scala'
-archivesBaseName = "spring-scala_2.10"
+archivesBaseName = "spring-scala_2.11"
 
 ext {
   springVersion = '3.2.4.RELEASE'
-  scalaVersion = '2.10.4'
-  scalaLibVersion = '2.10'
+  scalaVersion = '2.11.2'
+  scalaLibVersion = '2.11'
 }
 
 repositories {
@@ -35,9 +35,11 @@ dependencies {
   // Scala
   compile("org.scala-lang:scala-library:$scalaVersion")
   compile("org.scala-lang:scala-reflect:$scalaVersion")
+  //needs to be as separate jar file for scala 2.11
+  compile("org.scala-lang.modules:scala-xml_$scalaLibVersion:1.0.2")
 
   // Jackson
-  optional("com.fasterxml.jackson.module:jackson-module-scala_$scalaLibVersion:2.2.3")
+  optional("com.fasterxml.jackson.module:jackson-module-scala_$scalaLibVersion:2.4.2")
 
   // Java EE
   provided("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1")
@@ -45,7 +47,7 @@ dependencies {
   provided("javax.inject:javax.inject:1")
 
   // Test
-  testCompile("org.scalatest:scalatest_$scalaLibVersion:1.9.1")
+  testCompile("org.scalatest:scalatest_$scalaLibVersion:2.2.2")
   testCompile("junit:junit:4.10")
   testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
   testRuntime("log4j:log4j:1.2.16")
@@ -59,7 +61,7 @@ tasks.withType(ScalaCompile) {
 
 task wrapper(type: Wrapper) {
   description = 'Generates gradlew[.bat] scripts'
-  gradleVersion = '1.11'
+  gradleVersion = '2.1'
 }
 
 buildscript {
@@ -67,6 +69,6 @@ buildscript {
         maven { url 'http://repo.springsource.org/plugins-release' }
     }
     dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.3'
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
     }
 }

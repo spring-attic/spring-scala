@@ -16,15 +16,13 @@
 
 package org.springframework.scala.beans.factory.function
 
+import scala.beans.BeanProperty
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
 import org.springframework.core.PriorityOrdered
-import scala.reflect.BeanProperty
-import org.springframework.util.{StringUtils, Assert}
-import scala.collection.mutable.{ListBuffer, SynchronizedMap, HashMap}
-import scala.Predef._
-import scala.AnyRef
-import scala.Some
-import scala.collection.mutable
+import org.springframework.util.{Assert, StringUtils}
 
 /**
  * [[org.springframework.beans.factory.config.BeanPostProcessor]] implementation
@@ -44,10 +42,8 @@ class InitDestroyFunctionBeanPostProcessor
 		extends DestructionAwareBeanPostProcessor with PriorityOrdered {
 
 	val initFunctions = new mutable.HashMap[String, ListBuffer[Function1[Any, Unit]]]
-			with mutable.SynchronizedMap[String, ListBuffer[Function1[Any, Unit]]]
 
 	val destroyFunctions = new mutable.HashMap[String, ListBuffer[Function1[Any, Unit]]]
-			with mutable.SynchronizedMap[String, ListBuffer[Function1[Any, Unit]]]
 
 	@BeanProperty
 	var order: Int = org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -86,7 +82,7 @@ class InitDestroyFunctionBeanPostProcessor
 		addFunction(destroyFunctions, beanName, destroyFunction.asInstanceOf[Function1[Any, Unit]])
 	}
 
-	private def addFunction(functionsMap: HashMap[String, ListBuffer[Function1[Any, Unit]]],
+	private def addFunction(functionsMap: mutable.HashMap[String, ListBuffer[Function1[Any, Unit]]],
 	                        beanName: String,
 	                        function: (Any) => Unit) {
 

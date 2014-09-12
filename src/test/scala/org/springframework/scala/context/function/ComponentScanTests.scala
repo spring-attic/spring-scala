@@ -18,7 +18,7 @@ package org.springframework.scala.context.function
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.{GivenWhenThen, FunSuite}
+import org.scalatest.{Matchers, GivenWhenThen, FunSuite}
 import org.scalatest.matchers.ShouldMatchers
 import org.springframework.stereotype.Component
 import org.springframework.context.annotation.{AnnotationScopeMetadataResolver, ScopedProxyMode}
@@ -27,7 +27,7 @@ import java.util.regex.Pattern
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 
 @RunWith(classOf[JUnitRunner])
-class ComponentScanTests extends FunSuite with ShouldMatchers with GivenWhenThen {
+class ComponentScanTests extends FunSuite with Matchers with GivenWhenThen {
 
   // Fixtures
 
@@ -59,9 +59,9 @@ class ComponentScanTests extends FunSuite with ShouldMatchers with GivenWhenThen
 
   test("should validate conflicting scope configuration") {
     When("loaded config")
-    evaluating {
+	an [IllegalArgumentException] should be thrownBy {
       FunctionalConfigApplicationContext[ScopeConflictComponentScanConfig]
-    } should produce[IllegalArgumentException]
+    }
   }
 
   test("should exclude from scan") {
@@ -69,9 +69,9 @@ class ComponentScanTests extends FunSuite with ShouldMatchers with GivenWhenThen
     context = FunctionalConfigApplicationContext[ExcludingComponentScanConfig]
 
     When("scanned component is retrieved")
-    evaluating {
+    an [NoSuchBeanDefinitionException] should be thrownBy {
       context.getBean(classOf[TestComponent])
-    } should produce[NoSuchBeanDefinitionException]
+    }
   }
 
   test("should include in scan") {
@@ -82,7 +82,7 @@ class ComponentScanTests extends FunSuite with ShouldMatchers with GivenWhenThen
     val scannedComponent = context.getBean(classOf[TestComponent])
 
     Then("component should not be null")
-    scannedComponent should not be (null)
+    scannedComponent should not be null
   }
 
 }

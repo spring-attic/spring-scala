@@ -16,21 +16,22 @@
 
 package org.springframework.scala.context.function
 
-import org.springframework.scala.beans.factory.function.{InitDestroyFunctionBeanPostProcessor, FunctionalRootBeanDefinition}
+import scala.collection.mutable.ListBuffer
+import scala.reflect.ClassTag
+import scala.reflect.runtime.currentMirror
+import scala.reflect.runtime.universe._
+
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.config.{BeanDefinition, BeanDefinitionHolder, ConfigurableBeanFactory}
+import org.springframework.beans.factory.support.{BeanDefinitionReaderUtils, BeanDefinitionRegistry, BeanNameGenerator, RootBeanDefinition}
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.core.env.Environment
-import org.springframework.util.StringUtils
-import org.springframework.util.Assert.state
-import org.springframework.beans.factory.config.{BeanDefinition, BeanDefinitionHolder, ConfigurableBeanFactory}
-import scala.collection.mutable.ListBuffer
-import org.springframework.context.annotation.AnnotatedBeanDefinitionReader
-import org.springframework.beans.factory.support._
-import scala.reflect.runtime.universe._
-import scala.reflect.runtime.currentMirror
+import org.springframework.scala.beans.factory.function.{FunctionalRootBeanDefinition, InitDestroyFunctionBeanPostProcessor}
 import org.springframework.scala.util.TypeTagUtils.typeToClass
-import scala.reflect.ClassTag
+import org.springframework.util.Assert.state
+import org.springframework.util.StringUtils
 
 /**
  * Base trait used to declare one or more Spring Beans that may be processed by the Spring
