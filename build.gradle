@@ -58,6 +58,12 @@ dependencies {
   testCompile("org.springframework:spring-aspects:$springVersion")
 }
 
+//Java compiler settings
+tasks.withType(JavaCompile) {
+    //ignore conjunction warning
+    options.compilerArgs << '-Xlint:-options'
+}
+
 tasks.withType(ScalaCompile) {
   scalaCompileOptions.additionalParameters = ["-feature", "-language:implicitConversions", "-language:reflectiveCalls"]
   scalaCompileOptions.useAnt = false
