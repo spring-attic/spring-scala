@@ -11,6 +11,10 @@ apply plugin: 'propdeps-eclipse'
 group 'org.springframework.scala'
 archivesBaseName = "spring-scala_2.11"
 
+//set Java compiler -source and -target options
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
 ext {
   springVersion = '3.2.4.RELEASE'
   scalaVersion = '2.11.2'
@@ -52,6 +56,12 @@ dependencies {
   testRuntime("org.hsqldb:hsqldb-j5:2.2.4")
   testRuntime("log4j:log4j:1.2.16")
   testCompile("org.springframework:spring-aspects:$springVersion")
+}
+
+//Java compiler settings
+tasks.withType(JavaCompile) {
+    //ignore conjunction warning
+    options.compilerArgs << '-Xlint:-options'
 }
 
 tasks.withType(ScalaCompile) {
