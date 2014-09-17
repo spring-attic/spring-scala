@@ -11,6 +11,10 @@ apply plugin: 'propdeps-eclipse'
 group 'org.springframework.scala'
 archivesBaseName = "spring-scala_2.11"
 
+//set Java compiler -source and -target options
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
 ext {
   springVersion = '3.2.4.RELEASE'
   scalaVersion = '2.11.2'
