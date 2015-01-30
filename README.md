@@ -2,6 +2,8 @@
 
 The goal of Spring Scala is to make it easier to use the Spring framework in Scala.
 
+**Note that Spring Scala is currently not maintained by Pivotal, as such there will be no further releases nor bug fixes coming from Pivotal.**
+
 Currently, the two main areas of focus are:
 
 * Wiring up Scala classes as Spring Beans, both in traditional [XML](https://github.com/SpringSource/spring-scala/wiki/Defining-Scala-Beans-in-Spring-XML) as well as [Scala](https://github.com/SpringSource/spring-scala/wiki/Functional-Bean-Configuration)
