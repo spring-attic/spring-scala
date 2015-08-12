@@ -20,9 +20,15 @@ For Maven users:
     ...
     <dependency>
         <groupId>com.github.norru</groupId>
-        <artifactId>spring-scala_2.11</artifactId>
-        <version>1.0.0.RC1</version>
+        <artifactId>spring-scala</artifactId>
+        <version>1.0.0</version>
     </dependency>https://jitpack.io
+    
+For sbt users:
+
+    libraryDependencies ++= Seq(
+		"org.springframework.scala" % "spring-scala"	% "1.0.0",
+	)
     
 ### compile and test, build all jars, distribution zips and docs
 `./sbt publish`
