@@ -2,7 +2,7 @@ organization := "com.github.norru"
 name := "spring-scala"
 version in ThisBuild := "1.0.0-SNAPSHOT"
 
-val springVersion = "3.2.4.RELEASE"
+val springVersion = "3.2.14.RELEASE"
 crossPaths := true
 
 scalaVersion := "2.11.7"
@@ -39,7 +39,7 @@ libraryDependencies ++=	Seq(
 	"org.scala-lang" % "scala-reflect" % scalaVersion.value,
 
 	//needs to be as separate jar file for scala 2.11
-	"org.scala-lang.modules" %% "scala-xml" % "1.0.3",
+	"org.scala-lang.modules" %% "scala-xml" % "1.0.5",
 
 	// Jackson,
 	"com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.4.2" % "optional",
