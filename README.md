@@ -27,7 +27,7 @@ For Maven users:
 For sbt users:
 
     libraryDependencies ++= Seq(
-		"org.springframework.scala" % "spring-scala"	% "1.0.0",
+		"com.github.norru" % "spring-scala"	% "1.0.0",
 	)
     
 ### compile and test, build all jars, distribution zips and docs
