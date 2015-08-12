@@ -20,8 +20,8 @@ For Maven users:
     ...
     <dependency>
         <groupId>com.github.norru</groupId>
-        <artifactId>spring-scala_2.10</artifactId>
-        <version>1.0.0.M1</version>
+        <artifactId>spring-scala_2.11</artifactId>
+        <version>1.0.0.RC1</version>
     </dependency>https://jitpack.io
     
 ### compile and test, build all jars, distribution zips and docs
