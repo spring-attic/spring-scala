@@ -6,6 +6,7 @@ atlassian-ide-plugin.xml
 .settings
 .springBeans
 target
+/bin
 .gradle
 build
 .classpath
@@ -17,5 +18,7 @@ build
 *.iws
 .idea
 out
-/.cache-main
-/.cache-tests
+
+# IVY/Scala flotsam
+.cache-main
+.cache-tests
