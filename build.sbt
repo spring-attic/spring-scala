@@ -7,7 +7,7 @@ crossPaths := true
 
 scalaVersion := "2.11.7"
 javacOptions ++= Seq("-source", "1.7", "-target", "1.7", "-Xlint:-options")
-scalacOptions ++= Seq("-target:jvm-1.7", "-target:jvm-1.7""-feature", "-language:implicitConversions", "-language:reflectiveCalls", "-deprecation")
+scalacOptions ++= Seq("-target:jvm-1.7", "-feature", "-language:implicitConversions", "-language:reflectiveCalls", "-deprecation")
 
 EclipseKeys.withSource := true
 EclipseKeys.eclipseOutput := Some("target")
