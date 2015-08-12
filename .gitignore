@@ -12,6 +12,8 @@ build
 .classpath
 .project
 
+*~
+
 # IDEA metadata and output dirs
 *.iml
 *.ipr

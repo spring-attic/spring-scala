@@ -1,4 +1,4 @@
-**This is not the official build from Pivotal. I have forked the project to ultimately get a stable release for both Scala 2.10 and 2.11**
+**This is not the official build from Pivotal. I have forked the project to ultimately get a stable release for both Scala 2.10 and 2.11** --norru
 
 # Spring Scala
 
