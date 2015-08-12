@@ -6,6 +6,7 @@ val springVersion = "3.2.13.RELEASE"
 crossPaths := true
 
 scalaVersion := "2.11.7"
+
 javacOptions ++= Seq("-source", "1.7", "-target", "1.7", "-Xlint:-options")
 scalacOptions ++= Seq("-target:jvm-1.7", "-feature", "-language:implicitConversions", "-language:reflectiveCalls", "-deprecation")
 
@@ -37,7 +38,7 @@ libraryDependencies ++=	Seq(
 	"org.scala-lang" % "scala-reflect" % scalaVersion.value,
 
 	//needs to be as separate jar file for scala 2.11
-	"org.scala-lang.modules" %% "scala-xml" % "1.0.2",
+	"org.scala-lang.modules" %% "scala-xml" % "1.0.3",
 
 	// Jackson,
 	"com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.4.2" % "optional",
