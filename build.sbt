@@ -1,6 +1,5 @@
 organization := "com.github.norru"
 name := "spring-scala"
-version in ThisBuild := "1.0.0-SNAPSHOT"
 
 val springVersion = "3.2.14.RELEASE"
 crossPaths := true
