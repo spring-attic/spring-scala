@@ -17,3 +17,5 @@ build
 *.iws
 .idea
 out
+/.cache-main
+/.cache-tests
