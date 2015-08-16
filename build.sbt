@@ -29,11 +29,24 @@ resolvers := Seq(
 	"springsource" at "http://repo.springsource.org/libs"
 )
 
+// for Maven Central
+homepage := Some(url("http://itadinanta.github.io"))
+
 pomExtra := (
-  <scm>
-    <url>git@github.com:itadinanta/{name.value}.git</url>
-    <connection>scm:git:git@github.com:itadinanta/{name.value}.git</connection>
-  </scm>
+	<scm>
+    	<url>git@github.com:itadinanta/{name.value}.git</url>
+    	<developerConnection>scm:git:git@github.com:itadinanta/{name.value}.git</developerConnection>
+    	<connection>scm:git:git@github.com:itadinanta/{name.value}.git</connection>
+  	</scm>
+  	
+	<developers>
+	   <developer>
+	      <name>Nico Orru (norru)</name>
+	      <email>nigu.orru@gmail.com</email>
+	      <organization>Itadinanta</organization>
+	      <organizationUrl>http://itadinanta.github.io</organizationUrl>
+	   </developer>
+	</developers>
 )
 
 libraryDependencies ++=	Seq(
