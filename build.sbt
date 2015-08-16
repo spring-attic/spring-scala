@@ -1,15 +1,16 @@
-organization := "com.github.norru"
+organization := "net.itadinanta"
 name := "spring-scala"
 
-val springVersion = "3.2.14.RELEASE"
+// releaseCrossBuild := false
 crossPaths := true
 
+val springVersion = "3.2.14.RELEASE"
 scalaVersion := "2.11.7"
-
 javacOptions ++= Seq("-source", "1.7", "-target", "1.7", "-Xlint:-options")
 scalacOptions ++= Seq("-target:jvm-1.7", "-feature", "-language:implicitConversions", "-language:reflectiveCalls", "-deprecation")
 fork := true
 
+// eclipse
 EclipseKeys.withSource := true
 EclipseKeys.eclipseOutput := Some("target")
 EclipseKeys.withBundledScalaContainers := true
@@ -17,10 +18,22 @@ EclipseKeys.useProjectId := true
 unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: (scalaSource in Compile).value :: Nil
 unmanagedSourceDirectories in Test := (javaSource in Test).value :: (scalaSource in Test).value :: Nil
 
+//bintray
+bintrayOrganization := Some("itadinanta")
+bintrayReleaseOnPublish in ThisBuild := false
+bintrayPackageLabels := Seq("scala", "spring", "unofficial", "scala-2.11")
+
+licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+
 resolvers := Seq(
-	"springsource" at "http://repo.springsource.org/libs",
-	"jitpack" at "https://jitpack.io",
-	"springsource-snapshots" at "http://repo.springsource.org/libs-snapshot"
+	"springsource" at "http://repo.springsource.org/libs"
+)
+
+pomExtra := (
+  <scm>
+    <url>git@github.com:itadinanta/{name.value}.git</url>
+    <connection>scm:git:git@github.com:itadinanta/{name.value}.git</connection>
+  </scm>
 )
 
 libraryDependencies ++=	Seq(
