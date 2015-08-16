@@ -13,9 +13,9 @@ Please refer to the original project's [documentation on the wiki](https://githu
 For Maven users:
 
 	<repository>
-		<id>Bintray</id>
-		<name>Bintray public repository</name>
- 		<url>https://jcenter.bintray.com</url>
+		<id>Itadinanta bintray</id>
+		<name>Bintray itadinanta repository</name>
+ 		<url>https://dl.bintray.com/itadinanta/maven/</url>
 	</repository>
 	...
 	<dependency>
@@ -27,7 +27,7 @@ For Maven users:
 For sbt users:
 
 	libraryDependencies ++= Seq(
-		"itadinanta" %% "spring-scala"	% "1.0.0",
+		"net.itadinanta" %% "spring-scala"	% "1.0.0",
 	)
     
 ### compile and test, build all jars, distribution zips and docs
