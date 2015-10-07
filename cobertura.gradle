@@ -1,0 +1,55 @@
+def coberturaDependency = 'net.sourceforge.cobertura:cobertura:1.9.4.1'
+
+logger.info 'Configuring Cobertura Plugin'
+
+configurations {
+    coberturaRuntime { extendsFrom testRuntime }
+}
+
+dependencies {
+    coberturaRuntime coberturaDependency
+}
+
+def serFile = "${project.buildDir}/cobertura.ser"
+def classes = "${sourceSets.main.output.classesDir}"
+def coberturaClasses = "${classes}-cobertura"
+
+
+task cobertura(type: Test) {
+    dependencies {
+        testRuntime coberturaDependency
+    }
+
+    systemProperties['net.sourceforge.cobertura.datafile'] = serFile
+}
+
+cobertura.doFirst {
+    if (System.getProperty('java.version').startsWith('1.7')) {
+        logger.warn 'Cobertura requires Java version <= 1.6 to work correctly. Skipping Cobertura instrumentation.'
+    } else {
+        logger.quiet 'Instrumenting classes for Cobertura'
+        ant {
+            delete(file: serFile, failonerror: false)
+            delete(dir: coberturaClasses, failonerror: false)
+            copy(todir: coberturaClasses) { fileset(dir: classes) }
+
+            taskdef(resource: 'tasks.properties', classpath: configurations.coberturaRuntime.asPath)
+            'cobertura-instrument'(datafile: serFile) {
+                fileset(dir: classes,
+                        includes: '**/*.class',
+                        excludes: '**/*Test.class')
+            }
+        }
+    }
+}
+
+cobertura.doLast {
+    if (new File(coberturaClasses).exists()) {
+        ant.'cobertura-report'(destdir: "${reporting.baseDir}/cobertura",
+                format: 'html', srcdir: 'src/main/scala', datafile: serFile)
+
+        ant.delete(file: classes)
+        ant.move(file: coberturaClasses, tofile: classes)
+    }
+
+}
