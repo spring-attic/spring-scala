@@ -1,4 +1,14 @@
-**This is not the official build from Pivotal. I have forked the project to ultimately get a stable release for both Scala 2.10 and 2.11** --norru
+Good news! Official development of spring-scala **has resumed full steam** thanks to Paul Snively.
+
+Here's the official repository URL
+
+http://hub.darcs.net/psnively/spring-scala
+
+I no longer need to make unofficial releases :)
+
+I will keep the itadinanta Packages available for historical reasons, please consider these *deprecated*.
+
+-----
 
 # Spring Scala
 
