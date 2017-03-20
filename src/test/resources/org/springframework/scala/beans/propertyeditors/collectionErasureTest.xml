@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="configurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="propertyEditorRegistrars">
+            <bean class="org.springframework.scala.beans.propertyeditors.ScalaEditorRegistrar"/>
+        </property>
+    </bean>
+
+
+
+    <bean id="erasedMapBean1" class="org.springframework.scala.beans.propertyeditors.ErasedMapBean">
+        <constructor-arg name="data">
+            <map>
+                <entry key="FIRST" value="bar"/>
+                <entry key="SECOND" value="bar"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="erasedMapBean2" class="org.springframework.scala.beans.propertyeditors.ErasedMapBean">
+        <constructor-arg name="data">
+            <map key-type="org.springframework.scala.beans.propertyeditors.JavaEnum">
+                <entry key="FIRST" value="bar"/>
+                <entry key="SECOND" value="bar"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="wrongMap" class="org.springframework.scala.beans.propertyeditors.WrongMapBean">
+    <constructor-arg name="data">
+        <map>
+            <entry key="1" value="bar"/>
+            <entry key="2" value="bar"/>
+        </map>
+    </constructor-arg>
+</bean>
+
+</beans>
