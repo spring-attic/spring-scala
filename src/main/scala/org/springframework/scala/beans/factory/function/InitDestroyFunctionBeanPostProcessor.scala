@@ -16,6 +16,8 @@
 
 package org.springframework.scala.beans.factory.function
 
+import java.util.{concurrent => juc}
+
 import scala.beans.BeanProperty
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -41,9 +43,11 @@ import org.springframework.util.{Assert, StringUtils}
 class InitDestroyFunctionBeanPostProcessor
 		extends DestructionAwareBeanPostProcessor with PriorityOrdered {
 
-	val initFunctions = new mutable.HashMap[String, ListBuffer[Function1[Any, Unit]]]
+  import scala.collection.JavaConversions._
 
-	val destroyFunctions = new mutable.HashMap[String, ListBuffer[Function1[Any, Unit]]]
+	val initFunctions: mutable.Map[String,ListBuffer[Function1[Any, Unit]]] = new juc.ConcurrentHashMap[String, ListBuffer[Function1[Any, Unit]]]
+
+	val destroyFunctions: mutable.Map[String,ListBuffer[Function1[Any, Unit]]] = new juc.ConcurrentHashMap[String, ListBuffer[Function1[Any, Unit]]]
 
 	@BeanProperty
 	var order: Int = org.springframework.core.Ordered.LOWEST_PRECEDENCE
@@ -82,7 +86,7 @@ class InitDestroyFunctionBeanPostProcessor
 		addFunction(destroyFunctions, beanName, destroyFunction.asInstanceOf[Function1[Any, Unit]])
 	}
 
-	private def addFunction(functionsMap: mutable.HashMap[String, ListBuffer[Function1[Any, Unit]]],
+	private def addFunction(functionsMap: mutable.Map[String, ListBuffer[Function1[Any, Unit]]],
 	                        beanName: String,
 	                        function: (Any) => Unit) {
 
