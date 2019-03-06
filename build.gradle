@@ -22,7 +22,7 @@ ext {
 }
 
 repositories {
-  maven { url "http://repo.springsource.org/libs-snapshot" }
+  maven { url "https://repo.springsource.org/libs-snapshot" }
 }
 
 dependencies {
@@ -76,7 +76,7 @@ task wrapper(type: Wrapper) {
 
 buildscript {
     repositories {
-        maven { url 'http://repo.springsource.org/plugins-release' }
+        maven { url 'https://repo.springsource.org/plugins-release' }
     }
     dependencies {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
