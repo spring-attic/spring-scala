@@ -1,4 +1,4 @@
-# Spring Scala
+# Spring Scala is no longer actively maintained by VMware, Inc.
 
 The goal of Spring Scala is to make it easier to use the Spring framework in Scala.
 
